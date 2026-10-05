@@ -200,7 +200,8 @@ def build(out, dir_urls=True):
                 dropped_by[iid].append([mid, rate, kind])
         mob_index.append([mid, name, mob.get("Level", 1), mob.get("Hp", 1), mob.get("Race", "Formless"),
                           f"{mob.get('Element', 'Neutral')} {mob.get('ElementLevel', 1)}", mob.get("Size", "Small"),
-                          bt, 1 if mid in spawns else 0])
+                          bt, 1 if mid in spawns else 0, mob.get("BaseExp", 0), mob.get("JobExp", 0),
+                          " ".join(m for m, _ in spawns.get(mid, [])[:12])])
         mob_detail[mid // CHUNK][mid] = {
             "aegis": mob.get("AegisName"),
             "stats": {k: mob.get(k, 0) for k in ("Level", "Hp", "Sp", "BaseExp", "JobExp", "MvpExp", "Attack",
@@ -223,9 +224,16 @@ def build(out, dir_urls=True):
                 r[4] = items[iid].get("Buy") or (items[iid].get("Sell") or 0) * 2
     in_box, box_has = _boxes(items, by_aegis)
     item_index, item_detail = [], defaultdict(dict)
+    job_names = sorted({j for it in items.values() for j in _flags(it.get("Jobs")) if j != "All"})
+    job_pos = {j: i for i, j in enumerate(job_names)}
     for iid, it in sorted(items.items()):
         t = it.get("Type", "Etc")
-        item_index.append([iid, it.get("Name") or it.get("AegisName"), t, it.get("SubType", ""), it.get("Slots", 0)])
+        jobs = _flags(it.get("Jobs"))
+        jobs = "*" if "All" in jobs or (not jobs and t in ("Weapon", "Armor", "ShadowGear")) else ".".join(str(job_pos[j]) for j in jobs if j in job_pos)
+        item_index.append([iid, it.get("Name") or it.get("AegisName"), t, it.get("SubType", ""), it.get("Slots", 0),
+                           it.get("EquipLevelMin", 0), "|".join(_flags(it.get("Locations"))), jobs,
+                           it.get("Attack", 0), it.get("MagicAttack", 0), it.get("Defense", 0),
+                           round((it.get("Weight") or 0) / 10, 1)])
         d = {k: it[k] for k in ("AegisName", "SubType", "Buy", "Sell", "Weight", "Attack", "MagicAttack", "Defense",
                                 "Range", "Slots", "Gender", "WeaponLevel", "ArmorLevel", "EquipLevelMin",
                                 "EquipLevelMax", "Refineable", "Gradable", "View", "Script", "EquipScript",
@@ -307,7 +315,7 @@ def build(out, dir_urls=True):
         dump(f"items/{k}.json", v)
     for k, v in mob_detail.items():
         dump(f"mobs/{k}.json", v)
-    dump("meta.json", {"chunk": CHUNK, "dirUrls": dir_urls, "rates": {k: conf.get(k) for k in conf if k.startswith("item_rate_")}})
+    dump("meta.json", {"chunk": CHUNK, "dirUrls": dir_urls, "itemJobs": job_names, "rates": {k: conf.get(k) for k in conf if k.startswith("item_rate_")}})
     return len(item_index), len(mob_index), len(skill_out), len(jobs)
 
 

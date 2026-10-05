@@ -16,7 +16,7 @@ from rodb import ROOT  # noqa: E402
 
 NPC_START = re.compile(
     r"^(?:(?P<map>[\w@-]+),(?P<x>\d+),(?P<y>\d+),\d+|-|function)\t"
-    r"(?:script|duplicate\([^)]*\)|shop|cashshop|itemshop|pointshop|marketshop)\t(?P<name>[^\t]+)\t"
+    r"(?:script(?:\([^)]*\))?|duplicate\([^)]*\)|shop|cashshop|itemshop|pointshop|marketshop)\t(?P<name>[^\t]+)\t"
 )
 STR_ASSIGN = re.compile(r"""([.'$]?@?\w+\$)\s*(?:=|,)\s*"([^"]+)"\s*[;)]""")
 INSTANCE_CALL = re.compile(r"instance_(create|enter)\s*\(\s*([^,)]+)\s*(?:,\s*([^,)]+))?")
@@ -53,6 +53,17 @@ def official_scripts():
 
     walk("npc/re/scripts_main.conf")
     return [f for f in files if os.path.exists(os.path.join(ROOT, f))]
+
+
+def instance_scripts():
+    """Official scripts plus the official-style ones the server loads from scripts_custom.conf (npc/ep17,
+    npc/custom); Miracle's own npc/miracle scripts are covered by the Content pages."""
+    extra = []
+    for line in _read("npc/scripts_custom.conf").splitlines():
+        m = re.match(r"^npc:\s*(\S.*?)\s*$", line)
+        if m and not m.group(1).startswith("npc/miracle/") and os.path.exists(os.path.join(ROOT, m.group(1))):
+            extra.append(m.group(1))
+    return list(dict.fromkeys(official_scripts() + extra))
 
 
 @functools.lru_cache(None)
@@ -136,7 +147,7 @@ def instances():
     """Official instances the server loads, with entrance and limits read from their scripts."""
     db = instance_db()
     found = {}
-    for rel in official_scripts():
+    for rel in instance_scripts():
         blks = blocks(rel)
         whole = "\n".join(b for _, b in blks)
         literals = [n for n in db if f'"{n}"' in whole]
@@ -385,7 +396,7 @@ def description(rel):
 @functools.lru_cache(None)
 def _files_by_map():
     out = {}
-    for rel in official_scripts():
+    for rel in instance_scripts():
         for hdr, _ in blocks(rel):
             if hdr.group("map"):
                 out.setdefault(hdr.group("map"), [])

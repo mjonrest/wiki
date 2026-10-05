@@ -141,9 +141,35 @@ def fmt(n):
     return f"{int(n):,}"
 
 
+# Pictures are hotlinked from Divine Pride; custom Miracle ids have none, so a failed image removes itself.
+ITEM_ICON = "https://static.divine-pride.net/images/items/item/{}.png"
+MOB_IMAGE = "https://static.divine-pride.net/images/mobs/png/{}.png"
+ENV = None  # set by define_env; ENV.page is the page being rendered
+
+
+def _root():
+    """Relative path from the page being rendered to the docs root."""
+    page = getattr(ENV, "page", None)
+    src = getattr(getattr(page, "file", None), "src_uri", "") or ""
+    return "../" * src.count("/")
+
+
+def _md_text(s):
+    return str(s).replace("[", "\\[").replace("]", "\\]").replace("|", "\\|")
+
+
 def item(iid):
-    """Inline item name with its id."""
-    return f"{item_name(iid)} <small class=\"iid\">#{int(iid)}</small>"
+    """Item icon and name, linked to its Database entry, with its id."""
+    iid = int(iid)
+    icon = f'<img class="ico" src="{ITEM_ICON.format(iid)}" alt="" loading="lazy" onerror="this.remove()">'
+    return f'{icon}[{_md_text(item_name(iid))}]({_root()}db/items.md#{iid}) <small class="iid">#{iid}</small>'
+
+
+def mob(mid, size="sm"):
+    """Monster picture and name, linked to its Database entry."""
+    mid = int(mid)
+    img = f'<img class="mob-{size}" src="{MOB_IMAGE.format(mid)}" alt="" loading="lazy" onerror="this.remove()">'
+    return f'{img}[{_md_text(mob_name(mid))}]({_root()}db/monsters.md#{mid}) <small class="iid">#{mid}</small>'
 
 
 def currency_label(currency):
@@ -443,12 +469,26 @@ def official_instances():
 
 
 def _mob_cell(mid):
-    return f"{official.mob_db()[mid]['name']} <small class=\"iid\">#{mid}</small>"
+    return mob(mid)
 
 
 def _rate(rate):
     pct = int(rate) / 100
     return f"{pct:g}%"
+
+
+@functools.lru_cache(None)
+def _battle_conf():
+    import gen_db
+    return gen_db.battle_conf()
+
+
+def _server_rate(iid, rate, m, mvp_reward):
+    import gen_db
+    from ydb import items as ydb_items
+    bt = "mvp" if m["mvp"] else "boss" if m["cls"] == "Boss" else ""
+    t = ydb_items().get(iid, {}).get("Type", "Etc")
+    return gen_db.drop_rate(_battle_conf(), int(rate), t, bt, mvp_reward=mvp_reward)
 
 
 def _drops_table(mid):
@@ -460,11 +500,12 @@ def _drops_table(mid):
                 continue
             seen.add((aegis, rate, kind))
             iid = item_id(aegis)
-            rows.append([item(iid) if iid else aegis, _rate(rate), kind])
-    return _table(["Item", "Base chance", ""], rows) if rows else "_No drops._"
+            chance = _rate(_server_rate(iid, rate, m, bool(kind))) if iid else _rate(rate)
+            rows.append([item(iid) if iid else aegis, chance, kind])
+    return _table(["Item", "Chance", ""], rows) if rows else "_No drops._"
 
 
-def instance_page(key):
+def instance_page(key, overview_only=False):
     """Full page body for one instance (and its harder variants)."""
     ttl, recs = official.group(key)
     main = recs[0]
@@ -489,6 +530,8 @@ def instance_page(key):
     if len(recs) > 1:
         info.append("- **Modes:** " + ", ".join(official.title(r["name"]) for r in recs))
     out += ["## Overview", "", *info, ""]
+    if overview_only:
+        return "\n".join(out)
 
     d = {"mobs": [], "rewards": OrderedDict(), "shops": []}
     for r in recs:
@@ -505,14 +548,17 @@ def instance_page(key):
     normal = [m for m in d["mobs"] if m not in bosses]
     if bosses:
         out += ["## Bosses", "",
-                "Drop chances are the base rates. Miracle multiplies them by its server drop rates.", ""]
+                "Drop chances include Miracle's drop rates.", ""]
         bosses.sort(key=lambda m: (not db[m]["mvp"], -int(db[m]["hp"] or 0)))
         for mid in bosses:
             m = db[mid]
             kind = "MVP" if m["mvp"] else "Boss"
             stats = (f"{kind} · Level {m['level']} · {fmt(int(m['hp']))} HP · {m['race']} · "
                      f"{m['element']} · {m['size']}")
-            out.append(_details(f"{m['name']} #{mid}", stats + "\n\n" + _drops_table(mid), open_=m["mvp"]))
+            pic = f'<img class="mob-lg" src="{MOB_IMAGE.format(mid)}" alt="" loading="lazy" onerror="this.remove()">'
+            link = f"[Full monster entry]({_root()}db/monsters.md#{mid})"
+            out.append(_details(f"{m['name']} #{mid}", pic + "\n\n" + stats + " · " + link + "\n\n" + _drops_table(mid),
+                                open_=m["mvp"]))
             out.append("")
     if normal:
         out += ["## Monsters", "", _table(["Monster", "Level", "HP", "Race", "Element"],
@@ -592,9 +638,133 @@ def official_instance_count():
     return len(official.instances())
 
 
+# ---------------------------------------------------------------- Endless Tower
+
+def _et_file():
+    for r in official.instances():
+        if r["name"] == "Endless Tower":
+            return r["file"]
+    return None
+
+
+def _nums(text):
+    return [int(n) for n in re.findall(r"-?\d+", re.sub(r"//[^\n]*", "", text))]
+
+
+def endless_tower():
+    """Difficulty modes, floors and rewards of the Endless Tower script the server loads."""
+    rel = _et_file()
+    if not rel:
+        return "_Endless Tower is not loaded on this server._"
+    t = _read(rel)
+    out = []
+
+    # Difficulty modes: the menu gives names and levels, F_Tower_Settings the numbers.
+    menu = re.findall(r'"\[ Level (\d+)\+ \] (?:\^\w{6})?([A-Za-z]+)', t)
+    cfg = {k: _nums(v) for k, v in re.findall(r"setarray \$@(\w+)_mode_variables\s*,([^;]+);", t)}
+    exp = _nums((re.search(r"setarray \$@bonus_exp\[1\]\s*,([^;]+);", t) or [None, ""])[1])
+    pts = _nums((re.search(r"setarray \$@instance_points\[1\]\s*,([^;]+);", t) or [None, ""])[1])
+    summon = t[t.find("F_Tower_Monster_Summon\t{"):]
+    summon = summon[:summon.find("\nfunction\t")]
+    keys = ["easy", "veteran", "nightmare", "hell", "torment"]
+    broken = set(re.findall(r"\.@(\w+)_mode_variables", summon))  # read from an empty local array
+    if menu:
+        rows = []
+        for i, (lv, name) in enumerate(menu):
+            k = keys[i] if i < len(keys) else ""
+            v = cfg.get(k, [0] * 7) + [0] * 7
+            mult = exp[i] if i < len(exp) else 0
+            stats = (f"+{v[0]}%", f"+{v[1]}%", f"{v[2]}%", f"+{v[3]}% / +{v[4]}%", f"+{v[5]}% / +{v[6]}%")
+            if k in broken:
+                stats = ("not applied",) * 5
+            rows.append([f"**{name}**", f"{lv}+", *stats,
+                         f"+{mult}× monster exp" if mult else "normal", pts[i] if i < len(pts) else "—"])
+        out += ["## Difficulty modes", "",
+                "The party leader picks a mode when creating the tower. Every party member must meet its level. "
+                "Monsters get the bonuses below on top of their normal stats.", "",
+                _table(["Mode", "Level", "Monster HP", "Monster damage", "Damage they take", "DEF / MDEF",
+                        "HIT / FLEE", "Bonus exp", "Instance Points"], rows), ""]
+        if broken & set(keys):
+            out += ['!!! warning "Known issue"',
+                    "    " + ", ".join(k.title() for k in keys if k in broken) +
+                    " mode currently spawns monsters without its bonuses, so it plays easier than intended.", ""]
+
+    # Floors.
+    s = t.find("F_Tower_Monster\t{")
+    e = t.find("\nfunction\t", s + 1)
+    body = t[s:e] if s >= 0 else ""
+    parts = re.split(r"\n\s*case (\d+):", body)
+    floors = {}
+    for i in range(1, len(parts), 2):
+        spawns = re.findall(r'"([^"]+)",\s*(\d+),\s*(\d+),\s*\.@label\$', parts[i + 1])
+        if spawns:
+            floors[int(parts[i])] = [(int(mid), int(n)) for _, mid, n in spawns]
+    db = official.mob_db()
+
+    def is_boss(mid):
+        m = db.get(mid)
+        return bool(m and (m["mvp"] or m["cls"] == "Boss"))
+
+    def cell(lst, only=None):
+        merged = OrderedDict()
+        for mid, n in lst:
+            if only is None or only(mid):
+                merged[mid] = merged.get(mid, 0) + n
+        return "<br>".join(f"{mob(mid)} ×{n}" for mid, n in merged.items())
+
+    boss_floors = [(f, l) for f, l in sorted(floors.items()) if any(is_boss(m) for m, _ in l)]
+    if boss_floors:
+        out += ["## Boss floors", "",
+                _table(["Floor", "Boss", "With"], [[f"**{f}F**", cell(l, is_boss), cell(l, lambda m: not is_boss(m)) or "—"]
+                                                   for f, l in boss_floors]), ""]
+    if floors:
+        out += ["## Every floor", "",
+                "Kill everything on a floor to open the gate to the next one. Floors 26, 51 and 76 start new maps.", ""]
+        top = max(floors)
+        for start in range(1, top + 1, 10):
+            rows = [[f"{f}F", cell(floors[f])] for f in range(start, min(start + 9, top) + 1) if f in floors]
+            if rows:
+                out.append(_details(f"Floors {start} to {min(start + 9, top)}", _table(["Floor", "Monsters"], rows)))
+                out.append("")
+
+    # Rewards.
+    rew = []
+    shared = re.search(r'F_PartySharedDrop_Map",\s*[^,]+,\s*(\d+),\s*(\d+),\s*(\d+)', t)
+    if shared:
+        iid, n, ch = map(int, shared.groups())
+        rew.append(f"- **Every monster you kill:** {ch}% chance for each party member to get {n}× {item(iid)} "
+                   "(one per player, extra accounts of the same person don't count).")
+    ash = re.search(r"getitem (\d+),\s*1;\s*//\s*Dark_Ashes", t)
+    if ash:
+        rew.append(f"- **Gates on floors 25, 50 and 75:** 1× {item(int(ash.group(1)))} each time you pass.")
+    m = re.search(r"\.@roll = rand\(1,\s*(\d+)\);(.*?)getitem (\d+), \.@amount;", t, re.S)
+    if m:
+        top, block, iid = int(m.group(1)), m.group(2), int(m.group(3))
+        limits = [int(x) for x in re.findall(r"\.@roll <= (\d+)", block)] + [top]
+        amounts = re.findall(r"\.@amount = rand\((\d+),\s*(\d+)\)", block)
+        rows, prev = [], 0
+        for lim, (a, b) in zip(limits, amounts):
+            rows.append([f"{int(a)} to {int(b)}", f"{(lim - prev) * 100 / top:g}%"])
+            prev = lim
+        rew += [f"- **Clearing the tower** (talk to the Lost Souls after Nacht Sieger): {item(iid)}, amount rolled like this:", "",
+                _table(["Amount", "Chance"], rows), ""]
+    if "F_EarnInstancePoints" in t:
+        rew.append("- **Instance Points** for the mode you cleared (see the table above). Spend them at the "
+                   f"[Instance Point Merchant]({_root()}shops/instance-point-merchant.md).")
+    craft = re.search(r"delitem (\d+),1;[^\n]*\n\s*delitem (\d+),1;[^\n]*\n\s*getitem (\d+),1;", t)
+    if craft:
+        a, b, c = map(int, craft.groups())
+        rew.append(f"- **The Lost Souls** combine {item(a)} and {item(b)} (both dropped by Nacht Sieger) into {item(c)}.")
+    if rew:
+        out += ["## Rewards", "", *rew, ""]
+    return "\n".join(out)
+
+
 def define_env(env):
+    global ENV
+    ENV = env
     for fn in (item, shops_in, items_table, items_list, shop, barter, quest_shop, quest_shop_tabs, slot_enchanter,
                item_enchant, array_seq, event_schedule, costume_drops, npc_directory, npc_where, arrays, scalar,
                fmt, item_name, mob_name, official_instances, official_instance_count,
-               official_npcs, instance_page):
+               official_npcs, instance_page, mob, endless_tower):
         env.macro(fn)
