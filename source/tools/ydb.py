@@ -116,7 +116,7 @@ def load(rel):
     if not os.path.exists(path):
         return {}
     with open(path, encoding="utf-8", errors="replace") as f:
-        return _Parser(f.read()).node() or {}
+        return _Parser(f.read().replace("\ufffd", "")).node() or {}
 
 
 def files(rel):
