@@ -37,6 +37,12 @@ theme:
 extra_css:
   - assets/miracle.css
 
+extra_javascript:
+  - assets/db.js
+
+hooks:
+  - hooks.py
+
 plugins:
   - search
   - macros:
@@ -107,6 +113,12 @@ nav:
       - Costume Drops: content/costume-drops.md
       - PvP & WoE: content/pvp-woe.md
       - Episode Skip: content/episode-skip.md
+  - Database:
+      - db/index.md
+      - Items: db/items.md
+      - Monsters: db/monsters.md
+      - Skills: db/skills.md
+      - Jobs: db/jobs.md
   - Official Content:
       - official/index.md
       - Instances:

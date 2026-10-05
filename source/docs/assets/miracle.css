@@ -10,3 +10,21 @@
 
 /* Key/value tables written with an empty header row: hide that row. */
 .md-typeset table:not([class]) thead:not(:has(th:not(:empty))) { display: none; }
+
+/* Database pages (assets/db.js). */
+.db-bar { display: flex; flex-wrap: wrap; gap: .6rem; margin: 1em 0 .4em; }
+.db-bar input, .db-bar select { font: inherit; font-size: .8rem; padding: .45em .7em; border-radius: .3rem;
+  border: 1px solid var(--md-default-fg-color--lighter); background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
+.db-bar input { flex: 1 1 16rem; min-width: 0; }
+.md-typeset .db-count, .md-typeset .db-loading { color: var(--md-default-fg-color--light); font-size: .75rem; margin: .2em 0; }
+.md-typeset .db-list table { font-size: .74rem; }
+.md-typeset .db-list td:first-child { font-variant-numeric: tabular-nums; color: var(--md-default-fg-color--light); }
+.md-typeset .db-chip { display: inline-block; font-size: .68rem; padding: .05em .5em; margin: .1em 0; border-radius: 1em;
+  background: var(--md-default-fg-color--lightest); white-space: nowrap; }
+.md-typeset .db-chip.db-mvp { background: var(--md-accent-fg-color); color: var(--md-accent-bg-color); font-weight: 700; }
+.md-typeset .db-facts { display: grid; grid-template-columns: max-content 1fr; gap: .35em 1.2em; margin: 1em 0; font-size: .78rem; }
+.md-typeset .db-facts dt { font-weight: 700; color: var(--md-default-fg-color--light); }
+.md-typeset .db-facts dd { margin: 0; min-width: 0; font-variant-numeric: tabular-nums; }
+.md-typeset .db-script { font-size: .72rem; white-space: pre-wrap; }
+.md-typeset .db-script code { white-space: pre-wrap; word-break: break-word; }
+@media (max-width: 30em) { .md-typeset .db-facts { grid-template-columns: 1fr; } .md-typeset .db-facts dd { margin-bottom: .4em; } }

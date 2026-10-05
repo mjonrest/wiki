@@ -42,6 +42,10 @@ server's own scripts.
 
     Hunting Missions, Daily Quests, World Boss, Hell Raid, Mining and the hourly events.
 
+-   :material-database-search: **[Database](db/index.md)**
+
+    Every item, monster, skill and job, with drops, spawn maps, shops and skill trees.
+
 -   :material-castle: **[Official content](official/index.md)**
 
     {{ official_instance_count() }} official instances, the Eden Group, episode quests and official systems.
