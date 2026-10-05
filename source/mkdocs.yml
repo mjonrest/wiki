@@ -1,0 +1,190 @@
+site_name: Miracle RO Wiki
+site_description: Player guide for the Miracle Ragnarok Online server
+site_url: https://miracle-mmo.com/wiki/
+docs_dir: docs
+site_dir: site
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/weather-night
+        name: Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/weather-sunny
+        name: Light mode
+  icon:
+    logo: material/sword-cross
+
+extra_css:
+  - assets/miracle.css
+
+plugins:
+  - search
+  - macros:
+      module_name: main
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
+# Server facts shown on the home page. These come from conf/battle/*.conf in
+# the repository; conf/import/ is not committed, so correct them here if the
+# live server overrides them.
+extra:
+  server:
+    exp_rate: 1000x
+    drop_rate: 1000x (equipment 250x, cards 100x)
+    client: 2026-01-07
+    episode: Episode 20
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - New Players: guide/new-players.md
+      - Currencies & Points: guide/currencies.md
+      - Commands: guide/commands.md
+      - VIP: guide/vip.md
+      - Anti-bot & Fair Play: guide/fair-play.md
+  - Shops:
+      - shops/index.md
+      - Quest Shop: shops/quest-shop.md
+      - Instance Point Merchant: shops/instance-point-merchant.md
+      - World Boss Merchant: shops/world-boss-merchant.md
+      - Master Shadow: shops/master-shadow.md
+      - Card Trader: shops/card-trader.md
+      - Coin Exchanger: shops/coin-exchanger.md
+      - Paradise Merchant: shops/paradise-merchant.md
+      - Ancient Weapon Master: shops/ancient-weapon-master.md
+      - Event Shop (Aston): shops/event-shop.md
+      - Miracle Mall: shops/mall.md
+      - Other Shops: shops/other.md
+  - Enchants:
+      - enchants/index.md
+      - iRO Enchanter: enchants/iro-enchanter.md
+      - Accessory Enchanter (Aulion): enchants/aulion.md
+      - Armor Enchanter (Desmond): enchants/desmond.md
+      - Wing Enchanters: enchants/wing-enchanters.md
+      - Special & Memory Enchanters: enchants/special.md
+  - Content:
+      - Hunting Missions: content/hunting-missions.md
+      - Daily Quests: content/daily-quests.md
+      - Instances: content/instances.md
+      - World Boss: content/world-boss.md
+      - Hell Raid: content/hell-raid.md
+      - Automatic Events: content/events.md
+      - Mining Zone: content/mining.md
+      - Gacha Machines: content/gacha.md
+      - Costume Drops: content/costume-drops.md
+      - PvP & WoE: content/pvp-woe.md
+      - Episode Skip: content/episode-skip.md
+  - Official Content:
+      - official/index.md
+      - Instances:
+          - official/instances/index.md
+          - "2nd OS Search": official/instances/2nd-os-search.md
+          - "Airship Destruction": official/instances/airship-destruction.md
+          - "Assault on the Airship": official/instances/assault-on-the-airship.md
+          - "Bagot Laboratory": official/instances/bagot-laboratory.md
+          - "Bakonawa Lake": official/instances/bakonawa-lake.md
+          - "Bangungot Hospital 2F": official/instances/bangungot-hospital-2f.md
+          - "Buwaya Cave": official/instances/buwaya-cave.md
+          - "Canyon Exploration": official/instances/canyon-exploration.md
+          - "Central Laboratory": official/instances/central-laboratory.md
+          - "Charleston in Distress": official/instances/charleston-in-distress.md
+          - "Confused Snake's Nest": official/instances/confused-snake-s-nest.md
+          - "Cor Memorial": official/instances/cor-memorial.md
+          - "Culvert": official/instances/culvert.md
+          - "Devil's Tower": official/instances/devil-s-tower.md
+          - "Drift Ice Zone": official/instances/drift-ice-zone.md
+          - "Eclage Interior": official/instances/eclage-interior.md
+          - "Edda Bio": official/instances/edda-bio.md
+          - "Endless Tower": official/instances/endless-tower.md
+          - "Faceworm's Nest": official/instances/faceworm-s-nest.md
+          - "Fall of Glast Heim": official/instances/fall-of-glast-heim.md
+          - "Farm Lost in Time": official/instances/farm-lost-in-time.md
+          - "Fenrir and Sarah": official/instances/fenrir-and-sarah.md
+          - "Friday Dungeon": official/instances/friday-dungeon.md
+          - "Geffen Magic Tournament": official/instances/geffen-magic-tournament.md
+          - "Ghost Palace": official/instances/ghost-palace.md
+          - "Glastheim Challenge Mode": official/instances/glastheim-challenge-mode.md
+          - "Half Moon In The Daylight": official/instances/half-moon-in-the-daylight.md
+          - "Hall of Life": official/instances/hall-of-life.md
+          - "Heart Hunter War Base 1": official/instances/heart-hunter-war-base-1.md
+          - "Heart Hunter War Base 2": official/instances/heart-hunter-war-base-2.md
+          - "Hey! Sweety": official/instances/hey-sweety.md
+          - "Hidden Flower Garden": official/instances/hidden-flower-garden.md
+          - "High Priest's Villa": official/instances/high-priest-s-villa.md
+          - "Horror Toy Factory": official/instances/horror-toy-factory.md
+          - "Immortal": official/instances/immortal.md
+          - "Infinite Space": official/instances/infinite-space.md
+          - "Isle of Bios": official/instances/isle-of-bios.md
+          - "Iwin Patrol": official/instances/iwin-patrol.md
+          - "Lake of Fire": official/instances/lake-of-fire.md
+          - "Last Room": official/instances/last-room.md
+          - "Mistwood Maze": official/instances/mistwood-maze.md
+          - "Morse's Cave": official/instances/morse-s-cave.md
+          - "Nidhoggur's Nest": official/instances/nidhoggur-s-nest.md
+          - "Nightmarish Jitterbug": official/instances/nightmarish-jitterbug.md
+          - "Octopus Cave": official/instances/octopus-cave.md
+          - "Old Glast Heim": official/instances/old-glast-heim.md
+          - "Orc's Memory": official/instances/orc-s-memory.md
+          - "OS Occupation": official/instances/os-occupation.md
+          - "Oz Labyrinth": official/instances/oz-labyrinth.md
+          - "Poring Village": official/instances/poring-village.md
+          - "Regenschirm": official/instances/regenschirm.md
+          - "Ritual of Blessing": official/instances/ritual-of-blessing.md
+          - "Room of Consciousness": official/instances/room-of-consciousness.md
+          - "Sanctuary Purification": official/instances/sanctuary-purification.md
+          - "Sara's Memories": official/instances/sara-s-memories.md
+          - "Sealed Catacomb": official/instances/sealed-catacomb.md
+          - "Sealed OS": official/instances/sealed-os.md
+          - "Security Area 1": official/instances/security-area-1.md
+          - "Security Area 2": official/instances/security-area-2.md
+          - "Separated Sanctuary": official/instances/separated-sanctuary.md
+          - "Simulation Battle": official/instances/simulation-battle.md
+          - "Sky Fortress Invasion": official/instances/sky-fortress-invasion.md
+          - "Sticky Sea": official/instances/sticky-sea.md
+          - "Temple of the Demon God": official/instances/temple-of-the-demon-god.md
+          - "Thor Military Base": official/instances/thor-military-base.md
+          - "Twilight Garden": official/instances/twilight-garden.md
+          - "Villa of Deception": official/instances/villa-of-deception.md
+          - "Water Garden": official/instances/water-garden.md
+          - "Wave Mode": official/instances/wave-mode.md
+          - "Weekend Dungeon": official/instances/weekend-dungeon.md
+          - "Werner Laboratory Central Room": official/instances/werner-laboratory-central-room.md
+          - "Wolfchev's Laboratory": official/instances/wolfchev-s-laboratory.md
+          - "Wolves Gathering Place": official/instances/wolves-gathering-place.md
+      - Eden Group: official/eden-group.md
+      - Quests: official/quests.md
+      - Official Systems: official/systems.md
+  - NPC Directory: npcs.md

@@ -1,0 +1,12 @@
+/* Item ids: small and quiet, still searchable. */
+.md-typeset small.iid { color: var(--md-default-fg-color--light); font-size: .7em; margin-left: .15em; white-space: nowrap; }
+
+/* Collapsible shop / enchant lists (Material's details styling, plus an item count). */
+.md-typeset details.shop > summary .count { font-weight: 400; color: var(--md-default-fg-color--light); font-size: .85em; margin-left: .4em; }
+.md-typeset details.shop table:not([class]) { font-size: .72rem; }
+
+/* Home page cards. */
+.md-typeset .grid.cards > ul > li { border-radius: .4rem; }
+
+/* Key/value tables written with an empty header row: hide that row. */
+.md-typeset table:not([class]) thead:not(:has(th:not(:empty))) { display: none; }
