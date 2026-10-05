@@ -24,7 +24,7 @@ def items():
         path = os.path.join(ROOT, rel)
         if not os.path.exists(path):
             continue
-        text = open(path, encoding="utf-8", errors="replace").read()
+        text = open(path, encoding="utf-8", errors="replace").read().replace("\ufffd", "")
         for m in ENTRY.finditer(text):
             iid = int(m.group(1))
             info = by_id.get(iid, {}).copy()
@@ -69,7 +69,7 @@ def mobs():
         path = os.path.join(ROOT, rel)
         if not os.path.exists(path):
             continue
-        text = open(path, encoding="utf-8", errors="replace").read()
+        text = open(path, encoding="utf-8", errors="replace").read().replace("\ufffd", "")
         for m in MOB_ENTRY.finditer(text):
             info = by_id.get(int(m.group(1)), {}).copy()
             for k, v in MOB_FIELD.findall(m.group(2)):

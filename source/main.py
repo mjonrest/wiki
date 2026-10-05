@@ -42,7 +42,7 @@ FLOAT_SHOP = re.compile(r"^-\t(?P<type>shop|cashshop|itemshop|pointshop|marketsh
 
 def _read(rel):
     with open(os.path.join(ROOT, rel), encoding="utf-8", errors="replace") as f:
-        return f.read()
+        return f.read().replace("\ufffd", "")
 
 
 def _strip_comments(text):
