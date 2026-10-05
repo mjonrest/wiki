@@ -18,6 +18,12 @@
     return cache[path];
   }
 
+  var ITEM_ICON = "https://static.divine-pride.net/images/items/item/";
+  var MOB_IMAGE = "https://static.divine-pride.net/images/mobs/png/";
+  function pic(url, cls) {
+    return '<img class="' + cls + '" src="' + url + '" alt="" loading="lazy" onerror="this.remove()">';
+  }
+
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
@@ -32,11 +38,11 @@
   function itemLink(id, names) {
     var it = names && names[id];
     var label = it ? it[1] + (+it[4] ? " [" + it[4] + "]" : "") : "Item " + id;
-    return '<a href="' + page("items") + "#" + id + '">' + esc(label) + '</a> <small class="iid">' + id + "</small>";
+    return pic(ITEM_ICON + id + ".png", "ico") + '<a href="' + page("items") + "#" + id + '">' + esc(label) + '</a> <small class="iid">' + id + "</small>";
   }
   function mobLink(id, names) {
     var m = names && names[id];
-    return '<a href="' + page("monsters") + "#" + id + '">' + esc(m ? m[1] : "Monster " + id) + '</a> <small class="iid">' + id + "</small>";
+    return pic(MOB_IMAGE + id + ".png", "mob-sm") + '<a href="' + page("monsters") + "#" + id + '">' + esc(m ? m[1] : "Monster " + id) + '</a> <small class="iid">' + id + "</small>";
   }
   function skillLink(aegis, skills) {
     var s = skills && skills.byAegis[aegis];
@@ -77,7 +83,7 @@
       index: "items.json",
       filter: function (r) { return r[2]; },
       head: ["Id", "Name", "Type", "Slots"],
-      row: function (r) { return [r[0], '<a href="#' + r[0] + '">' + esc(r[1]) + "</a>", esc(nice(r[2])) + (r[3] ? " <small>" + esc(nice(r[3])) + "</small>" : ""), r[4] || ""]; },
+      row: function (r) { return [r[0], pic(ITEM_ICON + r[0] + ".png", "ico") + '<a href="#' + r[0] + '">' + esc(r[1]) + "</a>", esc(nice(r[2])) + (r[3] ? " <small>" + esc(nice(r[3])) + "</small>" : ""), r[4] || ""]; },
       text: function (r) { return (r[0] + " " + r[1]).toLowerCase(); },
     },
     monsters: {
@@ -86,7 +92,7 @@
       head: ["Id", "Name", "Level", "HP", "Race", "Element", "Size"],
       row: function (r) {
         var tag = r[7] === "mvp" ? ' <span class="db-chip db-mvp">MVP</span>' : r[7] === "boss" ? ' <span class="db-chip">Boss</span>' : "";
-        return [r[0], '<a href="#' + r[0] + '">' + esc(r[1]) + "</a>" + tag, r[2], num(r[3]), esc(r[4]), esc(r[5]), esc(r[6])];
+        return [r[0], pic(MOB_IMAGE + r[0] + ".png", "mob-sm") + '<a href="#' + r[0] + '">' + esc(r[1]) + "</a>" + tag, r[2], num(r[3]), esc(r[4]), esc(r[5]), esc(r[6])];
       },
       text: function (r) { return (r[0] + " " + r[1]).toLowerCase(); },
     },
@@ -155,7 +161,7 @@
     return Promise.all([get("items.json"), get("mobs.json"), get("items/" + Math.floor(id / meta.chunk) + ".json")]).then(function (a) {
       var items = byId(a[0]), mobs = byId(a[1]), d = a[2][id], r = items[id];
       if (!r || !d) { root.innerHTML = back("items") + "<p>No item with id " + esc(id) + ".</p>"; return; }
-      var h = back("items") + "<h2>" + esc(r[1]) + (r[4] ? " [" + r[4] + "]" : "") + ' <small class="iid">' + id + "</small></h2>";
+      var h = back("items") + pic(ITEM_ICON + id + ".png", "db-pic") + "<h2>" + esc(r[1]) + (r[4] ? " [" + r[4] + "]" : "") + ' <small class="iid">' + id + "</small></h2>";
       h += facts([
         ["Type", esc(nice(r[2])) + (d.SubType ? " / " + esc(nice(d.SubType)) : "")],
         ["Aegis name", "<code>" + esc(d.AegisName) + "</code>"],
@@ -202,7 +208,7 @@
       if (!r || !d) { root.innerHTML = back("monsters") + "<p>No monster with id " + esc(id) + ".</p>"; return; }
       var s = d.stats;
       var tag = r[7] === "mvp" ? ' <span class="db-chip db-mvp">MVP</span>' : r[7] === "boss" ? ' <span class="db-chip">Boss</span>' : "";
-      var h = back("monsters") + "<h2>" + esc(r[1]) + ' <small class="iid">' + id + "</small>" + tag + "</h2>";
+      var h = back("monsters") + pic(MOB_IMAGE + id + ".png", "db-pic") + "<h2>" + esc(r[1]) + ' <small class="iid">' + id + "</small>" + tag + "</h2>";
       h += facts([
         ["Level", s.Level], ["HP", num(s.Hp)], ["Base / job exp", num(s.BaseExp) + " / " + num(s.JobExp)],
         ["MVP exp", s.MvpExp ? num(s.MvpExp) : ""],

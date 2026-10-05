@@ -124,6 +124,7 @@ nav:
       - Instances:
           - official/instances/index.md
           - "2nd OS Search": official/instances/2nd-os-search.md
+          - "Airship Crash": official/instances/airship-crash.md
           - "Airship Destruction": official/instances/airship-destruction.md
           - "Assault on the Airship": official/instances/assault-on-the-airship.md
           - "Bagot Laboratory": official/instances/bagot-laboratory.md
@@ -134,6 +135,7 @@ nav:
           - "Central Laboratory": official/instances/central-laboratory.md
           - "Charleston in Distress": official/instances/charleston-in-distress.md
           - "Confused Snake's Nest": official/instances/confused-snake-s-nest.md
+          - "Constellation Tower": official/instances/constellation-tower.md
           - "Cor Memorial": official/instances/cor-memorial.md
           - "Culvert": official/instances/culvert.md
           - "Devil's Tower": official/instances/devil-s-tower.md
@@ -147,6 +149,7 @@ nav:
           - "Fenrir and Sarah": official/instances/fenrir-and-sarah.md
           - "Friday Dungeon": official/instances/friday-dungeon.md
           - "Geffen Magic Tournament": official/instances/geffen-magic-tournament.md
+          - "Geffen Night Arena": official/instances/geffen-night-arena.md
           - "Ghost Palace": official/instances/ghost-palace.md
           - "Glastheim Challenge Mode": official/instances/glastheim-challenge-mode.md
           - "Half Moon In The Daylight": official/instances/half-moon-in-the-daylight.md
@@ -165,6 +168,7 @@ nav:
           - "Last Room": official/instances/last-room.md
           - "Mistwood Maze": official/instances/mistwood-maze.md
           - "Morse's Cave": official/instances/morse-s-cave.md
+          - "Nest of Twigs": official/instances/nest-of-twigs.md
           - "Nidhoggur's Nest": official/instances/nidhoggur-s-nest.md
           - "Nightmarish Jitterbug": official/instances/nightmarish-jitterbug.md
           - "Octopus Cave": official/instances/octopus-cave.md
@@ -187,7 +191,9 @@ nav:
           - "Sky Fortress Invasion": official/instances/sky-fortress-invasion.md
           - "Sticky Sea": official/instances/sticky-sea.md
           - "Temple of the Demon God": official/instances/temple-of-the-demon-god.md
+          - "Thanatos Tower": official/instances/thanatos-tower.md
           - "Thor Military Base": official/instances/thor-military-base.md
+          - "Tomb of Remorse": official/instances/tomb-of-remorse.md
           - "Twilight Garden": official/instances/twilight-garden.md
           - "Villa of Deception": official/instances/villa-of-deception.md
           - "Water Garden": official/instances/water-garden.md
