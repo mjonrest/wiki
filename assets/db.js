@@ -78,76 +78,198 @@
 
   /* ------------------------------------------------------------ list views */
 
+  /* Each list: columns (header, cell, sort key) and filters (select, range or text) suited to its data. */
+  function nameCell(img, href, label, extra) {
+    return img + '<a href="#' + esc(href) + '">' + esc(label) + "</a>" + (extra || "");
+  }
+  function tagOf(bt) {
+    return bt === "mvp" ? ' <span class="db-chip db-mvp">MVP</span>' : bt === "boss" ? ' <span class="db-chip db-boss">Boss</span>' : "";
+  }
+  var ELEM = /^(\w+)/;
+  function elemChip(e) {
+    var base = (ELEM.exec(e) || [, ""])[1];
+    return '<span class="db-chip db-el db-el-' + esc(base.toLowerCase()) + '">' + esc(e) + "</span>";
+  }
+  function itemJobs(r) {
+    if (r[7] === "*") return ["All jobs"];
+    return r[7] ? r[7].split(".").map(function (i) { return meta.itemJobs[+i]; }) : [];
+  }
+  function isMain(j) { return !/^Baby|^Super_Baby/.test(j.job) && !/\d$/.test(j.job); }
+
   var KINDS = {
     items: {
       index: "items.json",
-      filter: function (r) { return r[2]; },
-      head: ["Id", "Name", "Type", "Slots"],
-      row: function (r) { return [r[0], pic(ITEM_ICON + r[0] + ".png", "ico") + '<a href="#' + r[0] + '">' + esc(r[1]) + "</a>", esc(nice(r[2])) + (r[3] ? " <small>" + esc(nice(r[3])) + "</small>" : ""), r[4] || ""]; },
       text: function (r) { return (r[0] + " " + r[1]).toLowerCase(); },
+      filters: [
+        { label: "Type", type: "select", get: function (r) { return r[2]; } },
+        { label: "Sub-type", type: "select", get: function (r) { return r[3]; } },
+        { label: "Equips on", type: "select", get: function (r) { return r[6] ? r[6].split("|") : []; } },
+        { label: "Job", type: "select", get: function (r) { return r[7] === "*" ? meta.itemJobs : itemJobs(r); } },
+        { label: "Slots", type: "select", get: function (r) { return r[2] === "Weapon" || r[2] === "Armor" ? String(r[4] || 0) : ""; } },
+        { label: "Required level", type: "range", get: function (r) { return r[5]; } },
+      ],
+      cols: [
+        { h: "Id", cell: function (r) { return r[0]; }, sort: function (r) { return r[0]; } },
+        { h: "Name", cell: function (r) { return nameCell(pic(ITEM_ICON + r[0] + ".png", "ico"), r[0], r[1] + (r[4] ? " [" + r[4] + "]" : "")); }, sort: function (r) { return r[1]; } },
+        { h: "Type", cell: function (r) { return esc(nice(r[2])) + (r[3] ? " <small>" + esc(nice(r[3])) + "</small>" : ""); }, sort: function (r) { return r[2] + r[3]; } },
+        { h: "Level", cell: function (r) { return r[5] || ""; }, sort: function (r) { return r[5]; } },
+        { h: "ATK", cell: function (r) { return r[8] || ""; }, sort: function (r) { return r[8]; } },
+        { h: "MATK", cell: function (r) { return r[9] || ""; }, sort: function (r) { return r[9]; } },
+        { h: "DEF", cell: function (r) { return r[10] || ""; }, sort: function (r) { return r[10]; } },
+        { h: "Weight", cell: function (r) { return r[11] || ""; }, sort: function (r) { return r[11]; } },
+      ],
     },
     monsters: {
       index: "mobs.json",
-      filter: function (r) { return r[7] === "mvp" ? "MVP" : r[7] === "boss" ? "Boss" : r[4]; },
-      head: ["Id", "Name", "Level", "HP", "Race", "Element", "Size"],
-      row: function (r) {
-        var tag = r[7] === "mvp" ? ' <span class="db-chip db-mvp">MVP</span>' : r[7] === "boss" ? ' <span class="db-chip">Boss</span>' : "";
-        return [r[0], pic(MOB_IMAGE + r[0] + ".png", "mob-sm") + '<a href="#' + r[0] + '">' + esc(r[1]) + "</a>" + tag, r[2], num(r[3]), esc(r[4]), esc(r[5]), esc(r[6])];
-      },
       text: function (r) { return (r[0] + " " + r[1]).toLowerCase(); },
+      filters: [
+        { label: "Class", type: "select", get: function (r) { return r[7] === "mvp" ? "MVP" : r[7] === "boss" ? "Boss" : "Normal"; } },
+        { label: "Race", type: "select", get: function (r) { return r[4]; } },
+        { label: "Element", type: "select", get: function (r) { return (ELEM.exec(r[5]) || [, ""])[1]; } },
+        { label: "Size", type: "select", get: function (r) { return r[6]; } },
+        { label: "Spawns on map", type: "text", get: function (r) { return r[11] || ""; }, placeholder: "e.g. prt_fild08" },
+        { label: "Level", type: "range", get: function (r) { return r[2]; } },
+      ],
+      cols: [
+        { h: "Id", cell: function (r) { return r[0]; }, sort: function (r) { return r[0]; } },
+        { h: "Name", cell: function (r) { return nameCell(pic(MOB_IMAGE + r[0] + ".png", "mob-sm"), r[0], r[1], tagOf(r[7])); }, sort: function (r) { return r[1]; } },
+        { h: "Level", cell: function (r) { return r[2]; }, sort: function (r) { return r[2]; } },
+        { h: "HP", cell: function (r) { return num(r[3]); }, sort: function (r) { return r[3]; } },
+        { h: "Base exp", cell: function (r) { return num(r[9]); }, sort: function (r) { return r[9]; } },
+        { h: "Race", cell: function (r) { return esc(r[4]); }, sort: function (r) { return r[4]; } },
+        { h: "Element", cell: function (r) { return elemChip(r[5]); }, sort: function (r) { return r[5]; } },
+        { h: "Size", cell: function (r) { return esc(r[6]); }, sort: function (r) { return r[6]; } },
+      ],
     },
     skills: {
       index: "skills.json",
-      filter: function (s) { return s.type; },
-      head: ["Id", "Skill", "Max level", "Type", "Learned by"],
-      row: function (s) {
-        return [s.id, '<a href="#' + esc(s.aegis) + '">' + esc(s.name) + "</a> <small>" + esc(s.aegis) + "</small>", s.max, esc(s.type),
-          s.jobs.slice(0, 4).map(function (j) { return esc(nice(j)); }).join(", ") + (s.jobs.length > 4 ? " +" + (s.jobs.length - 4) : "")];
-      },
       text: function (s) { return (s.id + " " + s.name + " " + s.aegis).toLowerCase(); },
+      filters: [
+        { label: "Job", type: "select", get: function (s) { return s.jobs.map(nice); } },
+        { label: "Type", type: "select", get: function (s) { return s.type; } },
+        { label: "Target", type: "select", get: function (s) { return nice(s.target); } },
+        { label: "Element", type: "select", get: function (s) { return typeof s.Element === "string" ? s.Element : ""; } },
+        { label: "Max level", type: "range", get: function (s) { return s.max; } },
+      ],
+      cols: [
+        { h: "Id", cell: function (s) { return s.id; }, sort: function (s) { return s.id; } },
+        { h: "Skill", cell: function (s) { return nameCell("", s.aegis, s.name, " <small>" + esc(s.aegis) + "</small>"); }, sort: function (s) { return s.name; } },
+        { h: "Max level", cell: function (s) { return s.max; }, sort: function (s) { return s.max; } },
+        { h: "Type", cell: function (s) { return esc(s.type); }, sort: function (s) { return s.type; } },
+        { h: "Element", cell: function (s) { return typeof s.Element === "string" ? elemChip(s.Element) : ""; }, sort: function (s) { return typeof s.Element === "string" ? s.Element : ""; } },
+        { h: "Learned by", cell: function (s) { return s.jobs.slice(0, 4).map(function (j) { return esc(nice(j)); }).join(", ") + (s.jobs.length > 4 ? " +" + (s.jobs.length - 4) : ""); }, sort: function (s) { return s.jobs[0] || "~"; } },
+      ],
     },
     jobs: {
       index: "jobs.json",
-      filter: function (j) { return /^Baby|^Super_Baby/.test(j.job) ? "Baby" : /\d$/.test(j.job) ? "Mounted / alternate" : "Main"; },
-      defaultFilter: "Main",
-      head: ["Job", "Inherits from", "Max level", "Skills"],
-      row: function (j) {
-        return ['<a href="#' + esc(j.job) + '">' + esc(nice(j.job)) + "</a>", j.inherit.map(function (x) { return esc(nice(x)); }).join(", "),
-          (j.maxBase || "") + (j.maxJob ? " / " + j.maxJob : ""), j.tree.length];
-      },
       text: function (j) { return j.job.toLowerCase().replace(/_/g, " "); },
+      filters: [
+        { label: "Show", type: "select", def: "Main jobs", get: function (j) { return /^Baby|^Super_Baby/.test(j.job) ? "Baby jobs" : /\d$/.test(j.job) ? "Mounted / alternate" : "Main jobs"; } },
+        { label: "Comes from", type: "select", get: function (j) { return j.inherit.map(nice); } },
+        { label: "Max base level", type: "range", get: function (j) { return j.maxBase || 0; } },
+      ],
+      cols: [
+        { h: "Job", cell: function (j) { return nameCell("", j.job, nice(j.job)); }, sort: function (j) { return j.job; } },
+        { h: "Comes from", cell: function (j) { return j.inherit.map(function (x) { return esc(nice(x)); }).join(", "); }, sort: function (j) { return j.inherit.length; } },
+        { h: "Max level", cell: function (j) { return (j.maxBase || "") + (j.maxJob ? " / " + j.maxJob : ""); }, sort: function (j) { return j.maxBase || 0; } },
+        { h: "Skills", cell: function (j) { return j.tree.length; }, sort: function (j) { return j.tree.length; } },
+      ],
     },
   };
+
+  function asList(v) { return Array.isArray(v) ? v : v === "" || v == null ? [] : [v]; }
 
   function listView(root, kind) {
     var K = KINDS[kind];
     root.innerHTML = '<p class="db-loading">Loading…</p>';
     return get(K.index).then(function (rows) {
-      var groups = {};
-      rows.forEach(function (r) { var g = K.filter(r); if (g) groups[g] = (groups[g] || 0) + 1; });
-      var opts = Object.keys(groups).sort();
-      var state = root._state || (root._state = { q: "", f: K.defaultFilter || "", shown: 100 });
-      root.innerHTML =
-        '<div class="db-bar"><input type="search" class="db-q" placeholder="Search by name or id" aria-label="Search">' +
-        '<select class="db-f" aria-label="Filter"><option value="">All (' + num(rows.length) + ")</option>" +
-        opts.map(function (o) { return '<option value="' + esc(o) + '">' + esc(nice(o)) + " (" + num(groups[o]) + ")</option>"; }).join("") +
-        '</select></div><p class="db-count"></p><div class="db-list"></div><p><button class="md-button db-more">Show more</button></p>';
-      var q = root.querySelector(".db-q"), f = root.querySelector(".db-f");
-      q.value = state.q; f.value = state.f;
+      var state = root._state;
+      if (!state) {
+        state = root._state = { q: "", f: {}, sort: 0, dir: 1, shown: 100 };
+        K.filters.forEach(function (f, i) { if (f.def) state.f[i] = f.def; });
+      }
+      var h = '<div class="db-bar"><input type="search" class="db-q" placeholder="Search by name or id" aria-label="Search"></div>' +
+        '<div class="db-filters">';
+      K.filters.forEach(function (f, i) {
+        h += '<label class="db-filter"><span>' + esc(f.label) + "</span>";
+        if (f.type === "select") {
+          var counts = {};
+          rows.forEach(function (r) { asList(f.get(r)).forEach(function (v) { counts[v] = (counts[v] || 0) + 1; }); });
+          h += '<select data-i="' + i + '"><option value="">Any</option>' + Object.keys(counts).sort(function (a, b) {
+            return isNaN(a) || isNaN(b) ? a.localeCompare(b) : a - b;
+          }).map(function (o) { return '<option value="' + esc(o) + '">' + esc(nice(o)) + " (" + num(counts[o]) + ")</option>"; }).join("") + "</select>";
+        } else if (f.type === "range") {
+          h += '<span class="db-range"><input type="number" inputmode="numeric" data-i="' + i + '" data-end="min" placeholder="min" aria-label="' + esc(f.label) + ' from">' +
+            '<span>to</span><input type="number" inputmode="numeric" data-i="' + i + '" data-end="max" placeholder="max" aria-label="' + esc(f.label) + ' to"></span>';
+        } else {
+          h += '<input type="search" data-i="' + i + '" placeholder="' + esc(f.placeholder || "") + '">';
+        }
+        h += "</label>";
+      });
+      h += '<button type="button" class="db-reset">Clear filters</button></div>' +
+        '<p class="db-count"></p><div class="db-list"></div><p><button class="md-button db-more">Show more</button></p>';
+      root.innerHTML = h;
+
+      var q = root.querySelector(".db-q");
+      q.value = state.q;
+      root.querySelectorAll("[data-i]").forEach(function (el) {
+        var i = +el.getAttribute("data-i"), end = el.getAttribute("data-end"), v = state.f[i];
+        el.value = end ? (v && v[end] != null ? v[end] : "") : (v || "");
+      });
+
+      function matches(r) {
+        for (var i = 0; i < K.filters.length; i++) {
+          var f = K.filters[i], want = state.f[i];
+          if (want == null || want === "") continue;
+          var v = f.get(r);
+          if (f.type === "select") { if (asList(v).indexOf(want) < 0) return false; }
+          else if (f.type === "range") {
+            if (want.min != null && want.min !== "" && !(v >= +want.min)) return false;
+            if (want.max != null && want.max !== "" && !(v <= +want.max)) return false;
+          } else if (String(v).toLowerCase().indexOf(want.toLowerCase()) < 0) return false;
+        }
+        return true;
+      }
       function draw() {
         var words = state.q.toLowerCase().split(/\s+/).filter(Boolean);
         var hits = rows.filter(function (r) {
-          if (state.f && K.filter(r) !== state.f) return false;
           var t = K.text(r);
-          return words.every(function (w) { return t.indexOf(w) >= 0; });
+          return words.every(function (w) { return t.indexOf(w) >= 0; }) && matches(r);
+        });
+        var key = K.cols[state.sort].sort, dir = state.dir;
+        hits.sort(function (a, b) {
+          var x = key(a), y = key(b);
+          return (typeof x === "string" ? x.localeCompare(y) : x - y) * dir;
         });
         root.querySelector(".db-count").textContent = num(hits.length) + " found";
-        root.querySelector(".db-list").innerHTML = table(K.head, hits.slice(0, state.shown).map(K.row));
+        var head = K.cols.map(function (c, i) {
+          return '<button type="button" class="db-sort' + (i === state.sort ? " on" : "") + '" data-col="' + i + '">' + c.h +
+            (i === state.sort ? (dir > 0 ? " ▲" : " ▼") : "") + "</button>";
+        });
+        root.querySelector(".db-list").innerHTML = table(head, hits.slice(0, state.shown).map(function (r) {
+          return K.cols.map(function (c) { return c.cell(r); });
+        }));
         root.querySelector(".db-more").style.display = hits.length > state.shown ? "" : "none";
       }
       var t;
       q.addEventListener("input", function () { clearTimeout(t); t = setTimeout(function () { state.q = q.value; state.shown = 100; draw(); }, 120); });
-      f.addEventListener("change", function () { state.f = f.value; state.shown = 100; draw(); });
+      root.querySelector(".db-filters").addEventListener("input", function (e) {
+        var el = e.target, i = el.getAttribute("data-i");
+        if (i == null) return;
+        var end = el.getAttribute("data-end");
+        if (end) { state.f[i] = state.f[i] || {}; state.f[i][end] = el.value; } else state.f[i] = el.value;
+        clearTimeout(t); t = setTimeout(function () { state.shown = 100; draw(); }, 120);
+      });
+      root.querySelector(".db-reset").addEventListener("click", function () {
+        root._state = null; listView(root, kind);
+      });
+      root.querySelector(".db-list").addEventListener("click", function (e) {
+        var b = e.target.closest && e.target.closest(".db-sort");
+        if (!b) return;
+        var c = +b.getAttribute("data-col");
+        if (c === state.sort) state.dir = -state.dir; else { state.sort = c; state.dir = c === 0 || c === 1 ? 1 : -1; }
+        draw();
+      });
       root.querySelector(".db-more").addEventListener("click", function () { state.shown += 200; draw(); });
       draw();
     });
@@ -216,7 +338,7 @@
         ["Def / MDef", num(s.Defense) + " / " + num(s.MagicDefense)],
         ["Res / MRes", s.Resistance || s.MagicResistance ? num(s.Resistance) + " / " + num(s.MagicResistance) : ""],
         ["Race", esc(r[4]) + (d.racegroups.length ? " <small>(" + esc(d.racegroups.map(nice).join(", ")) + ")</small>" : "")],
-        ["Element", esc(r[5])], ["Size", esc(r[6])],
+        ["Element", elemChip(r[5])], ["Size", esc(r[6])],
         ["Stats", ["Str", "Agi", "Vit", "Int", "Dex", "Luk"].map(function (k) { return k.toUpperCase() + " " + s[k]; }).join(" · ")],
         ["Attack range", s.AttackRange], ["Walk speed", s.WalkSpeed], ["Attack delay", s.AttackDelay ? s.AttackDelay + " ms" : ""],
         ["Behaviour", d.modes.filter(function (m) { return m !== "Mvp"; }).length ? chips(d.modes.filter(function (m) { return m !== "Mvp"; })) : ""], ["Aegis name", "<code>" + esc(d.aegis) + "</code>"],
