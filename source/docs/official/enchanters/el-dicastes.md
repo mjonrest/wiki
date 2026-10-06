@@ -28,10 +28,9 @@ Each upgrade step adds one random enchant. The steps always go in the same order
 Your progress is saved **on your character**, not on the item. Every step takes the item from your inventory
 and gives you a new one with all the enchants you have rolled so far.
 
-!!! warning "Known issue: carry only one copy"
-    The NPC takes whichever copy of the item it finds first, preferring a plain one, and builds the new item
-    from your character's record. If you carry more than one copy, a different copy than the one you meant
-    can be used. Keep exactly one copy of the item with you while upgrading.
+!!! note "Carry exactly one copy"
+    The NPC builds the new item from your character's record, not from the item itself, so it can't tell copies
+    apart. If you carry more than one copy of the item, it refuses to upgrade until you put the extras away.
 
 ## 1st upgrade (slot 4)
 

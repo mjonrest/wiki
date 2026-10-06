@@ -131,11 +131,6 @@ Every enchant above (except the top level) can be raised one level at a time. Up
 
 Both always succeed. A reroll can land on the same enchant you already had.
 
-!!! warning "Known issue: Reroll Slot 4 with a spare copy"
-    **Reroll Slot 4** looks for the armor by item ID instead of taking the one you are wearing. If you carry a
-    second copy of the same Nebula armor, the NPC can use up that copy instead. Keep only the armor you are
-    rerolling in your inventory.
-
 ## Signets of Star (Azzam the Lucky #2)
 
 **Where:** `/navi grademk 45/185`
@@ -148,10 +143,6 @@ Wear the signet in either accessory slot. If you wear two, the NPC asks which on
 {{ item(490137) }}
 
 The signet goes back to your inventory unequipped after every change.
-
-!!! warning "Known issue: identical signets"
-    The NPC takes the signet out of your inventory by item ID. If you carry or wear **two copies of the same
-    signet**, it may change the other copy. Keep only one copy of that signet on you while enchanting.
 
 ### Slot 3 and Slot 4 (random)
 

@@ -10,7 +10,7 @@ upgrades the Eden weapons.
 
 Both work on the item in your **inventory**. Each upgrade takes the item and gives you a new one, so the
 new item is always **+0** and any card in it is **lost**. Carry only one copy of the item you want to
-upgrade.
+upgrade: BK refuses if you carry two of the same weapon, and Thorn may take the other copy.
 
 ## Blacksmith Thorn
 

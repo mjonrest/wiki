@@ -15,13 +15,8 @@ The Thanatos Tower lobby has enchanters for the Good and Evil gear:
 
 The Boots Enchanter next to them has its own page: [Boots of Good and Evil](good-and-evil-boots.md).
 
-Every step on the headgear and weapon enchanters always succeeds. Refine, the first two slots and the enchant
+Every step on the headgear and weapon enchanters always succeeds. Refine, the first two slots, random options and the enchant
 grade are kept.
-
-!!! warning "Known issue: carry only one copy"
-    All of these NPCs take the item out of your inventory by item ID, not the one you are wearing. If you also
-    carry another copy of the **same** item, that copy can be used up instead while your worn item stays as it
-    was. Keep only the item you are enchanting on you.
 
 ## Materials
 
