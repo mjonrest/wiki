@@ -1,6 +1,6 @@
 # Database
 
-Look up any item, monster, skill, NPC or job on Miracle. Everything here is read from the server's own databases when
+Look up any item, monster, skill, NPC, enchant or job on Miracle. Everything here is read from the server's own databases when
 the wiki is built, including Miracle's custom items, monsters and jobs, so it matches the game.
 
 <div class="grid cards" markdown>
@@ -20,6 +20,10 @@ the wiki is built, including Miracle's custom items, monsters and jobs, so it ma
 -   :material-storefront: **[NPCs](npcs.md)**
 
     Where every NPC stands, what it sells or trades, which items it gives or takes, its menu and its quests.
+
+-   :material-auto-fix: **[Enchants](enchants.md)**
+
+    Enchant systems opened by NPCs and Laphine synthesis and upgrades: costs, enchant chances and rewards.
 
 -   :material-account-group: **[Jobs](jobs.md)**
 

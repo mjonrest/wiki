@@ -119,6 +119,7 @@ nav:
       - Monsters: db/monsters.md
       - Skills: db/skills.md
       - NPCs: db/npcs.md
+      - Enchants: db/enchants.md
       - Jobs: db/jobs.md
   - Official Content:
       - official/index.md

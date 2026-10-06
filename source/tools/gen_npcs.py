@@ -17,6 +17,7 @@ TAKE = re.compile(r"\b(?:delitem|delitem2)\s*\(?\s*(\d+|[A-Za-z_]\w*)\s*[,)]")
 WARP = re.compile(r"\bwarp\s*\(?\s*\"([\w@-]+)\"")
 INSTANCE = re.compile(r"\binstance_create\s*\(\s*\"([^\"]+)\"")
 QUEST = re.compile(r"\bsetquest\s*\(?\s*(\d+)")
+ENCHANT_UI = re.compile(r"\bitem_enchant\s*\(?\s*(\d+)")
 CALLSHOP = re.compile(r"\bcallshop\s*\(?\s*\"([^\"]+)\"")
 SELECT = re.compile(r"\b(?:select|prompt)\s*\(([^;]*)\)")
 MENU = re.compile(r"\bmenu\s+(\"[^;]*);")
@@ -126,7 +127,8 @@ def guide_pages(docs_dir):
 
 
 def build(items, by_aegis, docs_dir=None):
-    """(index rows, {id: detail}, {item id: [shop rows]}, {item id: [npc ids that give it]})."""
+    """(index rows, {id: detail}, {item id: [shop rows]}, {item id: [npc ids that give it]},
+    {enchant system id: [npc ids that open it]})."""
     import main
     import official
 
@@ -201,6 +203,7 @@ def build(items, by_aegis, docs_dir=None):
                          ("gives", _items(GIVE, body, by_aegis, items)), ("takes", _items(TAKE, body, by_aegis, items)),
                          ("warps", list(dict.fromkeys(w for w in WARP.findall(body) if w not in ("SavePoint", "Random")))[:20]),
                          ("instances", list(dict.fromkeys(INSTANCE.findall(body)))),
+                         ("enchants", [int(e) for e in dict.fromkeys(ENCHANT_UI.findall(body))]),
                          ("quests", [[int(q), quests.get(int(q), {}).get("Title", "")] for q in dict.fromkeys(QUEST.findall(body))][:30])):
                 if v:
                     n[k] = v
@@ -227,9 +230,9 @@ def build(items, by_aegis, docs_dir=None):
         if n["file"].startswith(("npc/miracle/", "npc/custom/")) and n["name"] in pages:
             n["page"] = pages[n["name"]]
     index, detail = [], {}
-    sold_by, given_by = defaultdict(list), defaultdict(list)
+    sold_by, given_by, enchanters = defaultdict(list), defaultdict(list), defaultdict(list)
     for nid, n in enumerate(sorted(npcs.values(), key=lambda n: (n["name"].lower(), n["locs"][0])), 1):
-        kinds = [k for k, f in (("Shop", "sells"), ("Barter", "barter"), ("Quest", "quests"), ("Instance", "instances"),
+        kinds = [k for k, f in (("Shop", "sells"), ("Barter", "barter"), ("Quest", "quests"), ("Instance", "instances"), ("Enchanter", "enchants"),
                                 ("Warper", "warps"), ("Gives items", "gives")) if n.get(f)]
         group = "Miracle" if n["file"].startswith(("npc/miracle/", "npc/custom/")) else "Official"
         m, x, y = n["locs"][0]
@@ -241,4 +244,6 @@ def build(items, by_aegis, docs_dir=None):
             sold_by[iid].append([n["name"], m, x, y, 0, {"barter": cost}, nid])
         for iid in n.get("gives", []):
             given_by[iid].append(nid)
-    return index, detail, sold_by, given_by
+        for e in n.get("enchants", []):
+            enchanters[e].append(nid)
+    return index, detail, sold_by, given_by, enchanters

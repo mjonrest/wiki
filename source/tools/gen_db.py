@@ -15,6 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import ydb  # noqa: E402
 import gen_npcs  # noqa: E402
+import gen_enchants  # noqa: E402
 from rodb import ROOT  # noqa: E402
 
 CHUNK = 1000  # detail files hold the ids id//CHUNK*CHUNK .. +CHUNK-1
@@ -117,7 +118,7 @@ def _boxes(items, item_by_aegis):
                 chance = None if sub.get("SubGroup") == 0 or not total else round(rate * 100 / total, 2)
                 rows.append([item_by_aegis[e["Item"]], chance, e.get("Amount", 1)])
         contents[str(gname).upper()] = rows
-    in_box, box_has = defaultdict(list), {}
+    in_box, box_has = defaultdict(list), {"_groups": contents}
     for iid, it in items.items():
         names = re.findall(r"\bIG_(\w+)", str(it.get("Script") or ""))
         rows = [r for n in dict.fromkeys(names) for r in contents.get(n.upper(), [])]
@@ -175,8 +176,14 @@ def build(out, dir_urls=True):
 
     # Items.
     docs = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "docs")
-    npc_index, npc_detail, shops, given_by = gen_npcs.build(items, by_aegis, docs)
+    npc_index, npc_detail, shops, given_by, enchanters = gen_npcs.build(items, by_aegis, docs)
     in_box, box_has = _boxes(items, by_aegis)
+    groups = box_has.pop("_groups")
+    ench_rows, ench_detail, ench_roles = gen_enchants.build(by_aegis, groups, enchanters, set(shops) | set(given_by))
+    for r in ench_rows:  # [key, type, item id, item name, count, minimum refine]
+        it = items.get(r[2]) or {}
+        r[3:3] = [it.get("Name") or it.get("AegisName") or ""]
+        del r[6:]
     item_index, item_detail = [], defaultdict(dict)
     job_names = sorted({j for it in items.values() for j in _flags(it.get("Jobs")) if j != "All"})
     job_pos = {j: i for i, j in enumerate(job_names)}
@@ -197,7 +204,7 @@ def build(out, dir_urls=True):
                 d[k] = _flags(it.get(k))
         for k, v in (("drops", sorted(dropped_by.get(iid, []), key=lambda x: -x[1])[:80]),
                      ("shops", shops.get(iid, [])[:60]), ("givenBy", given_by.get(iid, [])[:40]), ("boxes", in_box.get(iid, [])[:60]),
-                     ("contains", box_has.get(iid))):
+                     ("contains", box_has.get(iid)), ("enchant", ench_roles.get(iid))):
             if v:
                 d[k] = v
         item_detail[iid // CHUNK][iid] = d
@@ -271,6 +278,8 @@ def build(out, dir_urls=True):
     for k, v in mob_detail.items():
         dump(f"mobs/{k}.json", v)
     dump("npcs.json", npc_index)
+    dump("enchants.json", ench_rows)
+    dump("enchants_detail.json", ench_detail)
     npc_chunks = defaultdict(dict)
     for nid, d in npc_detail.items():
         npc_chunks[nid // CHUNK][nid] = d

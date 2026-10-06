@@ -189,6 +189,21 @@
         { h: "Content", cell: function (r) { return esc(r[7]); }, sort: function (r) { return r[7]; } },
       ],
     },
+    enchants: {
+      index: "enchants.json",
+      searchHint: "Item name, e.g. Gray Wolf Suits or Shadow Mix Recipe",
+      text: function (r) { return (r[2] + " " + r[3] + " " + r[1]).toLowerCase(); },
+      filters: [
+        { label: "Kind", type: "select", get: function (r) { return r[1]; } },
+        { label: "Minimum refine", type: "range", get: function (r) { return r[5]; } },
+      ],
+      cols: [
+        { h: "For", cell: function (r) { return nameCell(pic("items", r[2], "ico"), r[0], r[3], r[1] === "Enchant" && r[4] > 1 ? " <small>+" + (r[4] - 1) + " more items</small>" : ""); }, sort: function (r) { return r[3]; } },
+        { h: "Kind", cell: function (r) { return '<span class="db-chip">' + esc(r[1]) + "</span>"; }, sort: function (r) { return r[1]; } },
+        { h: "Items", cell: function (r) { return r[4]; }, sort: function (r) { return r[4]; } },
+        { h: "Min. refine", cell: function (r) { return r[5] ? "+" + r[5] : ""; }, sort: function (r) { return r[5]; } },
+      ],
+    },
     jobs: {
       index: "jobs.json",
       searchHint: "Job name, e.g. Arch Bishop",
@@ -312,7 +327,7 @@
 
   /* ------------------------------------------------------------ detail views */
 
-  function back(kind) { return '<p><a href="#" class="db-back">← All ' + (kind === "npcs" ? "NPCs" : kind) + "</a></p>"; }
+  function back(kind) { return '<p><a href="#" class="db-back">← All ' + (kind === "npcs" ? "NPCs" : kind === "enchants" ? "enchants" : kind) + "</a></p>"; }
 
   function itemView(root, id) {
     return Promise.all([get("items.json"), get("mobs.json"), get("items/" + Math.floor(id / meta.chunk) + ".json"), get("npcs.json")]).then(function (a) {
@@ -355,6 +370,13 @@
       }));
       if (d.givenBy) h += "<h3>Given by NPC</h3><p><small>These NPCs hand out this item, for example as a quest reward or exchange.</small></p>" +
         table(["NPC", "Where"], d.givenBy.map(function (n) { var x = npcs[n]; return [npcLink(n, npcs), x ? where(x[2], x[3], x[4]) : ""]; }));
+      if (d.enchant) {
+        var e = d.enchant, link = function (k) { return '<a href="' + page("enchants") + "#" + k + '">' + (k[0] === "E" ? "Enchant system " + k.slice(1) : itemLabel(+k.slice(1))) + "</a>"; };
+        var itemLabel = function (i) { var x = items[i]; return esc(x ? x[1] : "Item " + i); };
+        var parts = [["enchantTarget", "Can be enchanted with"], ["enchantResult", "Is an enchant from"], ["laphineItem", "Opens Laphine"],
+          ["laphineReq", "Used as material in"], ["laphineReward", "Comes out of Laphine"], ["laphineTarget", "Can be upgraded with"]];
+        h += "<h3>Enchanting</h3>" + facts(parts.map(function (p) { return [p[1], e[p[0]] ? e[p[0]].map(link).join(", ") : ""]; }));
+      }
       if (d.boxes) h += "<h3>Found in</h3>" + table(["Box", "Chance"], d.boxes.map(function (b) { return [itemLink(b[0], items), b[1] == null ? "always" : b[1] + "%"]; }));
       if (d.contains) h += "<h3>Contents</h3>" + table(["Item", "Amount", "Chance"], d.contains.map(function (b) { return [itemLink(b[0], items), b[2], b[1] == null ? "always" : b[1] + "%"]; }));
       root.innerHTML = h;
@@ -444,8 +466,67 @@
       if (d.gives) h += "<h3>Gives</h3><p><small>Items this NPC's script can hand out.</small></p>" + table(["Item"], d.gives.map(function (i) { return [itemLink(i, items)]; }));
       if (d.takes) h += "<h3>Takes</h3><p><small>Items this NPC's script can take from you.</small></p>" + table(["Item"], d.takes.map(function (i) { return [itemLink(i, items)]; }));
       if (d.quests) h += "<h3>Quests</h3>" + table(["Quest", "Id"], d.quests.map(function (q) { return [esc(q[1] || "Quest"), q[0]]; }));
+      if (d.enchants) h += "<h3>Enchanting</h3><p>" + d.enchants.map(function (e) { return '<a href="' + page("enchants") + "#E" + e + '">Enchant system ' + e + "</a>"; }).join(", ") + "</p>";
       if (d.instances) h += "<h3>Instances</h3><p>" + chips(d.instances) + "</p>";
       if (d.warps) h += "<h3>Can warp you to</h3><p>" + d.warps.map(function (m) { return "<code>" + esc(m) + "</code>"; }).join(" ") + "</p>";
+      root.innerHTML = h;
+    });
+  }
+
+  function costs(price, mats, items) {
+    var out = (mats || []).map(function (m) { return m[1] + " × " + itemLink(m[0], items); });
+    if (price) out.push(num(price) + " z");
+    return out.join("<br>") || "free";
+  }
+  function enchantView(root, key) {
+    return Promise.all([get("enchants_detail.json"), get("items.json"), get("npcs.json")]).then(function (a) {
+      var d = a[0][key], items = byId(a[1]), npcs = byId(a[2]);
+      if (!d) { root.innerHTML = back("enchants") + "<p>No enchant entry " + esc(key) + ".</p>"; return; }
+      var h = back("enchants");
+      var refine = function (lo, hi) { return lo || hi != null ? "+" + (lo || 0) + (hi != null ? " to +" + hi : " or higher") : ""; };
+      if (key[0] === "E") {
+        h += "<h2>Enchant system " + esc(key.slice(1)) + "</h2>";
+        h += facts([
+          ["Opened by", d.npcs.map(function (n) { var x = npcs[n]; return npcLink(n, npcs) + (x ? " " + where(x[2], x[3], x[4]) : ""); }).join("<br>")],
+          ["Needs refine", d.minRefine ? "+" + d.minRefine + " or higher" : ""], ["Needs enchant grade", d.minGrade || ""],
+          ["Slot order", d.order.length ? d.order.map(function (o) { return "slot " + o; }).join(" → ") : ""],
+          ["Reset", d.reset ? (d.reset[0] / 1000) + "% success, costs " + costs(d.reset[1], d.reset[2], items) : "not possible"],
+        ]);
+        h += "<h3>Items you can enchant</h3>" + table(["Item"], d.targets.map(function (t) { return [itemLink(t, items)]; }));
+        d.slots.forEach(function (sl) {
+          h += "<h3>Slot " + sl.slot + "</h3>" + facts([["Cost per try", costs(sl.price, sl.mats, items)], ["Success", sl.chance / 1000 + "%"],
+            ["Grade bonus", sl.bonus.length ? sl.bonus.map(function (b) { return "grade " + b[0] + ": +" + b[1] / 1000 + "%"; }).join(", ") : ""]]);
+          sl.grades.forEach(function (g) {
+            var total = g[1].reduce(function (t, x) { return t + x[1]; }, 0);
+            h += (sl.grades.length > 1 ? "<h4>Enchant grade " + g[0] + "</h4>" : "") + table(["Enchant", "Chance"], g[1].map(function (x) {
+              return [itemLink(x[0], items), total ? +(x[1] * 100 / total).toFixed(2) + "%" : ""];
+            }));
+          });
+          if (sl.perfect.length) h += "<h4>Perfect enchant (pick one, always succeeds)</h4>" + table(["Enchant", "Cost"], sl.perfect.map(function (p) { return [itemLink(p[0], items), costs(p[1], p[2], items)]; }));
+          if (sl.upgrades.length) h += "<h4>Upgrades</h4>" + table(["From", "To", "Cost"], sl.upgrades.map(function (u) { return [itemLink(u[0], items), itemLink(u[1], items), costs(u[2], u[3], items)]; }));
+        });
+      } else if (key[0] === "S") {
+        h += pic("items", d.item, "db-pic") + "<h2>Laphine synthesis: " + esc((items[d.item] || [, "Item " + d.item])[1]) + "</h2>";
+        h += "<p>Use " + itemLink(d.item, items) + " and hand in <b>" + d.count + "</b> of the items below" +
+          (d.minRefine || d.maxRefine != null ? ", refined " + refine(d.minRefine, d.maxRefine) : "") + ". You get one item from the reward list.</p>";
+        h += "<h3>Accepted items</h3>" + table(["Item", "Amount"], d.reqs.map(function (r) { return [itemLink(r[0], items), r[1]]; }));
+        if (d.rewards.length) h += "<h3>Rewards</h3>" + table(["Item", "Amount", "Chance"], d.rewards.map(function (r) { return [itemLink(r[0], items), r[2], r[1] == null ? "always" : r[1] + "%"]; }));
+      } else {
+        h += pic("items", d.item, "db-pic") + "<h2>Laphine upgrade: " + esc((items[d.item] || [, "Item " + d.item])[1]) + "</h2>";
+        h += facts([
+          ["Use", itemLink(d.item, items)],
+          ["Item must be refined", refine(d.minRefine, d.maxRefine)],
+          ["Refine afterwards", d.resultRefine != null ? "+" + d.resultRefine : d.resultMin != null ? "+" + d.resultMin + " to +" + d.resultMax : "unchanged"],
+          ["Needs random options", d.needOptions || ""], ["Cards", d.cards ? "kept" : "not allowed"],
+        ]);
+        if (d.options && d.options.length) h += "<h3>Random options added</h3>" + d.options.map(function (slot, i) {
+          var total = slot.reduce(function (t, o) { return t + o[3]; }, 0);
+          return "<h4>Option " + (i + 1) + "</h4>" + table(["Option", "Value", "Chance"], slot.map(function (o) {
+            return [esc(o[0]), o[1] === o[2] ? o[1] : o[1] + " ~ " + o[2], total ? +(o[3] * 100 / total).toFixed(2) + "%" : ""];
+          }));
+        }).join("");
+        h += "<h3>Items you can upgrade</h3>" + table(["Item"], d.targets.map(function (t) { return [itemLink(t, items)]; }));
+      }
       root.innerHTML = h;
     });
   }
@@ -470,7 +551,7 @@
     });
   }
 
-  var DETAIL = { items: itemView, monsters: mobView, skills: skillView, npcs: npcView, jobs: jobView };
+  var DETAIL = { items: itemView, monsters: mobView, skills: skillView, npcs: npcView, enchants: enchantView, jobs: jobView };
 
   function route(root, kind) {
     var key = decodeURIComponent(location.hash.slice(1));
