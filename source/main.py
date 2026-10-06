@@ -141,12 +141,6 @@ def fmt(n):
     return f"{int(n):,}"
 
 
-# Pictures are hotlinked from Divine Pride; custom Miracle ids have none, so a failed image removes itself.
-REMOTE_PIC = {"items": "https://static.divine-pride.net/images/items/item/{}.png",
-              "mobs": "https://static.divine-pride.net/images/mobs/png/{}.png"}
-_PIC_ERR = "var a=this.getAttribute('data-alt');if(a){this.removeAttribute('data-alt');this.src=a}else this.remove()"
-
-
 def _site_root():
     """Relative path from the rendered page's URL to the site root (raw HTML is not rewritten by MkDocs)."""
     page = getattr(ENV, "page", None)
@@ -155,9 +149,10 @@ def _site_root():
 
 
 def pic(kind, pid, cls):
-    """<img> for a picture saved in img/ (tools/fetch_images.py), falling back to Divine Pride, then to nothing."""
-    return (f'<img class="{cls}" src="{_site_root()}img/{kind}/{pid}.png" data-alt="{REMOTE_PIC[kind].format(pid)}" '
-            f'alt="" loading="lazy" onerror="{_PIC_ERR}">')
+    """<img> for a picture saved in img/ by tools/fetch_images.py; a missing one removes itself."""
+    return f'<img class="{cls}" src="{_site_root()}img/{kind}/{pid}.png" alt="" loading="lazy" onerror="this.remove()">'
+
+
 ENV = None  # set by define_env; ENV.page is the page being rendered
 
 

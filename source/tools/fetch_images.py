@@ -1,12 +1,13 @@
 """Downloads item icons, monster pictures, skill icons and NPC pictures from Divine Pride into img/ at the wiki root.
 
-The wiki shows img/<kind>/<id>.png first and falls back to Divine Pride when a picture is
-missing, so this only has to run when the database gains new ids. Ids Divine Pride has no picture for are kept
-in img/missing.json and skipped next time (pass --retry to try them again).
+The wiki only shows pictures saved in img/<kind>/<id>.png, so this runs whenever the database gains new ids.
+Ids Divine Pride has no picture for are kept in img/missing.json and skipped next time (pass --retry to try them
+again).
 
     python3 source/tools/fetch_images.py            # from the wiki repo root
 """
 import argparse
+import hashlib
 import concurrent.futures
 import json
 import os
@@ -24,6 +25,14 @@ SOURCES = {
     "npcs": ("npcs.json", lambda rows: [r[5] for r in rows if 0 < r[5] and not 1001 <= r[5] < 4000],
              ["https://static.divine-pride.net/images/npc/{}.png", "https://static.divine-pride.net/images/npcs/{}.png"]),
 }
+
+
+# Divine Pride answers ids it has no picture for with this "no image" picture instead of a 404.
+PLACEHOLDERS = {"90fd5dfc46354798fa8fc4cbcec9dee97d8071b75abc58951ab1887b11cd916e"}
+
+
+def _placeholder(data):
+    return hashlib.sha256(data).hexdigest() in PLACEHOLDERS
 
 
 def fetch(urls, path):
@@ -44,7 +53,7 @@ def _fetch_one(url, path):
         try:
             with urllib.request.urlopen(req, timeout=30) as r:
                 data = r.read()
-            if not data.startswith(b"\x89PNG"):
+            if not data.startswith(b"\x89PNG") or _placeholder(data):
                 return False
             with open(path, "wb") as f:
                 f.write(data)
@@ -72,6 +81,20 @@ def main():
     if os.path.exists(missing_path) and not args.retry:
         with open(missing_path) as f:
             missing = {k: set(v) for k, v in json.load(f).items()}
+
+    # Drop placeholders saved before they were recognised.
+    removed = 0
+    for kind in SOURCES:
+        folder = os.path.join(img, kind)
+        for fn in os.listdir(folder) if os.path.isdir(folder) else []:
+            path = os.path.join(folder, fn)
+            with open(path, "rb") as f:
+                if _placeholder(f.read()):
+                    os.remove(path)
+                    missing.setdefault(kind, set()).add(int(fn.split(".")[0]))
+                    removed += 1
+    if removed:
+        print(f"removed {removed} placeholder pictures")
 
     jobs = []
     for kind, (index, read_ids, urls) in SOURCES.items():

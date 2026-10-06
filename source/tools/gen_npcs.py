@@ -115,15 +115,22 @@ def _shop_sells(t, rest, items, currencies):
 
 
 def guide_pages(docs_dir):
-    """{NPC display name: wiki page} for the Miracle NPCs a page documents with npc_where("Name")."""
-    out = {}
+    """({NPC name: page} for Miracle NPCs a page shows with npc_where("Name"),
+    {NPC name: page} for official NPCs a page lists in a `<!-- npcs: A; B -->` comment)."""
+    custom, official_npcs = {}, {}
     for root, _, names in os.walk(docs_dir):
         for fn in sorted(names):
             if fn.endswith(".md"):
                 path = os.path.join(root, fn)
-                for name in re.findall(r'npc_where\(\s*"([^"]+)"', open(path, encoding="utf-8").read()):
-                    out.setdefault(name, os.path.relpath(path, docs_dir).replace(os.sep, "/"))
-    return out
+                text = open(path, encoding="utf-8").read()
+                rel = os.path.relpath(path, docs_dir).replace(os.sep, "/")
+                for name in re.findall(r'npc_where\(\s*"([^"]+)"', text):
+                    custom.setdefault(name, rel)
+                for group in re.findall(r"<!--\s*npcs:(.*?)-->", text, re.S):
+                    names = [n.strip() for n in group.split(";") if n.strip()]
+                    for name in names:
+                        official_npcs.setdefault(name, (rel, names))
+    return custom, official_npcs
 
 
 def build(items, by_aegis, docs_dir=None):
@@ -225,10 +232,20 @@ def build(items, by_aegis, docs_dir=None):
                                        "locs": [[shop["Map"], shop.get("X", 0), shop.get("Y", 0)]],
                                        "barter": barter_rows(shop)}
 
-    pages = guide_pages(docs_dir) if docs_dir else {}
+    custom, official_npcs = guide_pages(docs_dir) if docs_dir else ({}, {})
+    files_of = defaultdict(set)
     for n in npcs.values():
-        if n["file"].startswith(("npc/miracle/", "npc/custom/")) and n["name"] in pages:
-            n["page"] = pages[n["name"]]
+        files_of[n["name"]].add(n["file"])
+    for n in npcs.values():
+        if n["file"].startswith(("npc/miracle/", "npc/custom/")):
+            if n["name"] in custom:
+                n["page"] = custom[n["name"]]
+        elif n["name"] in official_npcs:
+            page, names = official_npcs[n["name"]]
+            # A common name ("Lisa") links only the copy in the same script as the page's other NPCs.
+            near = set().union(*(files_of[o] for o in names if o != n["name"])) if len(names) > 1 else set()
+            if len(files_of[n["name"]]) == 1 or not near or n["file"] in near:
+                n["page"] = page
     index, detail = [], {}
     sold_by, given_by, enchanters = defaultdict(list), defaultdict(list), defaultdict(list)
     for nid, n in enumerate(sorted(npcs.values(), key=lambda n: (n["name"].lower(), n["locs"][0])), 1):
