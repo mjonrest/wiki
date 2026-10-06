@@ -28,6 +28,16 @@
 .md-typeset .db-facts dd { margin: 0; min-width: 0; font-variant-numeric: tabular-nums; }
 .md-typeset .db-script { font-size: .72rem; white-space: pre-wrap; }
 .md-typeset .db-script code { white-space: pre-wrap; word-break: break-word; }
+.md-typeset .db-fx { margin: .4em 0 .6em; }
+.md-typeset .db-fx .db-fx { margin: .2em 0 .3em; }
+.md-typeset .db-fx li { margin: .15em 0; }
+.md-typeset .db-fx .ico { vertical-align: middle; }
+.md-typeset .db-fx-code { font-size: .72rem; white-space: pre-wrap; word-break: break-word; }
+.md-typeset details.db-script-box { margin: .2em 0 1em; padding: 0; border: 0; box-shadow: none; background: none; font-size: .7rem; }
+.md-typeset details.db-script-box > summary { padding: 0; margin: 0; background: none; border: 0; font-weight: 400; cursor: pointer; color: var(--md-default-fg-color--light); }
+.md-typeset details.db-script-box > summary::before, .md-typeset details.db-script-box > summary::after { display: none; }
+.md-typeset details.db-script-box > summary:hover { color: var(--md-accent-fg-color); }
+.md-typeset details.db-script-box[open] > summary { margin-bottom: .3em; }
 @media (max-width: 30em) { .md-typeset .db-facts { grid-template-columns: 1fr; } .md-typeset .db-facts dd { margin-bottom: .4em; } }
 
 /* Item icons and monster pictures (hotlinked from Divine Pride; missing ones remove themselves). */
