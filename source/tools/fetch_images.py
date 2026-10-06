@@ -1,6 +1,7 @@
 """Downloads item icons, monster pictures, skill icons and NPC pictures from Divine Pride into img/ at the wiki root.
 
-The wiki only shows pictures saved in img/<kind>/<id>.png, so this runs whenever the database gains new ids.
+The wiki only shows pictures saved in img/, so this runs whenever the database gains new ids. Monster and NPC
+pictures stay as img/<kind>/<id>.png; item and skill icons are packed into sprite sheets by pack_icons.py.
 Ids Divine Pride has no picture for are kept in img/missing.json and skipped next time (pass --retry to try them
 again).
 
@@ -11,10 +12,14 @@ import hashlib
 import concurrent.futures
 import json
 import os
+import shutil
+import tempfile
 import time
 import urllib.error
 import urllib.request
 from collections import defaultdict
+
+import pack_icons
 
 # kind: (index file, how to read ids from it, URLs to try in order)
 SOURCES = {
@@ -96,18 +101,22 @@ def main():
     if removed:
         print(f"removed {removed} placeholder pictures")
 
+    packed = pack_icons.load_index(img)
+    tmp = tempfile.mkdtemp()
     jobs = []
     for kind, (index, read_ids, urls) in SOURCES.items():
-        os.makedirs(os.path.join(img, kind), exist_ok=True)
+        folder = os.path.join(tmp, kind) if kind in pack_icons.KINDS else os.path.join(img, kind)
+        os.makedirs(folder, exist_ok=True)
         path = os.path.join(args.root, "db", "data", index)
         if not os.path.exists(path):
             continue
         with open(path) as f:
             ids = sorted(set(read_ids(json.load(f))))
         skip = missing.get(kind, set())
+        have = packed.get(kind, {})
         for i in ids:
-            out = os.path.join(img, kind, f"{i}.png")
-            if i not in skip and not os.path.exists(out):
+            out = os.path.join(folder, f"{i}.png")
+            if i not in skip and i not in have and not os.path.exists(out):
                 jobs.append((kind, i, [u.format(i) for u in urls], out))
     if args.limit:
         jobs = jobs[: args.limit]
@@ -125,6 +134,12 @@ def main():
                 missing.setdefault(kind, set()).add(i)
             if n % 1000 == 0:
                 print(f"{n}/{len(jobs)} checked, {sum(saved.values())} saved")
+
+    new = {k: {int(f[:-4]): os.path.join(tmp, k, f) for f in os.listdir(os.path.join(tmp, k))}
+           for k in pack_icons.KINDS if os.path.isdir(os.path.join(tmp, k))}
+    if any(new.values()) or not os.path.exists(os.path.join(img, "icons.json")):
+        pack_icons.pack(img, new)
+    shutil.rmtree(tmp, ignore_errors=True)
 
     with open(missing_path, "w") as f:
         json.dump({k: sorted(v) for k, v in sorted(missing.items())}, f, separators=(",", ":"))

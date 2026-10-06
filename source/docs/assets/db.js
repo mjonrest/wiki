@@ -7,6 +7,7 @@
   var DATA = BASE + "db/data/";
   var cache = {};
   var meta = null;
+  var icons = null; // img/icons.json: where each item and skill icon sits in the sprite sheets
 
   function get(path) {
     if (!cache[path]) {
@@ -19,9 +20,29 @@
   }
 
   // Pictures saved in img/ by tools/fetch_images.py; a missing one removes itself. (No Divine Pride fallback:
-  // it answers unknown ids with a "no image" picture.)
+  // it answers unknown ids with a "no image" picture.) Item and skill icons are cells of the sprite sheets
+  // that tools/pack_icons.py writes, drawn as a background so one sheet serves a thousand icons.
   function pic(kind, id, cls) {
+    if (kind === "items" || kind === "skills") {
+      var slot = icons && icons[kind] && icons[kind][id];
+      if (slot == null) return "";
+      var per = icons.cols * icons.rows, col = slot % icons.cols, row = Math.floor(slot / icons.cols) % icons.rows;
+      return '<span class="spr ' + cls + '" style="background-image:url(' + BASE + "img/sheets/" + kind + "-" + Math.floor(slot / per) +
+        ".png);background-size:" + icons.cols * 100 + "% " + icons.rows * 100 + "%;background-position:" +
+        (col * 100 / (icons.cols - 1)) + "% " + (row * 100 / (icons.rows - 1)) + '%"></span>';
+    }
     return '<img class="' + cls + '" src="' + BASE + "img/" + kind + "/" + id + '.png" alt="" loading="lazy" onerror="this.remove()">';
+  }
+  function loadIcons() {
+    return fetch(BASE + "img/icons.json").then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+      if (!d) return;
+      icons = { cols: d.cols, rows: d.rows };
+      ["items", "skills"].forEach(function (k) {
+        var m = {}, a = d[k] || [];
+        for (var i = 0; i < a.length; i += 2) m[a[i]] = a[i + 1];
+        icons[k] = m;
+      });
+    }).catch(function () { icons = null; });
   }
 
   function esc(s) {
@@ -590,8 +611,8 @@
     root.addEventListener("click", function (e) {
       if (e.target.closest && e.target.closest(".db-back")) { e.preventDefault(); history.pushState(null, "", location.pathname); route(root, kind); }
     });
-    get("meta.json").then(function (m) {
-      meta = m;
+    Promise.all([get("meta.json"), loadIcons()]).then(function (a) {
+      meta = a[0];
       route(root, kind);
       window.addEventListener("hashchange", function () { route(root, kind); });
       window.addEventListener("popstate", function () { route(root, kind); });
