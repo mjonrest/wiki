@@ -142,8 +142,22 @@ def fmt(n):
 
 
 # Pictures are hotlinked from Divine Pride; custom Miracle ids have none, so a failed image removes itself.
-ITEM_ICON = "https://static.divine-pride.net/images/items/item/{}.png"
-MOB_IMAGE = "https://static.divine-pride.net/images/mobs/png/{}.png"
+REMOTE_PIC = {"items": "https://static.divine-pride.net/images/items/item/{}.png",
+              "mobs": "https://static.divine-pride.net/images/mobs/png/{}.png"}
+_PIC_ERR = "var a=this.getAttribute('data-alt');if(a){this.removeAttribute('data-alt');this.src=a}else this.remove()"
+
+
+def _site_root():
+    """Relative path from the rendered page's URL to the site root (raw HTML is not rewritten by MkDocs)."""
+    page = getattr(ENV, "page", None)
+    url = getattr(page, "url", "") or ""
+    return "../" * url.count("/")
+
+
+def pic(kind, pid, cls):
+    """<img> for a picture saved in img/ (tools/fetch_images.py), falling back to Divine Pride, then to nothing."""
+    return (f'<img class="{cls}" src="{_site_root()}img/{kind}/{pid}.png" data-alt="{REMOTE_PIC[kind].format(pid)}" '
+            f'alt="" loading="lazy" onerror="{_PIC_ERR}">')
 ENV = None  # set by define_env; ENV.page is the page being rendered
 
 
@@ -161,14 +175,14 @@ def _md_text(s):
 def item(iid):
     """Item icon and name, linked to its Database entry, with its id."""
     iid = int(iid)
-    icon = f'<img class="ico" src="{ITEM_ICON.format(iid)}" alt="" loading="lazy" onerror="this.remove()">'
+    icon = pic("items", iid, "ico")
     return f'{icon}[{_md_text(item_name(iid))}]({_root()}db/items.md#{iid}) <small class="iid">#{iid}</small>'
 
 
 def mob(mid, size="sm"):
     """Monster picture and name, linked to its Database entry."""
     mid = int(mid)
-    img = f'<img class="mob-{size}" src="{MOB_IMAGE.format(mid)}" alt="" loading="lazy" onerror="this.remove()">'
+    img = pic("mobs", mid, f"mob-{size}")
     return f'{img}[{_md_text(mob_name(mid))}]({_root()}db/monsters.md#{mid}) <small class="iid">#{mid}</small>'
 
 
@@ -555,9 +569,9 @@ def instance_page(key, overview_only=False):
             kind = "MVP" if m["mvp"] else "Boss"
             stats = (f"{kind} · Level {m['level']} · {fmt(int(m['hp']))} HP · {m['race']} · "
                      f"{m['element']} · {m['size']}")
-            pic = f'<img class="mob-lg" src="{MOB_IMAGE.format(mid)}" alt="" loading="lazy" onerror="this.remove()">'
+            pic_html = pic("mobs", mid, "mob-lg")
             link = f"[Full monster entry]({_root()}db/monsters.md#{mid})"
-            out.append(_details(f"{m['name']} #{mid}", pic + "\n\n" + stats + " · " + link + "\n\n" + _drops_table(mid),
+            out.append(_details(f"{m['name']} #{mid}", pic_html + "\n\n" + stats + " · " + link + "\n\n" + _drops_table(mid),
                                 open_=m["mvp"]))
             out.append("")
     if normal:

@@ -12,15 +12,29 @@ ITEM_DBS = [
     "db/import/item_db.yml", "db/import/item_db_other.yml", "db/import/item_db_costume_legacy.yml",
     "db/import/item_db_elite.yml", "db/import/item_db_newjob.yml", "db/import/item_db_ex.yml",
 ]
-ENTRY = re.compile(r"^  - Id: (\d+)\s*\n((?:    .*\n|\s*\n)*)", re.M)
+ENTRY = re.compile(r"^  - Id: (\d+)\s*\n((?:    .*\n|#.*\n|\s*\n)*)", re.M)
 FIELD = re.compile(r"^    (AegisName|Name|Type|Slots|Locations|Buy): ?(.*)$", re.M)
+
+
+def _chain(rel, fallback):
+    """The database files the server reads for `rel`, following its Footer imports (renewal mode)."""
+    import ydb  # imports ROOT from here
+    found = [f for f in ydb.files(rel) if os.path.exists(os.path.join(ROOT, f))]
+    return found[1:] if len(found) > 1 else fallback
+
+
+def _value(v):
+    """A YAML scalar without quotes or a trailing `# comment`."""
+    v = v.strip()
+    m = re.match(r'^"((?:[^"\\]|\\.)*)"', v)
+    return m.group(1).replace('\\"', '"') if m else re.sub(r"(^|\s+)#.*$", "", v).strip()
 
 
 @functools.lru_cache(None)
 def items():
     """Returns ({id: {name, aegis, type, slots}}, {aegis: id})."""
     by_id, by_aegis = {}, {}
-    for rel in ITEM_DBS:
+    for rel in _chain("db/item_db.yml", ITEM_DBS):
         path = os.path.join(ROOT, rel)
         if not os.path.exists(path):
             continue
@@ -29,7 +43,7 @@ def items():
             iid = int(m.group(1))
             info = by_id.get(iid, {}).copy()
             for k, v in FIELD.findall(m.group(2)):
-                info[k.lower()] = v.strip().strip('"')
+                info[k.lower()] = _value(v)
             by_id[iid] = info
             if "aegisname" in info:
                 by_aegis[info["aegisname"]] = iid
@@ -58,14 +72,14 @@ def item_cell(iid):
 
 
 MOB_DBS = ["db/re/mob_db.yml", "db/import/mob_db.yml", "db/import/new_mob.yml", "db/import/ep20_mob.yml"]
-MOB_ENTRY = re.compile(r"^  - Id: (\d+)\s*\n((?:    .*\n|\s*\n)*)", re.M)
+MOB_ENTRY = re.compile(r"^  - Id: (\d+)\s*\n((?:    .*\n|#.*\n|\s*\n)*)", re.M)
 MOB_FIELD = re.compile(r"^    (AegisName|Name|Level): ?(.*)$", re.M)
 
 
 @functools.lru_cache(None)
 def mobs():
     by_id = {}
-    for rel in MOB_DBS:
+    for rel in _chain("db/mob_db.yml", MOB_DBS):
         path = os.path.join(ROOT, rel)
         if not os.path.exists(path):
             continue
@@ -73,7 +87,7 @@ def mobs():
         for m in MOB_ENTRY.finditer(text):
             info = by_id.get(int(m.group(1)), {}).copy()
             for k, v in MOB_FIELD.findall(m.group(2)):
-                info[k.lower()] = v.strip().strip('"')
+                info[k.lower()] = _value(v)
             by_id[int(m.group(1))] = info
     return by_id
 

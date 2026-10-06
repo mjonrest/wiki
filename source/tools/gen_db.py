@@ -14,6 +14,8 @@ from collections import defaultdict
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import ydb  # noqa: E402
+import gen_npcs  # noqa: E402
+import gen_enchants  # noqa: E402
 from rodb import ROOT  # noqa: E402
 
 CHUNK = 1000  # detail files hold the ids id//CHUNK*CHUNK .. +CHUNK-1
@@ -102,50 +104,6 @@ def _spawns():
     return {k: sorted(([m, n] for m, n in v.items()), key=lambda x: -x[1]) for k, v in out.items()}
 
 
-def _shops(item_by_aegis):
-    """{item id: [[shop, map, x, y, price, currency], ...]} for NPC shops and barters."""
-    import official
-    import main
-    out = defaultdict(list)
-    files = list(dict.fromkeys(official.official_scripts() + main.enabled_scripts()))
-    for rel in files:
-        if not os.path.exists(os.path.join(ROOT, rel)):
-            continue
-        for line in main.script_text(rel).splitlines():
-            m = main.NPC_HEADER.match(line) or main.FLOAT_SHOP.match(line)
-            if not m or m.group("type") not in ("shop", "cashshop", "itemshop", "pointshop", "marketshop"):
-                continue
-            parts = [p.strip() for p in m.group("rest").rstrip(";").split(",") if p.strip()][1:]
-            t = m.group("type")
-            if t == "itemshop":
-                cur = "item:" + parts.pop(0).split(":")[0]
-            elif t == "pointshop":
-                v = parts.pop(0).split(":")[0]
-                cur = main.CURRENCIES.get(v, v)
-            elif t == "cashshop":
-                cur = "Cash Points"
-            else:
-                cur = "Zeny"
-            where = [m.group("map"), int(m.group("x")), int(m.group("y"))] if "map" in m.groupdict() else ["", 0, 0]
-            for p in parts:
-                iid, _, price = p.partition(":")
-                if iid.strip().isdigit():
-                    price = price.split(":")[0].strip()
-                    out[int(iid)].append([main.display_name(m.group("name")), *where,
-                                          int(price) if price.lstrip("-").isdigit() else -1, cur])
-    for name, shop in main.barters().items():
-        for entry in shop.get("Items") or []:
-            iid = item_by_aegis.get(entry.get("Item"))
-            if iid is None:
-                continue
-            cost = [[item_by_aegis.get(r.get("Item")), r.get("Amount", 1)] for r in entry.get("RequiredItems") or []]
-            if entry.get("Zeny"):
-                cost.append(["zeny", entry["Zeny"]])
-            out[iid].append([_nice(name), shop.get("Map", ""), shop.get("X", 0), shop.get("Y", 0), 0,
-                             {"barter": [c for c in cost if c[0] is not None]}])
-    return out
-
-
 def _boxes(items, item_by_aegis):
     """({item id: [[box id, chance %|null], ...]}, {box id: [[item id, chance|null, amount], ...]})."""
     groups = ydb.table("db/item_group_db.yml", "Group")
@@ -160,7 +118,7 @@ def _boxes(items, item_by_aegis):
                 chance = None if sub.get("SubGroup") == 0 or not total else round(rate * 100 / total, 2)
                 rows.append([item_by_aegis[e["Item"]], chance, e.get("Amount", 1)])
         contents[str(gname).upper()] = rows
-    in_box, box_has = defaultdict(list), {}
+    in_box, box_has = defaultdict(list), {"_groups": contents}
     for iid, it in items.items():
         names = re.findall(r"\bIG_(\w+)", str(it.get("Script") or ""))
         rows = [r for n in dict.fromkeys(names) for r in contents.get(n.upper(), [])]
@@ -217,12 +175,15 @@ def build(out, dir_urls=True):
         }
 
     # Items.
-    shops = _shops(by_aegis)
-    for iid, rows in shops.items():
-        for r in rows:
-            if r[4] == -1 and iid in items:  # -1 in a shop line means the item's Buy price
-                r[4] = items[iid].get("Buy") or (items[iid].get("Sell") or 0) * 2
+    docs = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "docs")
+    npc_index, npc_detail, shops, given_by, enchanters = gen_npcs.build(items, by_aegis, docs)
     in_box, box_has = _boxes(items, by_aegis)
+    groups = box_has.pop("_groups")
+    ench_rows, ench_detail, ench_roles = gen_enchants.build(by_aegis, groups, enchanters, set(shops) | set(given_by))
+    for r in ench_rows:  # [key, type, item id, item name, count, minimum refine]
+        it = items.get(r[2]) or {}
+        r[3:3] = [it.get("Name") or it.get("AegisName") or ""]
+        del r[6:]
     item_index, item_detail = [], defaultdict(dict)
     job_names = sorted({j for it in items.values() for j in _flags(it.get("Jobs")) if j != "All"})
     job_pos = {j: i for i, j in enumerate(job_names)}
@@ -242,8 +203,8 @@ def build(out, dir_urls=True):
             if _flags(it.get(k)):
                 d[k] = _flags(it.get(k))
         for k, v in (("drops", sorted(dropped_by.get(iid, []), key=lambda x: -x[1])[:80]),
-                     ("shops", shops.get(iid, [])[:40]), ("boxes", in_box.get(iid, [])[:60]),
-                     ("contains", box_has.get(iid))):
+                     ("shops", shops.get(iid, [])[:60]), ("givenBy", given_by.get(iid, [])[:40]), ("boxes", in_box.get(iid, [])[:60]),
+                     ("contains", box_has.get(iid)), ("enchant", ench_roles.get(iid))):
             if v:
                 d[k] = v
         item_detail[iid // CHUNK][iid] = d
@@ -302,6 +263,7 @@ def build(out, dir_urls=True):
     # Write.
     os.makedirs(os.path.join(out, "items"), exist_ok=True)
     os.makedirs(os.path.join(out, "mobs"), exist_ok=True)
+    os.makedirs(os.path.join(out, "npcs"), exist_ok=True)
 
     def dump(rel, data):
         with open(os.path.join(out, rel), "w", encoding="utf-8") as f:
@@ -315,6 +277,14 @@ def build(out, dir_urls=True):
         dump(f"items/{k}.json", v)
     for k, v in mob_detail.items():
         dump(f"mobs/{k}.json", v)
+    dump("npcs.json", npc_index)
+    dump("enchants.json", ench_rows)
+    dump("enchants_detail.json", ench_detail)
+    npc_chunks = defaultdict(dict)
+    for nid, d in npc_detail.items():
+        npc_chunks[nid // CHUNK][nid] = d
+    for k, v in npc_chunks.items():
+        dump(f"npcs/{k}.json", v)
     dump("meta.json", {"chunk": CHUNK, "dirUrls": dir_urls, "itemJobs": job_names, "rates": {k: conf.get(k) for k in conf if k.startswith("item_rate_")}})
     return len(item_index), len(mob_index), len(skill_out), len(jobs)
 

@@ -118,9 +118,24 @@ nav:
       - Items: db/items.md
       - Monsters: db/monsters.md
       - Skills: db/skills.md
+      - NPCs: db/npcs.md
+      - Enchants: db/enchants.md
       - Jobs: db/jobs.md
   - Official Content:
       - official/index.md
+      - Story Path:
+          - official/story/index.md
+          - "13.1 Ash Vacuum": official/story/ep13-1.md
+          - "14.3 Dimensional Travel": official/story/ep14-3.md
+          - "15.1 Phantasmagorika": official/story/ep15-1.md
+          - "15.2 Memory Records": official/story/ep15-2.md
+          - "16.1 Banquet for Heroes": official/story/ep16-1.md
+          - "16.2 Terra Gloria": official/story/ep16-2.md
+          - "17.1 Illusion": official/story/ep17-1.md
+          - "17.2 Sage's Legacy": official/story/ep17-2.md
+          - "18 Direction of Prayer": official/story/ep18.md
+          - "19 Issgard": official/story/ep19.md
+          - "20 Immortals": official/story/ep20.md
       - Instances:
           - official/instances/index.md
           - "2nd OS Search": official/instances/2nd-os-search.md

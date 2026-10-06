@@ -18,10 +18,13 @@
     return cache[path];
   }
 
-  var ITEM_ICON = "https://static.divine-pride.net/images/items/item/";
-  var MOB_IMAGE = "https://static.divine-pride.net/images/mobs/png/";
-  function pic(url, cls) {
-    return '<img class="' + cls + '" src="' + url + '" alt="" loading="lazy" onerror="this.remove()">';
+  // Pictures: the copy saved in img/ (tools/fetch_images.py), then Divine Pride, then nothing.
+  var REMOTE = { items: "https://static.divine-pride.net/images/items/item/", mobs: "https://static.divine-pride.net/images/mobs/png/",
+    skills: "https://static.divine-pride.net/images/skill/" };
+  var ONERR = "var a=this.getAttribute('data-alt');if(a){this.removeAttribute('data-alt');this.src=a}else this.remove()";
+  function pic(kind, id, cls) {
+    return '<img class="' + cls + '" src="' + BASE + "img/" + kind + "/" + id + '.png"' + (REMOTE[kind] ? ' data-alt="' + REMOTE[kind] + id + '.png"' : "") +
+      ' alt="" loading="lazy" onerror="' + ONERR + '">';
   }
 
   function esc(s) {
@@ -38,16 +41,23 @@
   function itemLink(id, names) {
     var it = names && names[id];
     var label = it ? it[1] + (+it[4] ? " [" + it[4] + "]" : "") : "Item " + id;
-    return pic(ITEM_ICON + id + ".png", "ico") + '<a href="' + page("items") + "#" + id + '">' + esc(label) + '</a> <small class="iid">' + id + "</small>";
+    return pic("items", id, "ico") + '<a href="' + page("items") + "#" + id + '">' + esc(label) + '</a> <small class="iid">' + id + "</small>";
   }
   function mobLink(id, names) {
     var m = names && names[id];
-    return pic(MOB_IMAGE + id + ".png", "mob-sm") + '<a href="' + page("monsters") + "#" + id + '">' + esc(m ? m[1] : "Monster " + id) + '</a> <small class="iid">' + id + "</small>";
+    return pic("mobs", id, "mob-sm") + '<a href="' + page("monsters") + "#" + id + '">' + esc(m ? m[1] : "Monster " + id) + '</a> <small class="iid">' + id + "</small>";
   }
   function skillLink(aegis, skills) {
     var s = skills && skills.byAegis[aegis];
-    return '<a href="' + page("skills") + "#" + esc(aegis) + '">' + esc(s ? s.name : nice(aegis)) + "</a>";
+    return (s ? pic("skills", s.id, "ico") : "") + '<a href="' + page("skills") + "#" + esc(aegis) + '">' + esc(s ? s.name : nice(aegis)) + "</a>";
   }
+  // NPC sprites: monster pictures for monster-shaped NPCs, otherwise the saved NPC picture.
+  function npcPic(sprite, cls) { return sprite >= 1001 && sprite < 4000 ? pic("mobs", sprite, cls) : sprite > 0 ? pic("npcs", sprite, cls) : ""; }
+  function npcLink(id, npcs) {
+    var n = npcs && npcs[id];
+    return (n ? npcPic(n[5], "ico") : "") + '<a href="' + page("npcs") + "#" + id + '">' + esc(n ? n[1] : "NPC " + id) + "</a>";
+  }
+  function where(m, x, y) { return "<code>/navi " + esc(m) + " " + x + "/" + y + "</code>"; }
   function jobLink(job) { return '<a href="' + page("jobs") + "#" + esc(job) + '">' + esc(nice(job)) + "</a>"; }
 
   function table(head, rows, cls) {
@@ -99,6 +109,7 @@
   var KINDS = {
     items: {
       index: "items.json",
+      searchHint: "Item name or id, e.g. Elunium or 985",
       text: function (r) { return (r[0] + " " + r[1]).toLowerCase(); },
       filters: [
         { label: "Type", type: "select", get: function (r) { return r[2]; } },
@@ -110,7 +121,7 @@
       ],
       cols: [
         { h: "Id", cell: function (r) { return r[0]; }, sort: function (r) { return r[0]; } },
-        { h: "Name", cell: function (r) { return nameCell(pic(ITEM_ICON + r[0] + ".png", "ico"), r[0], r[1] + (r[4] ? " [" + r[4] + "]" : "")); }, sort: function (r) { return r[1]; } },
+        { h: "Name", cell: function (r) { return nameCell(pic("items", r[0], "ico"), r[0], r[1] + (r[4] ? " [" + r[4] + "]" : "")); }, sort: function (r) { return r[1]; } },
         { h: "Type", cell: function (r) { return esc(nice(r[2])) + (r[3] ? " <small>" + esc(nice(r[3])) + "</small>" : ""); }, sort: function (r) { return r[2] + r[3]; } },
         { h: "Level", cell: function (r) { return r[5] || ""; }, sort: function (r) { return r[5]; } },
         { h: "ATK", cell: function (r) { return r[8] || ""; }, sort: function (r) { return r[8]; } },
@@ -121,6 +132,7 @@
     },
     monsters: {
       index: "mobs.json",
+      searchHint: "Monster name or id, e.g. Baphomet or 1039",
       text: function (r) { return (r[0] + " " + r[1]).toLowerCase(); },
       filters: [
         { label: "Class", type: "select", get: function (r) { return r[7] === "mvp" ? "MVP" : r[7] === "boss" ? "Boss" : "Normal"; } },
@@ -132,7 +144,7 @@
       ],
       cols: [
         { h: "Id", cell: function (r) { return r[0]; }, sort: function (r) { return r[0]; } },
-        { h: "Name", cell: function (r) { return nameCell(pic(MOB_IMAGE + r[0] + ".png", "mob-sm"), r[0], r[1], tagOf(r[7])); }, sort: function (r) { return r[1]; } },
+        { h: "Name", cell: function (r) { return nameCell(pic("mobs", r[0], "mob-sm"), r[0], r[1], tagOf(r[7])); }, sort: function (r) { return r[1]; } },
         { h: "Level", cell: function (r) { return r[2]; }, sort: function (r) { return r[2]; } },
         { h: "HP", cell: function (r) { return num(r[3]); }, sort: function (r) { return r[3]; } },
         { h: "Base exp", cell: function (r) { return num(r[9]); }, sort: function (r) { return r[9]; } },
@@ -143,6 +155,7 @@
     },
     skills: {
       index: "skills.json",
+      searchHint: "Skill name or id, e.g. Storm Gust",
       text: function (s) { return (s.id + " " + s.name + " " + s.aegis).toLowerCase(); },
       filters: [
         { label: "Job", type: "select", get: function (s) { return s.jobs.map(nice); } },
@@ -153,15 +166,47 @@
       ],
       cols: [
         { h: "Id", cell: function (s) { return s.id; }, sort: function (s) { return s.id; } },
-        { h: "Skill", cell: function (s) { return nameCell("", s.aegis, s.name, " <small>" + esc(s.aegis) + "</small>"); }, sort: function (s) { return s.name; } },
+        { h: "Skill", cell: function (s) { return nameCell(pic("skills", s.id, "ico"), s.aegis, s.name, " <small>" + esc(s.aegis) + "</small>"); }, sort: function (s) { return s.name; } },
         { h: "Max level", cell: function (s) { return s.max; }, sort: function (s) { return s.max; } },
         { h: "Type", cell: function (s) { return esc(s.type); }, sort: function (s) { return s.type; } },
         { h: "Element", cell: function (s) { return typeof s.Element === "string" ? elemChip(s.Element) : ""; }, sort: function (s) { return typeof s.Element === "string" ? s.Element : ""; } },
         { h: "Learned by", cell: function (s) { return s.jobs.slice(0, 4).map(function (j) { return esc(nice(j)); }).join(", ") + (s.jobs.length > 4 ? " +" + (s.jobs.length - 4) : ""); }, sort: function (s) { return s.jobs[0] || "~"; } },
       ],
     },
+    npcs: {
+      index: "npcs.json",
+      searchHint: "NPC name or map, e.g. Kafra or prontera",
+      text: function (r) { return (r[1] + " " + r[2]).toLowerCase(); },
+      filters: [
+        { label: "Does", type: "select", get: function (r) { return r[6] ? r[6].split("|") : []; } },
+        { label: "Content", type: "select", get: function (r) { return r[7]; } },
+        { label: "Map", type: "text", get: function (r) { return r[2]; }, placeholder: "e.g. prontera" },
+      ],
+      cols: [
+        { h: "NPC", cell: function (r) { return nameCell(npcPic(r[5], "mob-sm"), r[0], r[1], r[8] > 1 ? " <small>+" + (r[8] - 1) + " more places</small>" : ""); }, sort: function (r) { return r[1]; } },
+        { h: "Where", cell: function (r) { return where(r[2], r[3], r[4]); }, sort: function (r) { return r[2]; } },
+        { h: "Does", cell: function (r) { return r[6] ? chips(r[6].split("|")) : ""; }, sort: function (r) { return r[6] || "~"; } },
+        { h: "Content", cell: function (r) { return esc(r[7]); }, sort: function (r) { return r[7]; } },
+      ],
+    },
+    enchants: {
+      index: "enchants.json",
+      searchHint: "Item name, e.g. Gray Wolf Suits or Shadow Mix Recipe",
+      text: function (r) { return (r[2] + " " + r[3] + " " + r[1]).toLowerCase(); },
+      filters: [
+        { label: "Kind", type: "select", get: function (r) { return r[1]; } },
+        { label: "Minimum refine", type: "range", get: function (r) { return r[5]; } },
+      ],
+      cols: [
+        { h: "For", cell: function (r) { return nameCell(pic("items", r[2], "ico"), r[0], r[3], r[1] === "Enchant" && r[4] > 1 ? " <small>+" + (r[4] - 1) + " more items</small>" : ""); }, sort: function (r) { return r[3]; } },
+        { h: "Kind", cell: function (r) { return '<span class="db-chip">' + esc(r[1]) + "</span>"; }, sort: function (r) { return r[1]; } },
+        { h: "Items", cell: function (r) { return r[4]; }, sort: function (r) { return r[4]; } },
+        { h: "Min. refine", cell: function (r) { return r[5] ? "+" + r[5] : ""; }, sort: function (r) { return r[5]; } },
+      ],
+    },
     jobs: {
       index: "jobs.json",
+      searchHint: "Job name, e.g. Arch Bishop",
       text: function (j) { return j.job.toLowerCase().replace(/_/g, " "); },
       filters: [
         { label: "Show", type: "select", def: "Main jobs", get: function (j) { return /^Baby|^Super_Baby/.test(j.job) ? "Baby jobs" : /\d$/.test(j.job) ? "Mounted / alternate" : "Main jobs"; } },
@@ -188,7 +233,8 @@
         state = root._state = { q: "", f: {}, sort: 0, dir: 1, shown: 100 };
         K.filters.forEach(function (f, i) { if (f.def) state.f[i] = f.def; });
       }
-      var h = '<div class="db-bar"><input type="search" class="db-q" placeholder="Search by name or id" aria-label="Search"></div>' +
+      var h = '<form class="db-bar" role="search"><input type="search" class="db-q" placeholder="' + esc(K.searchHint || "Search by name or id") +
+        '" aria-label="Search"><button type="submit" class="md-button md-button--primary db-go">Search</button></form>' +
         '<div class="db-filters">';
       K.filters.forEach(function (f, i) {
         h += '<label class="db-filter"><span>' + esc(f.label) + "</span>";
@@ -253,6 +299,10 @@
       }
       var t;
       q.addEventListener("input", function () { clearTimeout(t); t = setTimeout(function () { state.q = q.value; state.shown = 100; draw(); }, 120); });
+      root.querySelector(".db-bar").addEventListener("submit", function (e) {
+        e.preventDefault(); clearTimeout(t); state.q = q.value; state.shown = 100; draw();
+        root.querySelector(".db-count").scrollIntoView({ block: "nearest", behavior: "smooth" });
+      });
       root.querySelector(".db-filters").addEventListener("input", function (e) {
         var el = e.target, i = el.getAttribute("data-i");
         if (i == null) return;
@@ -277,13 +327,13 @@
 
   /* ------------------------------------------------------------ detail views */
 
-  function back(kind) { return '<p><a href="#" class="db-back">← All ' + kind + "</a></p>"; }
+  function back(kind) { return '<p><a href="#" class="db-back">← All ' + (kind === "npcs" ? "NPCs" : kind === "enchants" ? "enchants" : kind) + "</a></p>"; }
 
   function itemView(root, id) {
-    return Promise.all([get("items.json"), get("mobs.json"), get("items/" + Math.floor(id / meta.chunk) + ".json")]).then(function (a) {
-      var items = byId(a[0]), mobs = byId(a[1]), d = a[2][id], r = items[id];
+    return Promise.all([get("items.json"), get("mobs.json"), get("items/" + Math.floor(id / meta.chunk) + ".json"), get("npcs.json")]).then(function (a) {
+      var items = byId(a[0]), mobs = byId(a[1]), d = a[2][id], r = items[id], npcs = byId(a[3]);
       if (!r || !d) { root.innerHTML = back("items") + "<p>No item with id " + esc(id) + ".</p>"; return; }
-      var h = back("items") + pic(ITEM_ICON + id + ".png", "db-pic") + "<h2>" + esc(r[1]) + (r[4] ? " [" + r[4] + "]" : "") + ' <small class="iid">' + id + "</small></h2>";
+      var h = back("items") + pic("items", id, "db-pic") + "<h2>" + esc(r[1]) + (r[4] ? " [" + r[4] + "]" : "") + ' <small class="iid">' + id + "</small></h2>";
       h += facts([
         ["Type", esc(nice(r[2])) + (d.SubType ? " / " + esc(nice(d.SubType)) : "")],
         ["Aegis name", "<code>" + esc(d.AegisName) + "</code>"],
@@ -307,7 +357,7 @@
         return [mobLink(x[0], mobs) + (x[2] === "mvp" ? ' <span class="db-chip db-mvp">MVP reward</span>' : ""), m ? m[2] : "", pct(x[1])];
       }));
       if (d.shops) h += "<h3>Sold by</h3>" + table(["NPC", "Where", "Price"], d.shops.map(function (s) {
-        var where = s[1] ? "<code>" + esc(s[1]) + "</code> " + s[2] + ", " + s[3] : "<small>opened from another NPC</small>";
+        var loc = s[1] ? where(s[1], s[2], s[3]) : "<small>opened from another NPC</small>";
         var price;
         if (s[5] && s[5].barter) {
           price = s[5].barter.map(function (c) { return c[0] === "zeny" ? num(c[1]) + " z" : c[1] + " × " + itemLink(c[0], items); }).join("<br>");
@@ -316,8 +366,17 @@
         } else {
           price = num(s[4]) + " " + esc(s[5] === "Zeny" ? "z" : s[5]);
         }
-        return [esc(s[0]), where, price];
+        return [s[6] ? npcLink(s[6], npcs) : esc(s[0]), loc, price];
       }));
+      if (d.givenBy) h += "<h3>Given by NPC</h3><p><small>These NPCs hand out this item, for example as a quest reward or exchange.</small></p>" +
+        table(["NPC", "Where"], d.givenBy.map(function (n) { var x = npcs[n]; return [npcLink(n, npcs), x ? where(x[2], x[3], x[4]) : ""]; }));
+      if (d.enchant) {
+        var e = d.enchant, link = function (k) { return '<a href="' + page("enchants") + "#" + k + '">' + (k[0] === "E" ? "Enchant system " + k.slice(1) : itemLabel(+k.slice(1))) + "</a>"; };
+        var itemLabel = function (i) { var x = items[i]; return esc(x ? x[1] : "Item " + i); };
+        var parts = [["enchantTarget", "Can be enchanted with"], ["enchantResult", "Is an enchant from"], ["laphineItem", "Opens Laphine"],
+          ["laphineReq", "Used as material in"], ["laphineReward", "Comes out of Laphine"], ["laphineTarget", "Can be upgraded with"]];
+        h += "<h3>Enchanting</h3>" + facts(parts.map(function (p) { return [p[1], e[p[0]] ? e[p[0]].map(link).join(", ") : ""]; }));
+      }
       if (d.boxes) h += "<h3>Found in</h3>" + table(["Box", "Chance"], d.boxes.map(function (b) { return [itemLink(b[0], items), b[1] == null ? "always" : b[1] + "%"]; }));
       if (d.contains) h += "<h3>Contents</h3>" + table(["Item", "Amount", "Chance"], d.contains.map(function (b) { return [itemLink(b[0], items), b[2], b[1] == null ? "always" : b[1] + "%"]; }));
       root.innerHTML = h;
@@ -330,7 +389,7 @@
       if (!r || !d) { root.innerHTML = back("monsters") + "<p>No monster with id " + esc(id) + ".</p>"; return; }
       var s = d.stats;
       var tag = r[7] === "mvp" ? ' <span class="db-chip db-mvp">MVP</span>' : r[7] === "boss" ? ' <span class="db-chip">Boss</span>' : "";
-      var h = back("monsters") + pic(MOB_IMAGE + id + ".png", "db-pic") + "<h2>" + esc(r[1]) + ' <small class="iid">' + id + "</small>" + tag + "</h2>";
+      var h = back("monsters") + pic("mobs", id, "db-pic") + "<h2>" + esc(r[1]) + ' <small class="iid">' + id + "</small>" + tag + "</h2>";
       h += facts([
         ["Level", s.Level], ["HP", num(s.Hp)], ["Base / job exp", num(s.BaseExp) + " / " + num(s.JobExp)],
         ["MVP exp", s.MvpExp ? num(s.MvpExp) : ""],
@@ -364,7 +423,7 @@
       var skills = a[0], items = byId(a[1]);
       var s = skills.byAegis[key] || skills.byId[key];
       if (!s) { root.innerHTML = back("skills") + "<p>No skill " + esc(key) + ".</p>"; return; }
-      var h = back("skills") + "<h2>" + esc(s.name) + ' <small class="iid">' + esc(s.aegis) + " · " + s.id + "</small></h2>";
+      var h = back("skills") + pic("skills", s.id, "db-pic") + "<h2>" + esc(s.name) + ' <small class="iid">' + esc(s.aegis) + " · " + s.id + "</small></h2>";
       h += facts([
         ["Max level", s.max], ["Type", esc(s.type)], ["Target", esc(nice(s.target))], ["Element", s.Element ? perLevel(s.Element) : ""],
         ["Range", s.Range != null ? perLevel(s.Range) : ""], ["Hits", s.HitCount ? perLevel(s.HitCount) : ""],
@@ -378,6 +437,96 @@
         ["Items used", s.ItemCost ? s.ItemCost.map(function (c) { return c[1] + " × " + itemLink(c[0], items) + (c[2] ? " <small>(Lv " + c[2] + ")</small>" : ""); }).join("<br>") : ""],
       ]);
       if (s.jobs.length) h += "<h3>Learned by</h3><p>" + s.jobs.map(jobLink).join(", ") + "</p>";
+      root.innerHTML = h;
+    });
+  }
+
+  function npcView(root, id) {
+    return Promise.all([get("npcs.json"), get("items.json"), get("npcs/" + Math.floor(id / meta.chunk) + ".json")]).then(function (a) {
+      var npcs = byId(a[0]), items = byId(a[1]), d = a[2][id], r = npcs[id];
+      if (!r || !d) { root.innerHTML = back("npcs") + "<p>No NPC with id " + esc(id) + ".</p>"; return; }
+      var h = back("npcs") + npcPic(r[5], "db-pic") + "<h2>" + esc(r[1]) + "</h2>";
+      h += facts([
+        ["Where", d.locs.slice(0, 1).map(function (l) { return where(l[0], l[1], l[2]); }).join("")],
+        ["Also at", d.locs.length > 1 ? d.locs.slice(1, 40).map(function (l) { return where(l[0], l[1], l[2]); }).join("<br>") + (d.locs.length > 41 ? "<br>…" : "") : ""],
+        ["Does", r[6] ? chips(r[6].split("|")) : ""],
+        ["Content", esc(r[7])],
+        ["Script", "<code>" + esc(d.file) + "</code>"],
+      ]);
+      if (d.page) h += '<p><a class="md-button" href="' + BASE + d.page.replace(/\.md$/, meta.dirUrls ? "/" : ".html").replace(/index\/$/, "") + '">Full guide for this NPC</a></p>';
+      if (d.says) h += "<h3>Says</h3><blockquote>" + d.says.map(esc).join("<br>") + "</blockquote>";
+      if (d.menu) h += "<h3>Menu options</h3><p>" + chips(d.menu) + "</p>";
+      if (d.sells) h += "<h3>Sells</h3>" + table(["Item", "Price"], d.sells.map(function (s) {
+        var price = /^item:/.test(s[2]) ? num(s[1]) + " × " + itemLink(+s[2].slice(5), items) : num(s[1]) + " " + esc(s[2] === "Zeny" ? "z" : s[2]);
+        return [itemLink(s[0], items), price];
+      }));
+      if (d.barter) h += "<h3>Trades</h3>" + table(["Item", "Costs"], d.barter.map(function (b) {
+        return [itemLink(b[0], items), b[1].map(function (c) { return c[0] === "zeny" ? num(c[1]) + " z" : c[1] + " × " + itemLink(c[0], items); }).join("<br>")];
+      }));
+      if (d.gives) h += "<h3>Gives</h3><p><small>Items this NPC's script can hand out.</small></p>" + table(["Item"], d.gives.map(function (i) { return [itemLink(i, items)]; }));
+      if (d.takes) h += "<h3>Takes</h3><p><small>Items this NPC's script can take from you.</small></p>" + table(["Item"], d.takes.map(function (i) { return [itemLink(i, items)]; }));
+      if (d.quests) h += "<h3>Quests</h3>" + table(["Quest", "Id"], d.quests.map(function (q) { return [esc(q[1] || "Quest"), q[0]]; }));
+      if (d.enchants) h += "<h3>Enchanting</h3><p>" + d.enchants.map(function (e) { return '<a href="' + page("enchants") + "#E" + e + '">Enchant system ' + e + "</a>"; }).join(", ") + "</p>";
+      if (d.instances) h += "<h3>Instances</h3><p>" + chips(d.instances) + "</p>";
+      if (d.warps) h += "<h3>Can warp you to</h3><p>" + d.warps.map(function (m) { return "<code>" + esc(m) + "</code>"; }).join(" ") + "</p>";
+      root.innerHTML = h;
+    });
+  }
+
+  function costs(price, mats, items) {
+    var out = (mats || []).map(function (m) { return m[1] + " × " + itemLink(m[0], items); });
+    if (price) out.push(num(price) + " z");
+    return out.join("<br>") || "free";
+  }
+  function enchantView(root, key) {
+    return Promise.all([get("enchants_detail.json"), get("items.json"), get("npcs.json")]).then(function (a) {
+      var d = a[0][key], items = byId(a[1]), npcs = byId(a[2]);
+      if (!d) { root.innerHTML = back("enchants") + "<p>No enchant entry " + esc(key) + ".</p>"; return; }
+      var h = back("enchants");
+      var refine = function (lo, hi) { return lo || hi != null ? "+" + (lo || 0) + (hi != null ? " to +" + hi : " or higher") : ""; };
+      if (key[0] === "E") {
+        h += "<h2>Enchant system " + esc(key.slice(1)) + "</h2>";
+        h += facts([
+          ["Opened by", d.npcs.map(function (n) { var x = npcs[n]; return npcLink(n, npcs) + (x ? " " + where(x[2], x[3], x[4]) : ""); }).join("<br>")],
+          ["Needs refine", d.minRefine ? "+" + d.minRefine + " or higher" : ""], ["Needs enchant grade", d.minGrade || ""],
+          ["Slot order", d.order.length ? d.order.map(function (o) { return "slot " + o; }).join(" → ") : ""],
+          ["Reset", d.reset ? (d.reset[0] / 1000) + "% success, costs " + costs(d.reset[1], d.reset[2], items) : "not possible"],
+        ]);
+        h += "<h3>Items you can enchant</h3>" + table(["Item"], d.targets.map(function (t) { return [itemLink(t, items)]; }));
+        d.slots.forEach(function (sl) {
+          h += "<h3>Slot " + sl.slot + "</h3>" + facts([["Cost per try", costs(sl.price, sl.mats, items)], ["Success", sl.chance / 1000 + "%"],
+            ["Grade bonus", sl.bonus.length ? sl.bonus.map(function (b) { return "grade " + b[0] + ": +" + b[1] / 1000 + "%"; }).join(", ") : ""]]);
+          sl.grades.forEach(function (g) {
+            var total = g[1].reduce(function (t, x) { return t + x[1]; }, 0);
+            h += (sl.grades.length > 1 ? "<h4>Enchant grade " + g[0] + "</h4>" : "") + table(["Enchant", "Chance"], g[1].map(function (x) {
+              return [itemLink(x[0], items), total ? +(x[1] * 100 / total).toFixed(2) + "%" : ""];
+            }));
+          });
+          if (sl.perfect.length) h += "<h4>Perfect enchant (pick one, always succeeds)</h4>" + table(["Enchant", "Cost"], sl.perfect.map(function (p) { return [itemLink(p[0], items), costs(p[1], p[2], items)]; }));
+          if (sl.upgrades.length) h += "<h4>Upgrades</h4>" + table(["From", "To", "Cost"], sl.upgrades.map(function (u) { return [itemLink(u[0], items), itemLink(u[1], items), costs(u[2], u[3], items)]; }));
+        });
+      } else if (key[0] === "S") {
+        h += pic("items", d.item, "db-pic") + "<h2>Laphine synthesis: " + esc((items[d.item] || [, "Item " + d.item])[1]) + "</h2>";
+        h += "<p>Use " + itemLink(d.item, items) + " and hand in <b>" + d.count + "</b> of the items below" +
+          (d.minRefine || d.maxRefine != null ? ", refined " + refine(d.minRefine, d.maxRefine) : "") + ". You get one item from the reward list.</p>";
+        h += "<h3>Accepted items</h3>" + table(["Item", "Amount"], d.reqs.map(function (r) { return [itemLink(r[0], items), r[1]]; }));
+        if (d.rewards.length) h += "<h3>Rewards</h3>" + table(["Item", "Amount", "Chance"], d.rewards.map(function (r) { return [itemLink(r[0], items), r[2], r[1] == null ? "always" : r[1] + "%"]; }));
+      } else {
+        h += pic("items", d.item, "db-pic") + "<h2>Laphine upgrade: " + esc((items[d.item] || [, "Item " + d.item])[1]) + "</h2>";
+        h += facts([
+          ["Use", itemLink(d.item, items)],
+          ["Item must be refined", refine(d.minRefine, d.maxRefine)],
+          ["Refine afterwards", d.resultRefine != null ? "+" + d.resultRefine : d.resultMin != null ? "+" + d.resultMin + " to +" + d.resultMax : "unchanged"],
+          ["Needs random options", d.needOptions || ""], ["Cards", d.cards ? "kept" : "not allowed"],
+        ]);
+        if (d.options && d.options.length) h += "<h3>Random options added</h3>" + d.options.map(function (slot, i) {
+          var total = slot.reduce(function (t, o) { return t + o[3]; }, 0);
+          return "<h4>Option " + (i + 1) + "</h4>" + table(["Option", "Value", "Chance"], slot.map(function (o) {
+            return [esc(o[0]), o[1] === o[2] ? o[1] : o[1] + " ~ " + o[2], total ? +(o[3] * 100 / total).toFixed(2) + "%" : ""];
+          }));
+        }).join("");
+        h += "<h3>Items you can upgrade</h3>" + table(["Item"], d.targets.map(function (t) { return [itemLink(t, items)]; }));
+      }
       root.innerHTML = h;
     });
   }
@@ -402,12 +551,12 @@
     });
   }
 
-  var DETAIL = { items: itemView, monsters: mobView, skills: skillView, jobs: jobView };
+  var DETAIL = { items: itemView, monsters: mobView, skills: skillView, npcs: npcView, enchants: enchantView, jobs: jobView };
 
   function route(root, kind) {
     var key = decodeURIComponent(location.hash.slice(1));
     var view = root.querySelector(".db-view") || root;
-    var go = key ? DETAIL[kind](view, kind === "items" || kind === "monsters" ? +key : key) : listView(view, kind);
+    var go = key ? DETAIL[kind](view, kind === "items" || kind === "monsters" || kind === "npcs" ? +key : key) : listView(view, kind);
     go.catch(function (e) { view.innerHTML = '<p class="db-loading">Could not load the database (' + esc(e.message) + ").</p>"; });
     if (key) window.scrollTo(0, root.getBoundingClientRect().top + window.scrollY - 80);
   }
@@ -425,6 +574,8 @@
       route(root, kind);
       window.addEventListener("hashchange", function () { route(root, kind); });
       window.addEventListener("popstate", function () { route(root, kind); });
+    }).catch(function (e) {
+      root.innerHTML = '<p class="db-loading">Could not load the database (' + esc(e.message) + "). Try reloading the page.</p>";
     });
   }
 
