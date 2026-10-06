@@ -8,6 +8,7 @@ import os
 import re
 import sys
 import functools
+import json
 from collections import OrderedDict
 
 import yaml
@@ -148,8 +149,34 @@ def _site_root():
     return "../" * url.count("/")
 
 
+@functools.lru_cache(None)
+def _icons():
+    """img/icons.json at the wiki root: {kind: {id: slot}} plus the sheet layout (tools/pack_icons.py)."""
+    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "img", "icons.json")
+    if not os.path.exists(path):
+        return {}
+    with open(path) as f:
+        d = json.load(f)
+    out = {k: d[k] for k in ("cols", "rows")}
+    for k in ("items", "skills"):
+        a = d.get(k) or []
+        out[k] = dict(zip(a[::2], a[1::2]))
+    return out
+
+
 def pic(kind, pid, cls):
-    """<img> for a picture saved in img/ by tools/fetch_images.py; a missing one removes itself."""
+    """Picture saved in img/ by tools/fetch_images.py; a missing one removes itself. Item and skill icons are
+    cells of the sprite sheets from tools/pack_icons.py."""
+    if kind in ("items", "skills"):
+        ic = _icons()
+        slot = ic.get(kind, {}).get(int(pid))
+        if slot is None:
+            return ""
+        cols, rows = ic["cols"], ic["rows"]
+        col, row, sheet = slot % cols, slot // cols % rows, slot // (cols * rows)
+        return (f'<span class="spr {cls}" style="background-image:url({_site_root()}img/sheets/{kind}-{sheet}.png);'
+                f'background-size:{cols * 100}% {rows * 100}%;'
+                f'background-position:{col * 100 / (cols - 1):g}% {row * 100 / (rows - 1):g}%"></span>')
     return f'<img class="{cls}" src="{_site_root()}img/{kind}/{pid}.png" alt="" loading="lazy" onerror="this.remove()">'
 
 
