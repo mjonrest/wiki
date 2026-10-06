@@ -1,4 +1,5 @@
-# Saves item icons, monster pictures, skill icons and NPC pictures from Divine Pride into img/, so the wiki serves them itself.
+# Saves item icons, monster pictures and skill icons from Divine Pride, and NPC pictures from ai4rei's NPC list
+# (nn.ai4rei.net/dev/npclist), into img/, so the wiki serves them itself.
 # Item and skill icons go into the sprite sheets in img/sheets/ (source/tools/pack_icons.py).
 # Runs when the database changes, or by hand from the Actions tab ("Run workflow").
 name: Sync images
@@ -7,7 +8,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: [db/data/items.json, db/data/mobs.json, db/data/skills.json, db/data/npcs.json]
+    paths: [db/data/items.json, db/data/mobs.json, db/data/skills.json, db/data/npcs.json, db/data/npc_sprites.json, source/tools/fetch_images.py]
 
 permissions:
   contents: write
@@ -31,6 +32,6 @@ jobs:
           if git diff --cached --quiet; then echo "No new pictures"; exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
-          git commit -m "Save item and monster pictures"
+          git commit -m "Save item, monster and NPC pictures"
           git pull --rebase origin main
           git push origin HEAD:main

@@ -1,8 +1,9 @@
-"""Downloads item icons, monster pictures, skill icons and NPC pictures from Divine Pride into img/ at the wiki root.
+"""Downloads item icons, monster pictures and skill icons from Divine Pride, and NPC pictures from ai4rei's NPC list
+(nn.ai4rei.net/dev/npclist), into img/ at the wiki root.
 
 The wiki only shows pictures saved in img/, so this runs whenever the database gains new ids. Monster and NPC
 pictures stay as img/<kind>/<id>.png; item and skill icons are packed into sprite sheets by pack_icons.py.
-Ids Divine Pride has no picture for are kept in img/missing.json and skipped next time (pass --retry to try them
+Ids no site has a picture for are kept in img/missing.json and skipped next time (pass --retry to try them
 again).
 
     python3 source/tools/fetch_images.py            # from the wiki repo root
@@ -19,17 +20,21 @@ import urllib.error
 import urllib.request
 from collections import defaultdict
 
+from PIL import Image
+
 import pack_icons
 
-# kind: (index file, how to read ids from it, URLs to try in order)
+# kind: (index file, how to read ids from it, URLs to try in order; {id} is the id and {name} the NPC sprite name)
 SOURCES = {
     "items": ("items.json", lambda rows: [r[0] for r in rows], ["https://static.divine-pride.net/images/items/item/{}.png"]),
     "mobs": ("mobs.json", lambda rows: [r[0] for r in rows], ["https://static.divine-pride.net/images/mobs/png/{}.png"]),
     "skills": ("skills.json", lambda rows: [r["id"] for r in rows], ["https://static.divine-pride.net/images/skill/{}.png"]),
     # NPC sprite ids; ids in the monster range use the monster picture instead.
     "npcs": ("npcs.json", lambda rows: [r[5] for r in rows if 0 < r[5] and not 1001 <= r[5] < 4000],
-             ["https://static.divine-pride.net/images/npc/{}.png", "https://static.divine-pride.net/images/npcs/{}.png"]),
+             ["http://nn.ai4rei.net/dev/npclist/i/{name}.gif"]),
 }
+# Bump a kind's number when its URLs change, so the ids the old URLs had no picture for are tried again.
+SOURCE_VERSION = {"npcs": 2}
 
 
 # Divine Pride answers ids it has no picture for with this "no image" picture instead of a 404.
@@ -58,6 +63,8 @@ def _fetch_one(url, path):
         try:
             with urllib.request.urlopen(req, timeout=30) as r:
                 data = r.read()
+            if data.startswith(b"GIF8"):
+                return _save_gif(data, path)
             if not data.startswith(b"\x89PNG") or _placeholder(data):
                 return False
             with open(path, "wb") as f:
@@ -70,6 +77,19 @@ def _fetch_one(url, path):
             pass
         time.sleep(2 ** attempt)
     return None
+
+
+def _save_gif(data, path):
+    """The first frame of an animated GIF sprite as a PNG, cropped to the sprite."""
+    import io
+    with Image.open(io.BytesIO(data)) as im:
+        im.seek(0)
+        im = im.convert("RGBA")
+    box = im.getchannel("A").getbbox()
+    if not box:
+        return False
+    im.crop(box).save(path, optimize=True)
+    return True
 
 
 def main():
@@ -85,7 +105,10 @@ def main():
     missing = {}
     if os.path.exists(missing_path) and not args.retry:
         with open(missing_path) as f:
-            missing = {k: set(v) for k, v in json.load(f).items()}
+            saved_missing = json.load(f)
+        versions = saved_missing.pop("_versions", {})
+        missing = {k: set(v) for k, v in saved_missing.items()
+                   if versions.get(k, 1) == SOURCE_VERSION.get(k, 1)}
 
     # Drop placeholders saved before they were recognised.
     removed = 0
@@ -112,12 +135,20 @@ def main():
             continue
         with open(path) as f:
             ids = sorted(set(read_ids(json.load(f))))
+        names = {}
+        if kind == "npcs":
+            names_path = os.path.join(args.root, "db", "data", "npc_sprites.json")
+            if os.path.exists(names_path):
+                with open(names_path) as f:
+                    names = {int(k): v for k, v in json.load(f).items()}
+            print(f"npcs: {len(ids)} sprite ids, {len(names)} sprite names")
         skip = missing.get(kind, set())
         have = packed.get(kind, {})
         for i in ids:
             out = os.path.join(folder, f"{i}.png")
-            if i not in skip and i not in have and not os.path.exists(out):
-                jobs.append((kind, i, [u.format(i) for u in urls], out))
+            todo = [u.format(i, id=i, name=names.get(i, "")) for u in urls if "{name}" not in u or i in names]
+            if todo and i not in skip and i not in have and not os.path.exists(out):
+                jobs.append((kind, i, todo, out))
     if args.limit:
         jobs = jobs[: args.limit]
     print(f"{len(jobs)} pictures to fetch")
@@ -142,7 +173,9 @@ def main():
     shutil.rmtree(tmp, ignore_errors=True)
 
     with open(missing_path, "w") as f:
-        json.dump({k: sorted(v) for k, v in sorted(missing.items())}, f, separators=(",", ":"))
+        out = {k: sorted(v) for k, v in sorted(missing.items())}
+        out["_versions"] = SOURCE_VERSION
+        json.dump(out, f, separators=(",", ":"))
     for kind in SOURCES:
         print(f"{kind}: saved {saved[kind]}, no picture for {len(missing.get(kind, ()))}")
 

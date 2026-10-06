@@ -210,13 +210,13 @@
     enchants: {
       index: "enchants.json",
       searchHint: "Item name, e.g. Gray Wolf Suits or Shadow Mix Recipe",
-      text: function (r) { return (r[2] + " " + r[3] + " " + r[1]).toLowerCase(); },
+      text: function (r) { return (r[2] + " " + r[3] + " " + r[1] + " " + (r[6] || "")).toLowerCase(); },
       filters: [
         { label: "Kind", type: "select", get: function (r) { return r[1]; } },
         { label: "Minimum refine", type: "range", get: function (r) { return r[5]; } },
       ],
       cols: [
-        { h: "For", cell: function (r) { return nameCell(pic("items", r[2], "ico"), r[0], r[3], r[1] === "Enchant" && r[4] > 1 ? " <small>+" + (r[4] - 1) + " more items</small>" : ""); }, sort: function (r) { return r[3]; } },
+        { h: "For", cell: function (r) { return nameCell(pic("items", r[2], "ico"), r[0], r[3], r[1] === "Enchant" && r[4] > 1 ? " <small>+" + (r[4] - 1) + " more items</small>" : r[0][0] === "G" && r[4] ? " <small>" + r[4] + " items</small>" : ""); }, sort: function (r) { return r[3]; } },
         { h: "Kind", cell: function (r) { return '<span class="db-chip">' + esc(r[1]) + "</span>"; }, sort: function (r) { return r[1]; } },
         { h: "Items", cell: function (r) { return r[4]; }, sort: function (r) { return r[4]; } },
         { h: "Min. refine", cell: function (r) { return r[5] ? "+" + r[5] : ""; }, sort: function (r) { return r[5]; } },
@@ -412,18 +412,32 @@
       }));
       if (d.givenBy) h += "<h3>Given by NPC</h3><p><small>These NPCs hand out this item, for example as a quest reward or exchange.</small></p>" +
         table(["NPC", "Where"], d.givenBy.map(function (n) { var x = npcs[n]; return [npcLink(n, npcs), x ? where(x[2], x[3], x[4]) : ""]; }));
-      if (d.enchant) {
-        var e = d.enchant, link = function (k) { return '<a href="' + page("enchants") + "#" + k + '">' + (k[0] === "E" ? "Enchant system " + k.slice(1) : itemLabel(+k.slice(1))) + "</a>"; };
-        var itemLabel = function (i) { var x = items[i]; return esc(x ? x[1] : "Item " + i); };
-        var parts = [["enchantTarget", "Can be enchanted with"], ["enchantResult", "Is an enchant from"], ["laphineItem", "Opens Laphine"],
-          ["laphineReq", "Used as material in"], ["laphineReward", "Comes out of Laphine"], ["laphineTarget", "Can be upgraded with"]];
-        h += "<h3>Enchanting</h3>" + facts(parts.map(function (p) { return [p[1], e[p[0]] ? e[p[0]].map(link).join(", ") : ""]; }));
-      }
+      if (d.enchant) h += '<div class="db-enchanting"></div>';
       if (d.boxes) h += "<h3>Found in</h3>" + table(["Box", "Chance"], d.boxes.map(function (b) { return [itemLink(b[0], items), b[1] == null ? "always" : b[1] + "%"]; }));
       if (d.contains) h += "<h3>Contents</h3>" + table(["Item", "Amount", "Chance"], d.contains.map(function (b) { return [itemLink(b[0], items), b[2], b[1] == null ? "always" : b[1] + "%"]; }));
       root.innerHTML = h;
+      if (d.enchant) return enchantLinks(d.enchant).then(function (names) {
+        var e = d.enchant, link = function (k) { return '<a href="' + page("enchants") + "#" + k + '">' + esc(names[k] || k) + "</a>"; };
+        var parts = [["enchantTarget", "Can be enchanted at"], ["enchantResult", "Is an enchant from"], ["enchantMaterial", "Used to enchant at"],
+          ["laphineItem", "Opens Laphine"], ["laphineReq", "Used as material in"], ["laphineReward", "Comes out of Laphine"], ["laphineTarget", "Can be upgraded with"]];
+        root.querySelector(".db-enchanting").innerHTML = "<h3>Enchanting</h3>" + facts(parts.map(function (p) { return [p[1], e[p[0]] ? e[p[0]].map(link).join("<br>") : ""]; }));
+      });
     });
   }
+
+  // {enchant key: name} for links: NPC enchanters by their guide's title, enchant systems by the NPC that opens them.
+  function enchantLinks() {
+    return Promise.all([get("enchants.json"), get("enchants_detail.json"), get("npcs.json")]).then(function (a) {
+      var npcs = byId(a[2]), out = {};
+      a[0].forEach(function (r) {
+        var d = a[1][r[0]] || {}, n = d.npcs && d.npcs.length && npcs[d.npcs[0]];
+        out[r[0]] = r[0][0] === "G" ? r[3] : r[0][0] === "E" ? (n ? n[1] + ": " : "") + "enchant system " + r[0].slice(1) + (r[4] > 1 ? " (" + r[3] + " and " + (r[4] - 1) + " more)" : " (" + r[3] + ")")
+          : r[1] + ": " + r[3];
+      });
+      return out;
+    });
+  }
+  function guideUrl(p) { return BASE + p.replace(/\.md$/, meta.dirUrls ? "/" : ".html").replace(/index\/$/, ""); }
 
   function mobView(root, id) {
     return Promise.all([get("items.json"), get("mobs.json"), get("mobs/" + Math.floor(id / meta.chunk) + ".json")]).then(function (a) {
@@ -495,7 +509,7 @@
         ["Content", esc(r[7])],
         ["Script", "<code>" + esc(d.file) + "</code>"],
       ]);
-      if (d.page) h += '<p><a class="md-button" href="' + BASE + d.page.replace(/\.md$/, meta.dirUrls ? "/" : ".html").replace(/index\/$/, "") + '">Full guide for this NPC</a></p>';
+      if (d.page) h += '<p><a class="md-button" href="' + guideUrl(d.page) + '">Full guide for this NPC</a></p>';
       if (d.says) h += "<h3>Says</h3><blockquote>" + d.says.map(esc).join("<br>") + "</blockquote>";
       if (d.menu) h += "<h3>Menu options</h3><p>" + chips(d.menu) + "</p>";
       if (d.sells) h += "<h3>Sells</h3>" + table(["Item", "Price"], d.sells.map(function (s) {
@@ -508,7 +522,8 @@
       if (d.gives) h += "<h3>Gives</h3><p><small>Items this NPC's script can hand out.</small></p>" + table(["Item"], d.gives.map(function (i) { return [itemLink(i, items)]; }));
       if (d.takes) h += "<h3>Takes</h3><p><small>Items this NPC's script can take from you.</small></p>" + table(["Item"], d.takes.map(function (i) { return [itemLink(i, items)]; }));
       if (d.quests) h += "<h3>Quests</h3>" + table(["Quest", "Id"], d.quests.map(function (q) { return [esc(q[1] || "Quest"), q[0]]; }));
-      if (d.enchants) h += "<h3>Enchanting</h3><p>" + d.enchants.map(function (e) { return '<a href="' + page("enchants") + "#E" + e + '">Enchant system ' + e + "</a>"; }).join(", ") + "</p>";
+      if (d.enchants || d.enchantGuide) h += "<h3>Enchanting</h3><p>" + (d.enchantGuide ? ['<a href="' + page("enchants") + "#" + d.enchantGuide + '">What this NPC enchants</a>'] : [])
+        .concat((d.enchants || []).map(function (e) { return '<a href="' + page("enchants") + "#E" + e + '">Enchant system ' + e + "</a>"; })).join("<br>") + "</p>";
       if (d.instances) h += "<h3>Instances</h3><p>" + chips(d.instances) + "</p>";
       if (d.warps) h += "<h3>Can warp you to</h3><p>" + d.warps.map(function (m) { return "<code>" + esc(m) + "</code>"; }).join(" ") + "</p>";
       root.innerHTML = h;
@@ -526,10 +541,21 @@
       if (!d) { root.innerHTML = back("enchants") + "<p>No enchant entry " + esc(key) + ".</p>"; return; }
       var h = back("enchants");
       var refine = function (lo, hi) { return lo || hi != null ? "+" + (lo || 0) + (hi != null ? " to +" + hi : " or higher") : ""; };
-      if (key[0] === "E") {
-        h += "<h2>Enchant system " + esc(key.slice(1)) + "</h2>";
+      var npcList = function (ids) { return ids.map(function (n) { var x = npcs[n]; return npcLink(n, npcs) + (x ? " " + where(x[2], x[3], x[4]) : ""); }).join("<br>"); };
+      var guide = d.page ? '<p><a class="md-button" href="' + guideUrl(d.page) + '">Read the full guide</a>' +
+        (d.guide ? ' <a class="md-button" href="#' + esc(d.guide) + '">Everything this NPC enchants</a>' : "") + "</p>" : "";
+      if (key[0] === "G") {
+        h += "<h2>" + esc(d.title) + "</h2>" + guide;
+        h += "<p><small>This enchanter is an NPC script, so the chances and costs are on its guide page. " +
+          "The lists below are the items the guide mentions.</small></p>";
+        h += facts([["NPC", npcList(d.npcs)]]);
+        h += "<h3>Items it enchants</h3>" + (table(["Item"], d.targets.map(function (t) { return [itemLink(t, items)]; })) || "<p>See the guide.</p>");
+        if (d.results.length) h += "<h3>Enchants it can add</h3>" + table(["Enchant"], d.results.map(function (t) { return [itemLink(t, items)]; }));
+        if (d.mats.length) h += "<h3>Materials and other items</h3>" + table(["Item"], d.mats.map(function (t) { return [itemLink(t, items)]; }));
+      } else if (key[0] === "E") {
+        h += "<h2>Enchant system " + esc(key.slice(1)) + "</h2>" + guide;
         h += facts([
-          ["Opened by", d.npcs.map(function (n) { var x = npcs[n]; return npcLink(n, npcs) + (x ? " " + where(x[2], x[3], x[4]) : ""); }).join("<br>")],
+          ["Opened by", npcList(d.npcs)],
           ["Needs refine", d.minRefine ? "+" + d.minRefine + " or higher" : ""], ["Needs enchant grade", d.minGrade || ""],
           ["Slot order", d.order.length ? d.order.map(function (o) { return "slot " + o; }).join(" → ") : ""],
           ["Reset", d.reset ? (d.reset[0] / 1000) + "% success, costs " + costs(d.reset[1], d.reset[2], items) : "not possible"],
