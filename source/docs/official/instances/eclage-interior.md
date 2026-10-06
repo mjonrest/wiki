@@ -37,8 +37,4 @@ Instance Point limit.
 !!! tip
     Heal up before you talk to Shenime: you arrive in the next room with 1% HP and blinded.
 
-!!! warning "Known issue"
-    Avant sends you to the shared copy of the last room instead of your own instance. Other players doing this
-    step at the same time may be there too. Talking to Hisie still completes the quest normally.
-
 {{ instance_page("eclage-interior") }}

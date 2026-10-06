@@ -112,16 +112,6 @@ Every enchant above (except the top level) can be raised one level at a time. Up
 | Slot 3 | 25 of your armor's powder + 500,000z | 75 of your armor's powder + 1,500,000z |
 | Slot 2 | 25 of your armor's fragment + 5,000,000z | 75 of your armor's fragment + 15,000,000z |
 
-!!! warning "Known issue: the upgrade list can pick the wrong slot"
-    The list of slots under **Upgrade Enchant** is numbered wrongly. It only lines up when Slot 3 holds an
-    enchant that can still be upgraded. Otherwise the entry you click can upgrade a **different** slot, and
-    **Cancel** can open an upgrade instead of closing.
-
-    Always read the **Upgrade path** line on the next screen before you confirm. It must show your current
-    enchant → the next level. If the right side is blank or shows the wrong enchant, choose **Cancel**.
-    Confirming a blank upgrade takes the materials and either does nothing or **deletes the enchant** in that
-    slot.
-
 ### Reroll and reset
 
 | Option | Cost | What it does |
@@ -200,10 +190,7 @@ Always succeeds.
 | {{ item(310704) }} | {{ item(310705) }} | 150 {{ item(1000373) }} + 9,000,000z |
 | {{ item(310705) }} | {{ item(310706) }} | 250 {{ item(1000373) }} + 15,000,000z |
 
-!!! warning "Known issue: only Star of Sharp can be upgraded"
-    Only the **Star of Sharp** line is in the upgrade list. Star of Mettle, Master Archer, Spell, Speed, Vital
-    and Spirit get "No upgrade available for this enchant!". The script also has a more expensive price list
-    for Slot 3, but it is never used, so Slot 3 pays the prices above.
+All seven Star enchants (Mettle, Master Archer, Sharp, Spell, Speed, Vital, Spirit) can be upgraded up to Lv. 5. Slot 4 costs 25 / 75 / 150 / 250 Meteorite Fragments plus 1.5M / 4.5M / 9M / 15M zeny per step. Slot 3 costs 50 / 150 / 300 / 500 plus 2.5M / 7.5M / 15M / 25M zeny.
 
 ### Slot 2: Star Clusters (selectable)
 

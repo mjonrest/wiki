@@ -168,11 +168,6 @@ The armor also accepts every **Epic** module (table below), up to **2 of the sam
 | {{ item(1000201) }} | Epic 3 | {{ item(310176) }} |
 | {{ item(1000202) }} | Epic 3 | {{ item(310177) }} |
 
-!!! warning "Known issue"
-    Two different modules are both called "Above All". {{ item(1000135) }} works on the Engine Wing and adds
-    {{ item(310112) }} as expected. {{ item(1000134) }} works on the Leg, but it adds {{ item(310111) }}, not an Above All
-    orb. Check the module ID before you use it.
-
 ## Yecheon: random modules and improvement devices
 
 `/navi ba_in01 87/380`

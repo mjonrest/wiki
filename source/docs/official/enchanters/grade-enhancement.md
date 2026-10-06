@@ -86,6 +86,4 @@ If you carry a {{ item(30055) }}, Sratos shows an extra option, **"Enchant with 
 
 There is no failure chance, no refine requirement, and the **refine is kept** (unlike a normal upgrade).
 
-!!! warning "Known issue"
-    Items that are already grade A still show up in the ticket list. Using the ticket on one takes the ticket
-    and nothing happens.
+Items that are already grade A are not listed.

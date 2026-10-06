@@ -93,7 +93,4 @@ Four NPCs in Payon take the quest items from the boxes. Each turn-in gives **70,
     - {{ mob(1277) }}, {{ mob(1494) }} and {{ mob(1166) }} roam the whole map.
     - Clear quickly but carefully. The chest timers keep running while you fight trash.
 
-!!! warning "Known issue"
-    The **Dimensional Device** warps you out to `dali` even if you pick **"Stop"**. If you pick "Stop", you also receive 0 Instance Points, and that still counts as your claim for this run. Only talk to it when you are ready to leave, and pick **"Return to Dimensional Gap"**.
-
 {{ instance_page("faceworm-s-nest") }}

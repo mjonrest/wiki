@@ -53,8 +53,4 @@ When Buwaya dies, the box, the clones and the entrance spawns all stop, and the 
 came in. The **exit** opens near the cave entrance (`1@ma_c 28/57`). Taking it gives **20–40 Instance Points**
 (+50 with {{ item(30034) }}, within the daily Instance Point limit) and returns you to `ma_fild02`.
 
-!!! warning "Known issue"
-    The exit asks *"Yes!"* or *"No, I will stay."*, but either answer warps you out. If you pick *No*, you leave
-    with **no** Instance Points. Only step on the exit when you are ready to go, and pick *Yes!*
-
 {{ instance_page("buwaya-cave") }}

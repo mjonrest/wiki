@@ -6520,11 +6520,6 @@ You need 1,000 free weight.</p>
 <p>Two enchants per item: the 1st goes into slot 4, the 2nd into slot 3. Each time you pick a type
 (Physical, Magical or Range) and get a random enchant from that list. Every entry in a list has the same
 chance.</p>
-<div class="admonition warning">
-<p class="admonition-title">Known issue: Quit does not cancel</p>
-<p>Choosing <strong>Quit</strong> on the Physical / Magical / Range menu does not end the conversation. To back out,
-choose <strong>I'll return later.</strong> on the next screen.</p>
-</div>
 <h3 id="1st-enchant-slot-4">1st enchant (slot 4)<a class="headerlink" href="#1st-enchant-slot-4" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -6602,11 +6597,7 @@ choose <strong>I'll return later.</strong> on the next screen.</p>
 <h2 id="initialize-reset">Initialize (reset)<a class="headerlink" href="#initialize-reset" title="Permanent link">&para;</a></h2>
 <p><strong>Cost:</strong> 30 <img class="ico" src="../../../img/items/6905.png" alt="" loading="lazy" onerror="this.remove()"><a href="../../../db/items/#6905">Broken Magic Stone</a> <small class="iid">#6905</small>. Removes both enchants. Refine and cards are kept. The item must have at least
 one enchant.</p>
-<div class="admonition warning">
-<p class="admonition-title">Known issue: the break warning is wrong</p>
-<p>The NPC warns that the item may be destroyed during the reset. In the current script the reset
-<strong>always succeeds</strong> and never destroys the item.</p>
-</div>
+<p>The reset succeeds 70% of the time. On failure the item is destroyed. The fee is used either way.</p>
 
 
 

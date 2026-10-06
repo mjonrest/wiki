@@ -55,18 +55,7 @@ The **Researcher** at the camp gives repeatable kill missions. Any monster kille
 
 Only one mission can be active at a time. Talk to the Researcher once it is complete to get the reward automatically.
 
-!!! warning "Known issue: Researcher menu is shifted by one"
-    The Researcher's options don't match the missions you get:
-
-    - **Cancel** starts the 100-kill mission.
-    - **Capture 100 monsters** starts the 200-kill mission.
-    - **Capture 200 monsters** starts the 350-kill mission.
-    - **Capture 350 monsters** does nothing.
-
-    The rewards still match the mission you actually have.
-
-!!! warning "Known issue: entrance gate"
-    The Warp Gate next to the arrival point on the crash site uses a destination that no script sets, so it may not take you out of the instance.
+The Warp Gate next to the arrival point on the crash site takes you back to Dr.Dulaisakstrom in Dali (`/navi dali02 136/83`).
 
 ### Rewards and exchange
 

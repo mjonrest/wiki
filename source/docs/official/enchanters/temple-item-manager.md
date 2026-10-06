@@ -30,9 +30,4 @@ You choose the exact enchant, so there is no random roll and it never fails. The
 
 There is no reset option at this NPC.
 
-!!! warning "Known issue"
-    The S Class enchants cannot be obtained. Before you even reach the class menu, the NPC refuses any necklace
-    that already has an enchant ("This necklace of yours already has an enchantment."). But the S Class upgrade
-    needs the A Class enchant to be on the necklace already, so the S Class choice is never reachable with a
-    valid necklace. Choosing S Class on a clean necklace only gives "You need to have your necklace enchanted with
-    ... first." Do not farm 1,000 Fragments for it.
+S Class needs the A Class of the same power already on the necklace; the S Class enchant replaces it.

@@ -30,10 +30,6 @@ Two enchants per item: the 1st goes into slot 4, the 2nd into slot 3. Each time 
 (Physical, Magical or Range) and get a random enchant from that list. Every entry in a list has the same
 chance.
 
-!!! warning "Known issue: Quit does not cancel"
-    Choosing **Quit** on the Physical / Magical / Range menu does not end the conversation. To back out,
-    choose **I'll return later.** on the next screen.
-
 ### 1st enchant (slot 4)
 
 | Item | Physical | Magical | Range |
@@ -67,6 +63,4 @@ chance.
 **Cost:** 30 {{ item(6905) }}. Removes both enchants. Refine and cards are kept. The item must have at least
 one enchant.
 
-!!! warning "Known issue: the break warning is wrong"
-    The NPC warns that the item may be destroyed during the reset. In the current script the reset
-    **always succeeds** and never destroys the item.
+The reset succeeds 70% of the time. On failure the item is destroyed. The fee is used either way.

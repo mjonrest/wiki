@@ -74,8 +74,7 @@ Wear the item, then pick its equipment slot in the menu. Every item has an **enc
 
 Refine and cards are kept on success and on a normal failure. Once all slots are full the Researcher refuses; reset the item to start over.
 
-!!! warning "Known issue"
-    **The 2nd enchant can wipe the 1st.** Before the 2nd enchant the Researcher says "The previous enforcement won't be affected", but if the 2nd enchant fails, the 1st enchant in the 4th slot is removed as well.
+If the 2nd enchant fails, only the 2nd slot stays empty; the 1st enchant is kept.
 
 ### Reset
 

@@ -30,11 +30,7 @@ All three enchanters work on the costume you are **wearing**. Refine and existin
 !!! tip "Which costume he picks"
     Aver only works on one costume: your upper costume if you wear one, otherwise your middle one, otherwise your lower one. To put a Middle stone on a separate middle costume, take off your upper costume first (and the middle one for a Lower stone).
 
-!!! warning "Known issue"
-    Before the attempt Aver warns that on failure an existing enchant "will be reset". It is not: on failure only the stone is lost and the costume keeps its old enchant.
-
-!!! warning "Known issue"
-    Four entries in the Middle stone list ask for the enchant itself instead of a stone: they show up as "Expert Archer", "After Skill Delay1 Middle", "Experience+2%" and "Variable Cast Reduction Middle". As a result {{ item(25070) }}, {{ item(25141) }} and {{ item(25173) }} cannot be used here. ({{ item(25061) }} does work; it is listed further down.)
+On failure only the stone is lost; the costume keeps its old enchant.
 
 ### Upper stones (1st slot)
 
@@ -210,6 +206,9 @@ All three enchanters work on the costume you are **wearing**. Refine and existin
 | {{ item(1002409) }} | {{ item(314671) }} |
 | {{ item(1002412) }} | {{ item(314674) }} |
 | {{ item(25061) }} | {{ item(310330) }} |
+| {{ item(25070) }} | {{ item(29054) }} |
+| {{ item(25141) }} | {{ item(29145) }} |
+| {{ item(25173) }} | {{ item(29157) }} |
 | {{ item(1000378) }} | {{ item(310328) }} |
 | {{ item(1000529) }} | {{ item(310665) }} |
 | {{ item(1002397) }} | {{ item(314663) }} |
@@ -329,9 +328,6 @@ Wear a costume garment and pick one of two services. Both cost 1 stone per attem
 
 For Dual stones Lace asks for confirmation if the 2nd slot is already enchanted.
 
-!!! warning "Known issue"
-    {{ item(1001950) }} gives the {{ item(314032) }} enchant (the Soul Ascetic one), not the Spirit Handler enchant.
-
 ### Single Enchant stones (1st slot)
 
 | Stone | Enchant |
@@ -406,7 +402,7 @@ For Dual stones Lace asks for confirmation if the 2nd slot is already enchanted.
 | {{ item(1002407) }} | {{ item(314669) }} |
 | {{ item(1002107) }} | {{ item(314032) }} |
 | {{ item(1002284) }} | {{ item(314192) }} |
-| {{ item(1001950) }} | {{ item(314032) }} |
+| {{ item(1001950) }} | {{ item(313737) }} |
 | {{ item(1001053) }} | {{ item(311469) }} |
 | {{ item(1001054) }} | {{ item(311470) }} |
 | {{ item(1001171) }} | {{ item(311924) }} |
@@ -454,7 +450,7 @@ Pick the costume position (Upper, Middle, Lower or Garment), then the effect sto
 
 | Stone | Effect |
 |---|---|
-| {{ item(1000319) }} | none (see known issue) |
+| {{ item(1000319) }} | {{ item(300152) }} |
 | {{ item(25176) }} | {{ item(29160) }} |
 | {{ item(25225) }} | {{ item(29226) }} |
 | {{ item(25136) }} | {{ item(29142) }} |
@@ -482,9 +478,6 @@ Pick the costume position (Upper, Middle, Lower or Garment), then the effect sto
 | {{ item(1001617) }} | {{ item(313067) }} |
 | {{ item(1001651) }} | {{ item(313069) }} |
 | {{ item(1001650) }} | {{ item(313068) }} |
-
-!!! warning "Known issue"
-    {{ item(1000319) }} is used up but applies an enchant that does not exist on the server, so the costume gets no Angel Blessing effect.
 
 ## Designer Heidam (stone boxes)
 

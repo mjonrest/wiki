@@ -14,16 +14,12 @@ The item must be **equipped**. You need 1,200 free weight. There is no refine re
 
 | Enchant table | Items |
 |---|---|
-| Melee weapons | {{ item(1291) }}, {{ item(1392) }}, {{ item(1393) }}, {{ item(1435) }}, {{ item(13069) }}, {{ item(13070) }}, {{ item(16017) }}, {{ item(1490) }}* |
+| Melee weapons | {{ item(1290) }}, {{ item(1291) }}, {{ item(1392) }}, {{ item(1393) }}, {{ item(1435) }}, {{ item(13069) }}, {{ item(13070) }}, {{ item(16017) }}, {{ item(1490) }}* |
 | Ranged weapons | {{ item(18109) }}, {{ item(18110) }}, {{ item(18111) }} |
 | Magic weapons | {{ item(1584) }}, {{ item(1659) }} |
 | Armor | {{ item(2160) }}, {{ item(2161) }}, {{ item(2162) }}, {{ item(2892) }}, {{ item(15044) }}, {{ item(2582) }}*, {{ item(18570) }}* |
 
 Items marked * use a wider roll, which makes them slightly more likely to be destroyed (see the tables).
-
-!!! warning "Known issue"
-    {{ item(1290) }} is on Pudding's list of "discovered" weapons and the Weird old man trades it, but Pudding does not
-    accept it: she always answers "This equipment cannot accept the power". It cannot be enchanted here.
 
 ## Enchanting
 

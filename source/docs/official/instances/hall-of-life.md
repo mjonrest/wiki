@@ -219,9 +219,7 @@ The reward is for the barrier level the leader picked, given once per account pe
 
 All amounts are guaranteed; there is no random roll.
 
-!!! warning "Known issue"
-    Rewards are only defined up to **level 13**. Claiming at level 14 to 20 gives **nothing** but still uses your
-    weekly claim. Raise your level past 13 if you like the challenge, but claim on a level-13 (or lower) clear.
+Rewards are only defined up to level 13; clears at level 14 to 20 give the level 13 rewards.
 
 ### Tips
 

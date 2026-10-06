@@ -62,14 +62,10 @@ The **exchange** NPC at `/navi glast_01 245/296` trades:
 The **enchanter** NPC at `/navi glast_01 243/296` adds up to three random enchants to an equipped King Schmidt item,
 one per visit, starting from the last slot.
 
-| Item (must be equipped) | Materials you must carry | 1st and 2nd enchant | 3rd enchant |
+| Item (must be equipped) | Materials (consumed) | 1st and 2nd enchant | 3rd enchant |
 |---|---|---|---|
 | {{ item(15388) }} | 5 {{ item(25739) }} + 10 {{ item(6608) }} | STR, AGI, VIT, INT, DEX or LUK +3 to +5 | A stat +3 or an armor element ({{ item(29302) }}, {{ item(29303) }}, {{ item(29304) }}, {{ item(29305) }}, {{ item(29306) }}, {{ item(29307) }}, {{ item(29308) }}, {{ item(29309) }}) |
 | {{ item(15389) }} | 5 {{ item(25739) }} + 10 {{ item(6608) }} | Fighting Spirit 4-6, Spell 3-5, Sharp 2-4, Expert Archer 3-5, Fatal 1-3 | Same list |
 | Insignia, in the **left** accessory slot | 10 {{ item(25740) }} + 40 {{ item(6755) }} | 1st: a stat +3 to +5. 2nd: Fighting Spirit 6-7, Spell 4-5, Sharp 4-5, Expert Archer 4-5, Fatal 2-3 | {{ item(29587) }}, {{ item(29588) }}, {{ item(29589) }}, {{ item(29590) }}, {{ item(29591) }} or {{ item(29592) }} |
-
-!!! warning "Known issue"
-    The enchanter gives the item back at **+0**: any refine on the suit or manteau is lost. Enchant before refining.
-    It also only checks that you carry the materials and does not take them.
 
 {{ instance_page("fall-of-glast-heim") }}

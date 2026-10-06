@@ -217,9 +217,7 @@ Accessories never break.
 Choose **"Reset product."** Costs 100,000 zeny + 1 {{ item(6752) }}. Always succeeds and removes every enchant;
 refine and cards are kept.
 
-!!! warning "Known issue"
-    The NPC does not check whether the item has any enchants. Resetting an item with no enchants still takes the
-    zeny and the Charleston Parts.
+The NPC does not check whether the item has enchants: resetting an item with none still costs the zeny and the Charleston Parts.
 
 ## Excelion gear
 

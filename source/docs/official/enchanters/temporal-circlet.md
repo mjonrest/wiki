@@ -121,12 +121,7 @@ For example {{ item(29706) }} goes up to {{ item(29715) }} and {{ item(29061) }}
 | 500,000z | 70% | **The circlet is destroyed** |
 | 10 Cash Points | 100% | - |
 
-!!! warning "Known issue: reset also removes your card"
-    The reset gives back a completely clean circlet with the same refine. A **card in the first slot is
-    removed and lost** along with the enchants. Take out anything you want to keep first.
-
-    The cost is also taken before the NPC checks whether there is anything to reset, and the 500,000z option
-    can destroy a circlet even if it had no enchants.
+The reset keeps the refine and the card in the first slot. If the circlet has no enchants, she refuses before taking any cost. A failed 500,000z reset still destroys the circlet.
 
 ## HUGINN2001
 
