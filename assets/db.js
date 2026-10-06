@@ -18,10 +18,12 @@
     return cache[path];
   }
 
-  var ITEM_ICON = "https://static.divine-pride.net/images/items/item/";
-  var MOB_IMAGE = "https://static.divine-pride.net/images/mobs/png/";
-  function pic(url, cls) {
-    return '<img class="' + cls + '" src="' + url + '" alt="" loading="lazy" onerror="this.remove()">';
+  // Pictures: the copy saved in img/ (tools/fetch_images.py), then Divine Pride, then nothing.
+  var REMOTE = { items: "https://static.divine-pride.net/images/items/item/", mobs: "https://static.divine-pride.net/images/mobs/png/" };
+  var ONERR = "var a=this.getAttribute('data-alt');if(a){this.removeAttribute('data-alt');this.src=a}else this.remove()";
+  function pic(kind, id, cls) {
+    return '<img class="' + cls + '" src="' + BASE + "img/" + kind + "/" + id + '.png" data-alt="' + REMOTE[kind] + id +
+      '.png" alt="" loading="lazy" onerror="' + ONERR + '">';
   }
 
   function esc(s) {
@@ -38,11 +40,11 @@
   function itemLink(id, names) {
     var it = names && names[id];
     var label = it ? it[1] + (+it[4] ? " [" + it[4] + "]" : "") : "Item " + id;
-    return pic(ITEM_ICON + id + ".png", "ico") + '<a href="' + page("items") + "#" + id + '">' + esc(label) + '</a> <small class="iid">' + id + "</small>";
+    return pic("items", id, "ico") + '<a href="' + page("items") + "#" + id + '">' + esc(label) + '</a> <small class="iid">' + id + "</small>";
   }
   function mobLink(id, names) {
     var m = names && names[id];
-    return pic(MOB_IMAGE + id + ".png", "mob-sm") + '<a href="' + page("monsters") + "#" + id + '">' + esc(m ? m[1] : "Monster " + id) + '</a> <small class="iid">' + id + "</small>";
+    return pic("mobs", id, "mob-sm") + '<a href="' + page("monsters") + "#" + id + '">' + esc(m ? m[1] : "Monster " + id) + '</a> <small class="iid">' + id + "</small>";
   }
   function skillLink(aegis, skills) {
     var s = skills && skills.byAegis[aegis];
@@ -99,6 +101,7 @@
   var KINDS = {
     items: {
       index: "items.json",
+      searchHint: "Item name or id, e.g. Elunium or 985",
       text: function (r) { return (r[0] + " " + r[1]).toLowerCase(); },
       filters: [
         { label: "Type", type: "select", get: function (r) { return r[2]; } },
@@ -110,7 +113,7 @@
       ],
       cols: [
         { h: "Id", cell: function (r) { return r[0]; }, sort: function (r) { return r[0]; } },
-        { h: "Name", cell: function (r) { return nameCell(pic(ITEM_ICON + r[0] + ".png", "ico"), r[0], r[1] + (r[4] ? " [" + r[4] + "]" : "")); }, sort: function (r) { return r[1]; } },
+        { h: "Name", cell: function (r) { return nameCell(pic("items", r[0], "ico"), r[0], r[1] + (r[4] ? " [" + r[4] + "]" : "")); }, sort: function (r) { return r[1]; } },
         { h: "Type", cell: function (r) { return esc(nice(r[2])) + (r[3] ? " <small>" + esc(nice(r[3])) + "</small>" : ""); }, sort: function (r) { return r[2] + r[3]; } },
         { h: "Level", cell: function (r) { return r[5] || ""; }, sort: function (r) { return r[5]; } },
         { h: "ATK", cell: function (r) { return r[8] || ""; }, sort: function (r) { return r[8]; } },
@@ -121,6 +124,7 @@
     },
     monsters: {
       index: "mobs.json",
+      searchHint: "Monster name or id, e.g. Baphomet or 1039",
       text: function (r) { return (r[0] + " " + r[1]).toLowerCase(); },
       filters: [
         { label: "Class", type: "select", get: function (r) { return r[7] === "mvp" ? "MVP" : r[7] === "boss" ? "Boss" : "Normal"; } },
@@ -132,7 +136,7 @@
       ],
       cols: [
         { h: "Id", cell: function (r) { return r[0]; }, sort: function (r) { return r[0]; } },
-        { h: "Name", cell: function (r) { return nameCell(pic(MOB_IMAGE + r[0] + ".png", "mob-sm"), r[0], r[1], tagOf(r[7])); }, sort: function (r) { return r[1]; } },
+        { h: "Name", cell: function (r) { return nameCell(pic("mobs", r[0], "mob-sm"), r[0], r[1], tagOf(r[7])); }, sort: function (r) { return r[1]; } },
         { h: "Level", cell: function (r) { return r[2]; }, sort: function (r) { return r[2]; } },
         { h: "HP", cell: function (r) { return num(r[3]); }, sort: function (r) { return r[3]; } },
         { h: "Base exp", cell: function (r) { return num(r[9]); }, sort: function (r) { return r[9]; } },
@@ -143,6 +147,7 @@
     },
     skills: {
       index: "skills.json",
+      searchHint: "Skill name or id, e.g. Storm Gust",
       text: function (s) { return (s.id + " " + s.name + " " + s.aegis).toLowerCase(); },
       filters: [
         { label: "Job", type: "select", get: function (s) { return s.jobs.map(nice); } },
@@ -162,6 +167,7 @@
     },
     jobs: {
       index: "jobs.json",
+      searchHint: "Job name, e.g. Arch Bishop",
       text: function (j) { return j.job.toLowerCase().replace(/_/g, " "); },
       filters: [
         { label: "Show", type: "select", def: "Main jobs", get: function (j) { return /^Baby|^Super_Baby/.test(j.job) ? "Baby jobs" : /\d$/.test(j.job) ? "Mounted / alternate" : "Main jobs"; } },
@@ -188,7 +194,8 @@
         state = root._state = { q: "", f: {}, sort: 0, dir: 1, shown: 100 };
         K.filters.forEach(function (f, i) { if (f.def) state.f[i] = f.def; });
       }
-      var h = '<div class="db-bar"><input type="search" class="db-q" placeholder="Search by name or id" aria-label="Search"></div>' +
+      var h = '<form class="db-bar" role="search"><input type="search" class="db-q" placeholder="' + esc(K.searchHint || "Search by name or id") +
+        '" aria-label="Search"><button type="submit" class="md-button md-button--primary db-go">Search</button></form>' +
         '<div class="db-filters">';
       K.filters.forEach(function (f, i) {
         h += '<label class="db-filter"><span>' + esc(f.label) + "</span>";
@@ -253,6 +260,10 @@
       }
       var t;
       q.addEventListener("input", function () { clearTimeout(t); t = setTimeout(function () { state.q = q.value; state.shown = 100; draw(); }, 120); });
+      root.querySelector(".db-bar").addEventListener("submit", function (e) {
+        e.preventDefault(); clearTimeout(t); state.q = q.value; state.shown = 100; draw();
+        root.querySelector(".db-count").scrollIntoView({ block: "nearest", behavior: "smooth" });
+      });
       root.querySelector(".db-filters").addEventListener("input", function (e) {
         var el = e.target, i = el.getAttribute("data-i");
         if (i == null) return;
@@ -283,7 +294,7 @@
     return Promise.all([get("items.json"), get("mobs.json"), get("items/" + Math.floor(id / meta.chunk) + ".json")]).then(function (a) {
       var items = byId(a[0]), mobs = byId(a[1]), d = a[2][id], r = items[id];
       if (!r || !d) { root.innerHTML = back("items") + "<p>No item with id " + esc(id) + ".</p>"; return; }
-      var h = back("items") + pic(ITEM_ICON + id + ".png", "db-pic") + "<h2>" + esc(r[1]) + (r[4] ? " [" + r[4] + "]" : "") + ' <small class="iid">' + id + "</small></h2>";
+      var h = back("items") + pic("items", id, "db-pic") + "<h2>" + esc(r[1]) + (r[4] ? " [" + r[4] + "]" : "") + ' <small class="iid">' + id + "</small></h2>";
       h += facts([
         ["Type", esc(nice(r[2])) + (d.SubType ? " / " + esc(nice(d.SubType)) : "")],
         ["Aegis name", "<code>" + esc(d.AegisName) + "</code>"],
@@ -330,7 +341,7 @@
       if (!r || !d) { root.innerHTML = back("monsters") + "<p>No monster with id " + esc(id) + ".</p>"; return; }
       var s = d.stats;
       var tag = r[7] === "mvp" ? ' <span class="db-chip db-mvp">MVP</span>' : r[7] === "boss" ? ' <span class="db-chip">Boss</span>' : "";
-      var h = back("monsters") + pic(MOB_IMAGE + id + ".png", "db-pic") + "<h2>" + esc(r[1]) + ' <small class="iid">' + id + "</small>" + tag + "</h2>";
+      var h = back("monsters") + pic("mobs", id, "db-pic") + "<h2>" + esc(r[1]) + ' <small class="iid">' + id + "</small>" + tag + "</h2>";
       h += facts([
         ["Level", s.Level], ["HP", num(s.Hp)], ["Base / job exp", num(s.BaseExp) + " / " + num(s.JobExp)],
         ["MVP exp", s.MvpExp ? num(s.MvpExp) : ""],
@@ -425,6 +436,8 @@
       route(root, kind);
       window.addEventListener("hashchange", function () { route(root, kind); });
       window.addEventListener("popstate", function () { route(root, kind); });
+    }).catch(function (e) {
+      root.innerHTML = '<p class="db-loading">Could not load the database (' + esc(e.message) + "). Try reloading the page.</p>";
     });
   }
 

@@ -15,7 +15,8 @@
 .db-bar { display: flex; flex-wrap: wrap; gap: .6rem; margin: 1em 0 .4em; }
 .db-bar input, .db-bar select { font: inherit; font-size: .8rem; padding: .45em .7em; border-radius: .3rem;
   border: 1px solid var(--md-default-fg-color--lighter); background: var(--md-default-bg-color); color: var(--md-default-fg-color); }
-.db-bar input { flex: 1 1 16rem; min-width: 0; }
+.db-bar input { flex: 1 1 16rem; min-width: 0; font-size: .85rem; padding: .6em .8em; border-width: 2px; border-color: var(--md-primary-fg-color); }
+.md-typeset .db-bar .db-go { margin: 0; padding: .5em 1.4em; font-size: .8rem; cursor: pointer; }
 .md-typeset .db-count, .md-typeset .db-loading { color: var(--md-default-fg-color--light); font-size: .75rem; margin: .2em 0; }
 .md-typeset .db-list table { font-size: .74rem; }
 .md-typeset .db-list td:first-child { font-variant-numeric: tabular-nums; color: var(--md-default-fg-color--light); }
