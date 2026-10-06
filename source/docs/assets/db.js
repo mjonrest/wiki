@@ -324,6 +324,25 @@
 
   /* ------------------------------------------------------------ detail views */
 
+  // Item effects come as plain-English lines (tools/describe.py): a string, [heading, [lines]] for a condition,
+  // or {c: script} for something written only as code. Strings carry links as ⟦i:ID|Name⟧, ⟦m:ID|Name⟧, ⟦k:AEGIS|Name⟧.
+  function fxText(t) {
+    return esc(t).replace(/⟦([imk]):([^|⟧]*)\|([^⟧]*)⟧/g, function (_, k, id, name) {
+      var kind = k === "i" ? "items" : k === "m" ? "monsters" : "skills";
+      return (k === "i" ? pic("items", id, "ico") : "") + '<a href="' + page(kind) + "#" + id + '">' + name + "</a>";
+    });
+  }
+  function fxList(lines) {
+    return '<ul class="db-fx">' + lines.map(function (x) {
+      if (Array.isArray(x)) return "<li>" + fxText(x[0]) + ":" + fxList(x[1]) + "</li>";
+      if (x && typeof x === "object") return '<li><code class="db-fx-code">' + esc(x.c) + "</code></li>";
+      return "<li>" + fxText(x) + "</li>";
+    }).join("") + "</ul>";
+  }
+  function scriptBox(script) {
+    return '<details class="db-script-box"><summary>Show script</summary><pre class="db-script"><code>' + esc(script) + "</code></pre></details>";
+  }
+
   function back(kind) { return '<p><a href="#" class="db-back">← All ' + (kind === "npcs" ? "NPCs" : kind === "enchants" ? "enchants" : kind) + "</a></p>"; }
 
   function itemView(root, id) {
@@ -346,9 +365,14 @@
         ["Trade limits", d.Trade ? chips(d.Trade) : ""],
       ]);
       if (d.Jobs) h += "<h3>Jobs</h3><p>" + (d.Jobs.indexOf("All") >= 0 ? "All jobs" : chips(d.Jobs)) + (d.Classes ? "<br><small>Classes: " + esc(d.Classes.map(nice).join(", ")) + "</small>" : "") + "</p>";
-      [["Script", "Effect"], ["EquipScript", "On equip"], ["UnEquipScript", "On unequip"]].forEach(function (s) {
-        if (d[s[0]]) h += "<h3>" + s[1] + '</h3><pre class="db-script"><code>' + esc(d[s[0]]) + "</code></pre>";
+      [["Script", "fx", "Effect"], ["EquipScript", "fxEquip", "When equipped"], ["UnEquipScript", "fxUnequip", "When taken off"]].forEach(function (s) {
+        if (!d[s[0]]) return;
+        h += "<h3>" + s[2] + "</h3>" + (d[s[1]] && d[s[1]].length ? fxList(d[s[1]]) : "<p><small>No effect on stats (looks only).</small></p>") + scriptBox(d[s[0]]);
       });
+      if (d.combos) h += "<h3>Set bonuses</h3>" + d.combos.map(function (c) {
+        var names = c[0].map(function (i) { return i == id ? "<strong>" + esc(items[i] ? items[i][1] : "Item " + i) + "</strong>" : itemLink(i, items); }).join(" + ");
+        return "<p>Worn together: " + names + "</p>" + (c[1].length ? fxList(c[1]) : "") + (c[2] ? scriptBox(c[2]) : "");
+      }).join("");
       if (d.drops) h += "<h3>Dropped by</h3>" + table(["Monster", "Level", "Chance"], d.drops.map(function (x) {
         var m = mobs[x[0]];
         return [mobLink(x[0], mobs) + (x[2] === "mvp" ? ' <span class="db-chip db-mvp">MVP reward</span>' : ""), m ? m[2] : "", pct(x[1])];

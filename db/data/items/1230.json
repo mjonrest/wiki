@@ -1,1 +1,1 @@
-{"1230000":{"AegisName":"IDTest_ammo","SubType":"Dagger","Weight":10,"Attack":10,"Locations":["Ammo"],"Flags":["BuyingStore"]}}
+{"1230000":{"AegisName":"IDTest_ammo","SubType":"Dagger","Weight":10,"Attack":10,"Locations":["Ammo"],"Flags":["BuyingStore"],"combos":[[[1230000,800000],["DEX +1"],"bonus bDex,1;"]]}}

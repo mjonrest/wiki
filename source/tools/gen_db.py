@@ -16,9 +16,33 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import ydb  # noqa: E402
 import gen_npcs  # noqa: E402
 import gen_enchants  # noqa: E402
+import describe  # noqa: E402
 from rodb import ROOT  # noqa: E402
 
 CHUNK = 1000  # detail files hold the ids id//CHUNK*CHUNK .. +CHUNK-1
+
+
+# ---------------------------------------------------------------- set bonuses
+
+def item_combos(by_aegis):
+    """{item id: [[[ids in the set], effects, script], ...]} from the combo database; a later file's entry for
+    the same set of items replaces an earlier one, as on the server."""
+    sets = {}
+    for rel in ydb.files("db/item_combos.yml"):
+        for e in ydb.load(rel).get("Body") or []:
+            if not isinstance(e, dict):
+                continue
+            for c in e.get("Combos") or []:
+                ids = [by_aegis.get(str(a)) for a in (c.get("Combo") or [])]
+                if len(ids) < 2 or None in ids:
+                    continue
+                sets[tuple(sorted(ids))] = (ids, e.get("Script") or "")
+    out = defaultdict(list)
+    for ids, script in sets.values():
+        fx = describe.describe(script)
+        for i in set(ids):
+            out[i].append([ids, fx, script.strip()])
+    return out
 
 
 # ---------------------------------------------------------------- server settings
@@ -187,6 +211,7 @@ def build(out, dir_urls=True):
     item_index, item_detail = [], defaultdict(dict)
     job_names = sorted({j for it in items.values() for j in _flags(it.get("Jobs")) if j != "All"})
     job_pos = {j: i for i, j in enumerate(job_names)}
+    combos = item_combos(by_aegis)
     for iid, it in sorted(items.items()):
         t = it.get("Type", "Etc")
         jobs = _flags(it.get("Jobs"))
@@ -202,6 +227,12 @@ def build(out, dir_urls=True):
         for k in ("Jobs", "Classes", "Locations", "Trade", "Flags"):
             if _flags(it.get(k)):
                 d[k] = _flags(it.get(k))
+        # Plain-English effects (the raw script stays available on the page).
+        for k, key in (("Script", "fx"), ("EquipScript", "fxEquip"), ("UnEquipScript", "fxUnequip")):
+            if it.get(k):
+                d[key] = describe.describe(it[k])
+        if combos.get(iid):
+            d["combos"] = combos[iid][:30]
         for k, v in (("drops", sorted(dropped_by.get(iid, []), key=lambda x: -x[1])[:80]),
                      ("shops", shops.get(iid, [])[:60]), ("givenBy", given_by.get(iid, [])[:40]), ("boxes", in_box.get(iid, [])[:60]),
                      ("contains", box_has.get(iid)), ("enchant", ench_roles.get(iid))):
