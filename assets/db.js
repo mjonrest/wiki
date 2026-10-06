@@ -19,11 +19,12 @@
   }
 
   // Pictures: the copy saved in img/ (tools/fetch_images.py), then Divine Pride, then nothing.
-  var REMOTE = { items: "https://static.divine-pride.net/images/items/item/", mobs: "https://static.divine-pride.net/images/mobs/png/" };
+  var REMOTE = { items: "https://static.divine-pride.net/images/items/item/", mobs: "https://static.divine-pride.net/images/mobs/png/",
+    skills: "https://static.divine-pride.net/images/skill/" };
   var ONERR = "var a=this.getAttribute('data-alt');if(a){this.removeAttribute('data-alt');this.src=a}else this.remove()";
   function pic(kind, id, cls) {
-    return '<img class="' + cls + '" src="' + BASE + "img/" + kind + "/" + id + '.png" data-alt="' + REMOTE[kind] + id +
-      '.png" alt="" loading="lazy" onerror="' + ONERR + '">';
+    return '<img class="' + cls + '" src="' + BASE + "img/" + kind + "/" + id + '.png"' + (REMOTE[kind] ? ' data-alt="' + REMOTE[kind] + id + '.png"' : "") +
+      ' alt="" loading="lazy" onerror="' + ONERR + '">';
   }
 
   function esc(s) {
@@ -48,8 +49,15 @@
   }
   function skillLink(aegis, skills) {
     var s = skills && skills.byAegis[aegis];
-    return '<a href="' + page("skills") + "#" + esc(aegis) + '">' + esc(s ? s.name : nice(aegis)) + "</a>";
+    return (s ? pic("skills", s.id, "ico") : "") + '<a href="' + page("skills") + "#" + esc(aegis) + '">' + esc(s ? s.name : nice(aegis)) + "</a>";
   }
+  // NPC sprites: monster pictures for monster-shaped NPCs, otherwise the saved NPC picture.
+  function npcPic(sprite, cls) { return sprite >= 1001 && sprite < 4000 ? pic("mobs", sprite, cls) : sprite > 0 ? pic("npcs", sprite, cls) : ""; }
+  function npcLink(id, npcs) {
+    var n = npcs && npcs[id];
+    return (n ? npcPic(n[5], "ico") : "") + '<a href="' + page("npcs") + "#" + id + '">' + esc(n ? n[1] : "NPC " + id) + "</a>";
+  }
+  function where(m, x, y) { return "<code>/navi " + esc(m) + " " + x + "/" + y + "</code>"; }
   function jobLink(job) { return '<a href="' + page("jobs") + "#" + esc(job) + '">' + esc(nice(job)) + "</a>"; }
 
   function table(head, rows, cls) {
@@ -158,11 +166,27 @@
       ],
       cols: [
         { h: "Id", cell: function (s) { return s.id; }, sort: function (s) { return s.id; } },
-        { h: "Skill", cell: function (s) { return nameCell("", s.aegis, s.name, " <small>" + esc(s.aegis) + "</small>"); }, sort: function (s) { return s.name; } },
+        { h: "Skill", cell: function (s) { return nameCell(pic("skills", s.id, "ico"), s.aegis, s.name, " <small>" + esc(s.aegis) + "</small>"); }, sort: function (s) { return s.name; } },
         { h: "Max level", cell: function (s) { return s.max; }, sort: function (s) { return s.max; } },
         { h: "Type", cell: function (s) { return esc(s.type); }, sort: function (s) { return s.type; } },
         { h: "Element", cell: function (s) { return typeof s.Element === "string" ? elemChip(s.Element) : ""; }, sort: function (s) { return typeof s.Element === "string" ? s.Element : ""; } },
         { h: "Learned by", cell: function (s) { return s.jobs.slice(0, 4).map(function (j) { return esc(nice(j)); }).join(", ") + (s.jobs.length > 4 ? " +" + (s.jobs.length - 4) : ""); }, sort: function (s) { return s.jobs[0] || "~"; } },
+      ],
+    },
+    npcs: {
+      index: "npcs.json",
+      searchHint: "NPC name or map, e.g. Kafra or prontera",
+      text: function (r) { return (r[1] + " " + r[2]).toLowerCase(); },
+      filters: [
+        { label: "Does", type: "select", get: function (r) { return r[6] ? r[6].split("|") : []; } },
+        { label: "Content", type: "select", get: function (r) { return r[7]; } },
+        { label: "Map", type: "text", get: function (r) { return r[2]; }, placeholder: "e.g. prontera" },
+      ],
+      cols: [
+        { h: "NPC", cell: function (r) { return nameCell(npcPic(r[5], "mob-sm"), r[0], r[1], r[8] > 1 ? " <small>+" + (r[8] - 1) + " more places</small>" : ""); }, sort: function (r) { return r[1]; } },
+        { h: "Where", cell: function (r) { return where(r[2], r[3], r[4]); }, sort: function (r) { return r[2]; } },
+        { h: "Does", cell: function (r) { return r[6] ? chips(r[6].split("|")) : ""; }, sort: function (r) { return r[6] || "~"; } },
+        { h: "Content", cell: function (r) { return esc(r[7]); }, sort: function (r) { return r[7]; } },
       ],
     },
     jobs: {
@@ -288,11 +312,11 @@
 
   /* ------------------------------------------------------------ detail views */
 
-  function back(kind) { return '<p><a href="#" class="db-back">← All ' + kind + "</a></p>"; }
+  function back(kind) { return '<p><a href="#" class="db-back">← All ' + (kind === "npcs" ? "NPCs" : kind) + "</a></p>"; }
 
   function itemView(root, id) {
-    return Promise.all([get("items.json"), get("mobs.json"), get("items/" + Math.floor(id / meta.chunk) + ".json")]).then(function (a) {
-      var items = byId(a[0]), mobs = byId(a[1]), d = a[2][id], r = items[id];
+    return Promise.all([get("items.json"), get("mobs.json"), get("items/" + Math.floor(id / meta.chunk) + ".json"), get("npcs.json")]).then(function (a) {
+      var items = byId(a[0]), mobs = byId(a[1]), d = a[2][id], r = items[id], npcs = byId(a[3]);
       if (!r || !d) { root.innerHTML = back("items") + "<p>No item with id " + esc(id) + ".</p>"; return; }
       var h = back("items") + pic("items", id, "db-pic") + "<h2>" + esc(r[1]) + (r[4] ? " [" + r[4] + "]" : "") + ' <small class="iid">' + id + "</small></h2>";
       h += facts([
@@ -318,7 +342,7 @@
         return [mobLink(x[0], mobs) + (x[2] === "mvp" ? ' <span class="db-chip db-mvp">MVP reward</span>' : ""), m ? m[2] : "", pct(x[1])];
       }));
       if (d.shops) h += "<h3>Sold by</h3>" + table(["NPC", "Where", "Price"], d.shops.map(function (s) {
-        var where = s[1] ? "<code>" + esc(s[1]) + "</code> " + s[2] + ", " + s[3] : "<small>opened from another NPC</small>";
+        var loc = s[1] ? where(s[1], s[2], s[3]) : "<small>opened from another NPC</small>";
         var price;
         if (s[5] && s[5].barter) {
           price = s[5].barter.map(function (c) { return c[0] === "zeny" ? num(c[1]) + " z" : c[1] + " × " + itemLink(c[0], items); }).join("<br>");
@@ -327,8 +351,10 @@
         } else {
           price = num(s[4]) + " " + esc(s[5] === "Zeny" ? "z" : s[5]);
         }
-        return [esc(s[0]), where, price];
+        return [s[6] ? npcLink(s[6], npcs) : esc(s[0]), loc, price];
       }));
+      if (d.givenBy) h += "<h3>Given by NPC</h3><p><small>These NPCs hand out this item, for example as a quest reward or exchange.</small></p>" +
+        table(["NPC", "Where"], d.givenBy.map(function (n) { var x = npcs[n]; return [npcLink(n, npcs), x ? where(x[2], x[3], x[4]) : ""]; }));
       if (d.boxes) h += "<h3>Found in</h3>" + table(["Box", "Chance"], d.boxes.map(function (b) { return [itemLink(b[0], items), b[1] == null ? "always" : b[1] + "%"]; }));
       if (d.contains) h += "<h3>Contents</h3>" + table(["Item", "Amount", "Chance"], d.contains.map(function (b) { return [itemLink(b[0], items), b[2], b[1] == null ? "always" : b[1] + "%"]; }));
       root.innerHTML = h;
@@ -375,7 +401,7 @@
       var skills = a[0], items = byId(a[1]);
       var s = skills.byAegis[key] || skills.byId[key];
       if (!s) { root.innerHTML = back("skills") + "<p>No skill " + esc(key) + ".</p>"; return; }
-      var h = back("skills") + "<h2>" + esc(s.name) + ' <small class="iid">' + esc(s.aegis) + " · " + s.id + "</small></h2>";
+      var h = back("skills") + pic("skills", s.id, "db-pic") + "<h2>" + esc(s.name) + ' <small class="iid">' + esc(s.aegis) + " · " + s.id + "</small></h2>";
       h += facts([
         ["Max level", s.max], ["Type", esc(s.type)], ["Target", esc(nice(s.target))], ["Element", s.Element ? perLevel(s.Element) : ""],
         ["Range", s.Range != null ? perLevel(s.Range) : ""], ["Hits", s.HitCount ? perLevel(s.HitCount) : ""],
@@ -389,6 +415,37 @@
         ["Items used", s.ItemCost ? s.ItemCost.map(function (c) { return c[1] + " × " + itemLink(c[0], items) + (c[2] ? " <small>(Lv " + c[2] + ")</small>" : ""); }).join("<br>") : ""],
       ]);
       if (s.jobs.length) h += "<h3>Learned by</h3><p>" + s.jobs.map(jobLink).join(", ") + "</p>";
+      root.innerHTML = h;
+    });
+  }
+
+  function npcView(root, id) {
+    return Promise.all([get("npcs.json"), get("items.json"), get("npcs/" + Math.floor(id / meta.chunk) + ".json")]).then(function (a) {
+      var npcs = byId(a[0]), items = byId(a[1]), d = a[2][id], r = npcs[id];
+      if (!r || !d) { root.innerHTML = back("npcs") + "<p>No NPC with id " + esc(id) + ".</p>"; return; }
+      var h = back("npcs") + npcPic(r[5], "db-pic") + "<h2>" + esc(r[1]) + "</h2>";
+      h += facts([
+        ["Where", d.locs.slice(0, 1).map(function (l) { return where(l[0], l[1], l[2]); }).join("")],
+        ["Also at", d.locs.length > 1 ? d.locs.slice(1, 40).map(function (l) { return where(l[0], l[1], l[2]); }).join("<br>") + (d.locs.length > 41 ? "<br>…" : "") : ""],
+        ["Does", r[6] ? chips(r[6].split("|")) : ""],
+        ["Content", esc(r[7])],
+        ["Script", "<code>" + esc(d.file) + "</code>"],
+      ]);
+      if (d.page) h += '<p><a class="md-button" href="' + BASE + d.page.replace(/\.md$/, meta.dirUrls ? "/" : ".html").replace(/index\/$/, "") + '">Full guide for this NPC</a></p>';
+      if (d.says) h += "<h3>Says</h3><blockquote>" + d.says.map(esc).join("<br>") + "</blockquote>";
+      if (d.menu) h += "<h3>Menu options</h3><p>" + chips(d.menu) + "</p>";
+      if (d.sells) h += "<h3>Sells</h3>" + table(["Item", "Price"], d.sells.map(function (s) {
+        var price = /^item:/.test(s[2]) ? num(s[1]) + " × " + itemLink(+s[2].slice(5), items) : num(s[1]) + " " + esc(s[2] === "Zeny" ? "z" : s[2]);
+        return [itemLink(s[0], items), price];
+      }));
+      if (d.barter) h += "<h3>Trades</h3>" + table(["Item", "Costs"], d.barter.map(function (b) {
+        return [itemLink(b[0], items), b[1].map(function (c) { return c[0] === "zeny" ? num(c[1]) + " z" : c[1] + " × " + itemLink(c[0], items); }).join("<br>")];
+      }));
+      if (d.gives) h += "<h3>Gives</h3><p><small>Items this NPC's script can hand out.</small></p>" + table(["Item"], d.gives.map(function (i) { return [itemLink(i, items)]; }));
+      if (d.takes) h += "<h3>Takes</h3><p><small>Items this NPC's script can take from you.</small></p>" + table(["Item"], d.takes.map(function (i) { return [itemLink(i, items)]; }));
+      if (d.quests) h += "<h3>Quests</h3>" + table(["Quest", "Id"], d.quests.map(function (q) { return [esc(q[1] || "Quest"), q[0]]; }));
+      if (d.instances) h += "<h3>Instances</h3><p>" + chips(d.instances) + "</p>";
+      if (d.warps) h += "<h3>Can warp you to</h3><p>" + d.warps.map(function (m) { return "<code>" + esc(m) + "</code>"; }).join(" ") + "</p>";
       root.innerHTML = h;
     });
   }
@@ -413,12 +470,12 @@
     });
   }
 
-  var DETAIL = { items: itemView, monsters: mobView, skills: skillView, jobs: jobView };
+  var DETAIL = { items: itemView, monsters: mobView, skills: skillView, npcs: npcView, jobs: jobView };
 
   function route(root, kind) {
     var key = decodeURIComponent(location.hash.slice(1));
     var view = root.querySelector(".db-view") || root;
-    var go = key ? DETAIL[kind](view, kind === "items" || kind === "monsters" ? +key : key) : listView(view, kind);
+    var go = key ? DETAIL[kind](view, kind === "items" || kind === "monsters" || kind === "npcs" ? +key : key) : listView(view, kind);
     go.catch(function (e) { view.innerHTML = '<p class="db-loading">Could not load the database (' + esc(e.message) + ").</p>"; });
     if (key) window.scrollTo(0, root.getBoundingClientRect().top + window.scrollY - 80);
   }

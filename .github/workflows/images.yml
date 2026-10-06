@@ -1,4 +1,4 @@
-# Saves item icons and monster pictures from Divine Pride into img/, so the wiki serves them itself.
+# Saves item icons, monster pictures, skill icons and NPC pictures from Divine Pride into img/, so the wiki serves them itself.
 # Runs when the database changes, or by hand from the Actions tab ("Run workflow").
 name: Sync images
 
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: [db/data/items.json, db/data/mobs.json]
+    paths: [db/data/items.json, db/data/mobs.json, db/data/skills.json, db/data/npcs.json]
 
 permissions:
   contents: write
