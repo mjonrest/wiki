@@ -26,9 +26,9 @@ and keeps refine and the first-slot card.
 Enchants are added in order: 4th slot, then 3rd slot, then 2nd slot (3 in total). Every enchant is picked at
 random from the same list, each entry equally likely ("Normal" column below).
 
-### Better 3rd enchant at +9 or higher
+### Better 3rd enchant at +7 or +9
 
-If the item is **refined to +9 or higher** when you add the **3rd** enchant, she offers a choice:
+If the item is **refined to +7 or higher** (Clergy's Manteau and Clergy's Boots) or **+9 or higher** (Soutanes) when you add the **3rd** enchant, she offers a choice:
 
 - **Proceed with Angel's Dream:** the normal cost and the normal list.
 - **Proceed with fruit:** costs 3 {{ item(6909) }} instead (no Angel's Dream, no zeny) and uses a better list
@@ -89,11 +89,7 @@ If the item is **refined to +9 or higher** when you add the **3rd** enchant, she
 | {{ item(4788) }} | - | - | 4.35% |
 | {{ item(4789) }} | - | - | 4.35% |
 
-!!! warning "Known issue"
-    - Her explanation says Clergy's Manteau and Clergy's Boots get the better option above +7, and Soutanes above
-      +9. In fact all items need **+9 or higher**.
-    - To even see the fruit option you must have **5 Angel's Dream and 500,000 zeny** with you. They are not
-      taken if you pick the fruit, but she will refuse without them.
+The better option is offered from +7 on Clergy's Manteau and Clergy's Boots, and from +9 on Soutanes. Choosing the fruit needs only the 3 Silvervine Fruit.
 
 ## Reset
 
@@ -107,7 +103,3 @@ partly enchanted item.
 
 A reset removes all three enchants. Refine and the first-slot card are kept.
 
-!!! warning "Known issue"
-    If you are wearing an item she does not work with, she says "I don't handle items like this." but then
-    carries on with the enchant or reset anyway. A reset on such an item clears its 2nd, 3rd and 4th slots,
-    including any cards in them.

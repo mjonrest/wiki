@@ -91,10 +91,6 @@ fight, and they vanish when the next 30-second cycle starts.
 | 20–29% | Magic shield and protection against the zombie | 6 Abysmal Knights |
 | 0–19% | Magic shield and protection against Amdarais's power (`165/232`) | 6 Wandering Archers |
 
-!!! warning "Known issue"
-    On **Hard**, the 6 Abysmal Knights at 70–79% never spawn because of a typo in the script. That stage has no
-    adds.
-
 ### Rewards
 
 | From | First time | Every later run |

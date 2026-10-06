@@ -44,7 +44,4 @@ Talk to **Sigma**:
 | {{ item(1000103) }} ×6 | Requires the "Red Pepper - Kappa Suppression" quest you got on entry, so you must have been in the room when Kappa died |
 | 10 [Instance Points](../../content/instances.md) | When you choose **"I'll leave."**. Counts toward the daily 1,200 cap |
 
-!!! warning "Known issue"
-    Sigma warps you out to `ba_maison` even if you pick **"I'll look around more."**. That option also gives no Instance Points. Claim your Barmil Tickets first, then talk to Sigma again and pick **"I'll leave."**.
-
 {{ instance_page("security-area-1") }}

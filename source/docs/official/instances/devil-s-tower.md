@@ -119,8 +119,4 @@ Spell, SP+50 or MDEF+2).
 talk to him again and pick *Get out of here*. You get **20–40 Instance Points** (+50 with {{ item(30034) }}, within
 the daily Instance Point limit) and go back to `dali02`. Then report to **Historian Shep** for your EXP.
 
-!!! warning "Known issue"
-    The weapon's second and third bonus options are always taken from the first option list. Spell 5 and DEF+3
-    never appear, even though the script defines them.
-
 {{ instance_page("devil-s-tower") }}

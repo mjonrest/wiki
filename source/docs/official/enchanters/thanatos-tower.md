@@ -79,10 +79,6 @@ If Slot 4 already has a Lv1 or Lv2 enchant, **Slot 4 Enchant** upgrades it inste
 
 50 {{ item(1000257) }}, 100 {{ item(1000263) }}, 1,000,000z. Removes the Slot 3 and Slot 4 enchants.
 
-!!! warning "Known issue: headgear is not put back on"
-    After an enchant, upgrade or reset, the conversation stops without the "successful" message and the crown
-    is left in your inventory. The change has been made. Just equip the crown again.
-
 ## Brilliant Light and Sinful weapons
 
 Wear the weapon in your right hand. Both NPCs work the same way. Only the material changes:
@@ -173,21 +169,6 @@ There is no zeny cost and it always succeeds. Refine and the first card are kept
 |---|---|
 | Slot 3 | {{ item(310217) }}, {{ item(310222) }}, {{ item(310227) }}, {{ item(310232) }} |
 | Slot 4 | {{ item(310247) }}, {{ item(310252) }} |
-
-!!! warning "Known issue: Brilight Accessory shows the wrong names"
-    The Brilight Accessory NPC shows the **Sinful** menu labels and says it needs "Piece of Sin". It really
-    takes {{ item(1000263) }}, and the labels map like this:
-
-    | Menu label | You get |
-    |---|---|
-    | Anger | Empathy |
-    | Horror | Happiness |
-    | Resentment | Shelter |
-    | Regret | Solace |
-    | Inverse Scale | Divine Evil |
-    | Dragon Scale | Destructive Evil |
-
-    The result screen shows the correct names.
 
 ### Reset
 

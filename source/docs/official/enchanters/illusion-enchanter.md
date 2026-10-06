@@ -151,10 +151,7 @@ can be reset. You choose how much zeny to pay, which sets the success chance:
 - **On success** both enchants are removed. Refine and cards stay.
 - **On failure** the zeny is gone **and the item is destroyed**, together with its cards and refine.
 
-!!! warning "Known issue"
-    A failed reset does not just leave the enchants in place: the NPC takes the item away and gives nothing
-    back. The only message is "Ah, that was unfortunate. Well, you can't always be lucky." Even at 500,000 zeny
-    there is a 10% chance to lose the item. Remove valuable cards before resetting.
+A failed reset destroys the item along with its cards and refine. The chance of failure is 10% to 50%, depending on the zeny you pay.
 
 ## Getting Illusion equipment
 

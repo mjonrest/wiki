@@ -88,6 +88,4 @@ Only works on **socketed** boots. Same materials as the Magician's slotted colum
     Hugin's Magician does the same enchants on socketed boots for the same materials, with no zeny and no
     chance to fail. There is no reason to use the Dark magic master.
 
-!!! warning "Known issue: the card in socketed boots is lost"
-    When either NPC enchants **socketed** boots, the boots come back with an empty socket. A card you put
-    in the socket is **deleted** on every enchant step. Enchant the boots fully first, then insert the card.
+A card in the socket is kept on every enchant step.

@@ -42,9 +42,6 @@ Sanctuary Purification is the daily Episode 18 instance that takes place in the 
 5. Afterwards, the leader enters the code at the last **Security Device** (around `2@nyr 124/138`), the guards gather near the exit, and the leader walks up to them to finish.
 6. Leave through the exit in the north-east (around `2@nyr 203/220`). **Each player who uses this exit** after the final scene is credited with the Heart Hunter raid and returned to Rachel.
 
-!!! warning "Known issue"
-    After the Resonators die, the script closes the warps into the final storage room but never opens the warp out of it. Teleporting is disabled on these maps, so the party may get stuck in that room and be unable to finish the **Heart Hunter** raid. The temple guard raid (Part 1) is not affected, since it is credited as you enter the vaults.
-
 ### Rewards
 
 Return to the **Priest** in Rachel and talk to her to turn in your completed raids:

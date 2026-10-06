@@ -65,11 +65,7 @@ or Affection, the enchant menu tries to raise it one level.
 - Refine, cards and the helmet itself are never lost.
 - Lv. 10 is the maximum. A stat enchant in the 2nd slot cannot be levelled; reset the helmet instead.
 
-!!! warning "Known issue"
-    When a Lv. 1 to Lv. 2 attempt fails, your 20 fragments are gone and the enchant stays at Lv. 1. For
-    {{ item(29061) }} the NPC only says "Something bad happened."; for the other five it says the power "didn't
-    explode". Both mean the same thing. Also, if you are short of fragments the NPC always says 10 are required,
-    whatever the real cost of the step is.
+When a Lv. 1 to Lv. 2 attempt fails, your fragments are used and the enchant stays at Lv. 1 (the NPC says the power "didn't explode").
 
 ## Wandering Mind: reset
 
@@ -104,13 +100,6 @@ calls it "slot 1") by one level, always successfully.
 
 Lv. 5 is the highest it goes ("Your enchant cannot be upgraded further"). To go beyond Lv. 5, use the Wandering
 Mind's chance-based level up.
-
-!!! warning "Known issue"
-    Hot Machine's enchant (not the level up) removes **one copy of that helmet from your inventory by item
-    type**, not necessarily the one you were wearing. If you carry a second copy of the same Old helmet, that
-    copy can be the one deleted, along with its cards and refine. Carry only the helmet you want to enchant.
-    Also, after you pick an enchant from the list, the NPC's name in the dialog turns into that enchant's name.
-    This is only cosmetic.
 
 ## Sorrowful Soul's Mind: making Old helmets
 

@@ -10,7 +10,7 @@ upgrades the Eden weapons.
 
 Both work on the item in your **inventory**. Each upgrade takes the item and gives you a new one, so the
 new item is always **+0** and any card in it is **lost**. Carry only one copy of the item you want to
-upgrade: BK refuses if you carry two of the same weapon, and Thorn may take the other copy.
+upgrade: Thorn and BK both refuse if you carry more than one copy of it.
 
 ## Blacksmith Thorn
 
@@ -83,7 +83,4 @@ Weapons: {{ item(1197) }}, {{ item(13434) }}, {{ item(13066) }}, {{ item(1289) }
 Your choices are saved on your character. Step 3 builds the finished weapon from those choices, whichever
 Eden weapon you pick. There is no reset: once step 3 is done, BK has nothing more to offer.
 
-!!! warning "Known issue: step 2 picks the weapon for you"
-    In step 2 BK does not ask which weapon to use. He takes the **first Eden weapon he finds**, in the order
-    of the weapon list above. If you carry more than one Eden weapon, step 2 can go on the wrong one. Carry
-    only the weapon you upgraded in step 1.
+In step 2 BK asks which Eden weapon to enhance.

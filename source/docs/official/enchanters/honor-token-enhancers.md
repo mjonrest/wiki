@@ -55,10 +55,6 @@ you hear his story, and then you can trade.
 | DEX | {{ item(4720) }} 13.49% | {{ item(4721) }} 2.7% | {{ item(4722) }} 0.45% | {{ item(4723) }} 0.018% | {{ item(4724) }} 0.0045% |
 | LUK | {{ item(4750) }} 13.49% | {{ item(4751) }} 2.7% | {{ item(4752) }} 0.45% | {{ item(4753) }} 0.018% | {{ item(4754) }} 0.0045% |
 
-!!! warning "Known issue: an enhancement can give nothing"
-    A tiny share of rolls gives no enchant at all: 0.1% for the robe and 0.0045% for the badge. The tokens
-    are still used and the slot stays empty, so you can simply enhance again.
-
 ### Badge reset
 
 Dylan says the reset works 80% of the time. It actually works **79%** of the time. On success you get a

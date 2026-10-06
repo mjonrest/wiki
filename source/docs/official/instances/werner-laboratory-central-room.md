@@ -21,8 +21,7 @@ The Central Room of Werner's laboratory is part of the Terra Gloria (Episode 16.
 2. Go to the Rookie in `slabw01`. The party leader (with the quest active) picks **Enter now.** to create the instance.
 3. Click the **Central Room** gate next to him and pick **Go in.**
 
-!!! warning "Known issue"
-    The Central Room gate is hidden by default and the script only reveals it to the party leader who created the instance. Other party members may not see the gate and so cannot click it to enter.
+Party members with the daily quest active talk to the Rookie after the leader has created the instance; the gate then appears for them. Click it and pick **Go in**.
 
 ### Walkthrough (daily)
 

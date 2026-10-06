@@ -62,7 +62,4 @@ When Stefan dies, the remaining adds vanish and the **Sky Fortress Escape Warp**
 - Gold Treasures from the side rooms (see above).
 - **20–40 [Instance Points](../../content/instances.md)** when you leave through the Escape Warp. This counts toward the daily 1,200 cap. The warp takes you back to where you entered (Prontera or the Dimensional Gap).
 
-!!! warning "Known issue"
-    When you summon the Immortal Cursed Knight or the Immortal Wind Ghost, an announcement saying it has died shows up about 2 seconds later, even though the boss is still alive. Ignore it and keep fighting.
-
 {{ instance_page("sky-fortress-invasion") }}

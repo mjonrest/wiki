@@ -41,10 +41,7 @@ pick depend on how many times **you, the leader,** have cleared Challenge Mode:
 | 9 | 1,800,000,000 |
 | 10 | 2,000,000,000 |
 
-!!! warning "Known issue"
-    A clear is only counted for the **party leader** who claims the reward from Oscar. The other members' clear counts
-    never go up, so they cannot unlock higher stages as leader and always get the minimum Instance Points at the exit.
-    Take turns leading if several of you want to progress.
+Everyone inside the instance when the leader claims the reward from Oscar gets the clear counted.
 
 ### Walkthrough
 

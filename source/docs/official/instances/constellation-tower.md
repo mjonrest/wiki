@@ -95,9 +95,7 @@ On floor 50 the boss starts fully sealed (0%). On floor 75 every ability starts 
     opens its menu (choosing *Quit* is enough). On floor 75 the boss already has 3–5 stars everywhere, but if the
     leader never opens the altar, the run is counted as **0%**. Always open the altar once after your last change.
 
-!!! warning "Known issue"
-    The altar says a sealed ability "cannot be changed afterwards", but a later reroll or maximize still changes it.
-    Seal last.
+A sealed ability stays at 0 stars: later rerolls and maximizes leave it alone, and the 5-star maximize can't target it.
 
 **Going up.** When ready, the party leader steps on the switch at the top of the altar area and the whole party is
 moved to the top floor. This is the moment your reward bonus is decided. Every player gets the bonus that matches the

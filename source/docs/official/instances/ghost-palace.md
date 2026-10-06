@@ -16,10 +16,6 @@ your {{ item(6672) }} to the King's ghost for Thanos weapons and Gray armor.
   it ends at the next **04:00** server time. When it has ended, talk to the Royal Guard or the device once to clear
   the quest, then you can go in again.
 
-!!! warning "Known issue"
-    The Interdimensional Device runs the "party leaders only" check on everyone who clicks it, so only the party
-    leader gets in through it. Other members are told to have their party leader talk to the guard.
-
 ### Walkthrough
 
 Each floor opens once its waves are cleared. A yellow announcement says when the next floor's passage is open.

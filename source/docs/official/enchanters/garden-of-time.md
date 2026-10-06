@@ -16,10 +16,6 @@ Beast cloaks, the Circulation of Life cloaks and the Signets of Circulation.
 walk up to them after that. You also need room for more items (the machines refuse to talk to you when your
 inventory is too full or too heavy).
 
-!!! warning "Known issue: machine #4 never appears"
-    Walking up to the machines only reveals machines #1, #2 and #3. Machine #4 stays hidden, so the
-    Signet of Circulation and Circulation of Life enchants below cannot be reached in the current script.
-
 ## Cloak upgrade (machine #2)
 
 Choose **Upgrade Divine Beast's Cloak**. Put the cloak in the window from your **inventory** (unequip it

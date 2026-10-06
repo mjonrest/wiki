@@ -40,7 +40,6 @@ Simulation Battle is the repeatable Episode 19 rematch against Juncea. Bagot's l
 !!! tip
     If your inventory is full the Summon Device refuses to hand out the Antiquity box but does not send you out, so free a slot and click it again.
 
-!!! warning "Known issue"
-    Arolong counts the *Simulation Battle* quest as finished as soon as it is in your log; he does not check that Juncea was actually beaten. If you leave the laboratory (death, logout, warp) and talk to Arolong before winning, he hands in the quest and puts you on the 4 hour cooldown, so you cannot go back in through him. Finish the fight in one go before talking to Arolong again.
+Arolong only accepts the quest once Juncea has been defeated. If you leave early, you can go back in and try again.
 
 {{ instance_page("simulation-battle") }}

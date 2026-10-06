@@ -86,9 +86,6 @@ The **enchant** NPC ("Edda bio enchants") at `/navi yuno 210/340` enchants the E
 | Reroll the 3rd slot | 500 of each material, 20% chance the weapon is destroyed | 2,000 of each material, no risk |
 | Reroll the 4th slot | 200 of each material, 20% chance the weapon is destroyed | 1,000 of each material, no risk |
 
-!!! warning "Known issue"
-    Rerolling in **normal mode** takes the materials (and can destroy the weapon) but never changes the enchant. Only
-    **safe mode** actually rerolls. The NPC also understates the risks: it says 5% for normal rerolls and suggests
-    first-time enchants are fairly safe.
+Normal mode rerolls the enchant with a 20% chance to destroy the weapon (first-time enchants: 40%). Safe mode costs more but never breaks it.
 
 {{ instance_page("edda-bio") }}
