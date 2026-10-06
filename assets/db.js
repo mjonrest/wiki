@@ -18,13 +18,10 @@
     return cache[path];
   }
 
-  // Pictures: the copy saved in img/ (tools/fetch_images.py), then Divine Pride, then nothing.
-  var REMOTE = { items: "https://static.divine-pride.net/images/items/item/", mobs: "https://static.divine-pride.net/images/mobs/png/",
-    skills: "https://static.divine-pride.net/images/skill/" };
-  var ONERR = "var a=this.getAttribute('data-alt');if(a){this.removeAttribute('data-alt');this.src=a}else this.remove()";
+  // Pictures saved in img/ by tools/fetch_images.py; a missing one removes itself. (No Divine Pride fallback:
+  // it answers unknown ids with a "no image" picture.)
   function pic(kind, id, cls) {
-    return '<img class="' + cls + '" src="' + BASE + "img/" + kind + "/" + id + '.png"' + (REMOTE[kind] ? ' data-alt="' + REMOTE[kind] + id + '.png"' : "") +
-      ' alt="" loading="lazy" onerror="' + ONERR + '">';
+    return '<img class="' + cls + '" src="' + BASE + "img/" + kind + "/" + id + '.png" alt="" loading="lazy" onerror="this.remove()">';
   }
 
   function esc(s) {

@@ -136,6 +136,48 @@ nav:
           - "18 Direction of Prayer": official/story/ep18.md
           - "19 Issgard": official/story/ep19.md
           - "20 Immortals": official/story/ep20.md
+      - Enchanters:
+          - official/enchanters/index.md
+          - "Abyss Depth Enchant Manager (Rune Crowns and Dimension Weapons)": official/enchanters/abyss-depth-enchants.md
+          - "Apprentice Craftsman (armor enchant)": official/enchanters/apprentice-craftsman.md
+          - "Artisan Tene (Kagerou / Oboro gear)": official/enchanters/artisan-tene.md
+          - "Azzam the Lucky (Nebula Armor and Signets of Star)": official/enchanters/azzam-the-lucky.md
+          - "Boots of Good and Evil": official/enchanters/good-and-evil-boots.md
+          - "Consecrated Weapons (Ester)": official/enchanters/consecrate-weapons.md
+          - "Devil Enchant Master (Upgrade weapons)": official/enchanters/devil-enchant-master.md
+          - "Eden Group Equipment (Thorn and BK)": official/enchanters/eden-group.md
+          - "El Dicastes Enchanters": official/enchanters/el-dicastes.md
+          - "Fallen Angel (Archangel Wings enchant)": official/enchanters/fallen-angel.md
+          - "Flush Weapons (Flush MK4U)": official/enchanters/flush-weapons.md
+          - "Garden of Time Vending Machines": official/enchanters/garden-of-time.md
+          - "Grade Enhancement (Sratos and Suribell)": official/enchanters/grade-enhancement.md
+          - "Gray Wolf Equipment (Emmet)": official/enchanters/gray-wolf.md
+          - "Hero Ring Enchanter (Morocc)": official/enchanters/hero-ring.md
+          - "Honor Token Enhancers (Dylan and Hogar)": official/enchanters/honor-token-enhancers.md
+          - "Horror Toy Factory Enchanter": official/enchanters/toy-factory.md
+          - "Illusion Enchanter": official/enchanters/illusion-enchanter.md
+          - "Infinite Space Artifact Enhancer": official/enchanters/infinite-space.md
+          - "Lisa (Automatic Equipment Modules)": official/enchanters/lisa-automatic-modules.md
+          - "Malangdo Costume Enchanters": official/enchanters/malangdo-costume-enchanters.md
+          - "Mayomayo (Malangdo weapon enchants)": official/enchanters/mayomayo.md
+          - "Mora Arch Bishop & Warlock Artifacts": official/enchanters/mora-arch-bishop-warlock-artifacts.md
+          - "Mora Artifact Researcher": official/enchanters/mora-artifact-researcher.md
+          - "Mora Crafters (Army Padding, Guardian Pendant, Loki's Muffler)": official/enchanters/mora-crafters.md
+          - "Muqaddas Weapons (Weapon Master)": official/enchanters/muqaddas-weapons.md
+          - "Old Helmet Enchants (Nightmare Bio Lab)": official/enchanters/old-helmet-enchants.md
+          - "Pudding (Bio Lab Enchants)": official/enchanters/pudding-bio-lab.md
+          - "Regenschirm Reforms and OS Weapon Enchants": official/enchanters/regenschirm-reforms.md
+          - "Rock Ridge Contraband Processor": official/enchanters/rock-ridge-contraband.md
+          - "RS26 (Illusion Armor Modules)": official/enchanters/rs26-illusion-modules.md
+          - "Slot Enchanters (Seiyablem and Leablem)": official/enchanters/slot-enchanters.md
+          - "Susan Grey (Odin Temple gear)": official/enchanters/susan-grey.md
+          - "Temple Item Manager (Bishop Necklace)": official/enchanters/temple-item-manager.md
+          - "Temporal Boots (Old Glast Heim)": official/enchanters/temporal-boots.md
+          - "Temporal Circlet Enchanter": official/enchanters/temporal-circlet.md
+          - "Thanatos Tower Enchanters": official/enchanters/thanatos-tower.md
+          - "Time Gap Weapons (Kkat)": official/enchanters/time-gap-weapons.md
+          - "Varmundt Rune Gear (Biosphere)": official/enchanters/varmundt-biosphere.md
+          - "Verus Enchanters (Charleston and Excelion)": official/enchanters/verus.md
       - Instances:
           - official/instances/index.md
           - "2nd OS Search": official/instances/2nd-os-search.md
