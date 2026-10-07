@@ -15,6 +15,8 @@ Follow these pages in order to play through Miracle's episode storylines without
 | 9 | [18: Direction of Prayer](ep18.md) | 170+ | Wolves Gathering Place, Oz Labyrinth, High Priest's Villa, Thor Military Base |
 | 10 | [19: Issgard, Land of Snow Flowers](ep19.md) | 200+ | Iwin Patrol, Bagot Laboratory, Confused Snake's Nest, Airship Destruction |
 | 11 | [20: Immortals](ep20.md) | 215+ | Canyon Exploration, Drift Ice Zone, Nest of Twigs, Separated Sanctuary, Immortal |
+| 12 | [21: Age of Heroes](ep21.md) | 230+ | Gimli Infiltration, Mysterious Ghost Ship, Final Battle, Secret Altar, Silent Sanctuary |
+| 13 | [Chapter 1: Call of the World Tree](ch1.md) | 200+ | Ominous Dark Whisper |
 
 !!! tip "Short on time?"
     The [Episode Skip](../../content/episode-skip.md) NPC can complete some episodes for you. Each episode page says what the skip covers and what it leaves out.

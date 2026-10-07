@@ -71,7 +71,7 @@ extra:
     exp_rate: 1000x
     drop_rate: 1000x (equipment 250x, cards 100x)
     client: 2026-01-07
-    episode: Episode 20
+    episode: Episode 21 and Chapter 1
 
 nav:
   - Home: index.md
@@ -79,6 +79,7 @@ nav:
       - New Players: guide/new-players.md
       - Currencies & Points: guide/currencies.md
       - Commands: guide/commands.md
+      - Warper: guide/warper.md
       - VIP: guide/vip.md
       - Anti-bot & Fair Play: guide/fair-play.md
   - Shops:
@@ -138,6 +139,8 @@ nav:
           - "18 Direction of Prayer": official/story/ep18.md
           - "19 Issgard": official/story/ep19.md
           - "20 Immortals": official/story/ep20.md
+          - "21 Age of Heroes": official/story/ep21.md
+          - "Chapter 1 Call of the World Tree": official/story/ch1.md
       - Enchanters:
           - official/enchanters/index.md
           - "Abyss Depth Enchant Manager (Rune Crowns and Dimension Weapons)": official/enchanters/abyss-depth-enchants.md
@@ -206,10 +209,12 @@ nav:
           - "Fall of Glast Heim": official/instances/fall-of-glast-heim.md
           - "Farm Lost in Time": official/instances/farm-lost-in-time.md
           - "Fenrir and Sarah": official/instances/fenrir-and-sarah.md
+          - "Final Battle": official/instances/final-battle.md
           - "Friday Dungeon": official/instances/friday-dungeon.md
           - "Geffen Magic Tournament": official/instances/geffen-magic-tournament.md
           - "Geffen Night Arena": official/instances/geffen-night-arena.md
           - "Ghost Palace": official/instances/ghost-palace.md
+          - "Gimli Infiltration": official/instances/gimli-infiltration.md
           - "Glastheim Challenge Mode": official/instances/glastheim-challenge-mode.md
           - "Half Moon In The Daylight": official/instances/half-moon-in-the-daylight.md
           - "Hall of Life": official/instances/hall-of-life.md
@@ -227,11 +232,13 @@ nav:
           - "Last Room": official/instances/last-room.md
           - "Mistwood Maze": official/instances/mistwood-maze.md
           - "Morse's Cave": official/instances/morse-s-cave.md
+          - "Mysterious Ghost Ship": official/instances/mysterious-ghost-ship.md
           - "Nest of Twigs": official/instances/nest-of-twigs.md
           - "Nidhoggur's Nest": official/instances/nidhoggur-s-nest.md
           - "Nightmarish Jitterbug": official/instances/nightmarish-jitterbug.md
           - "Octopus Cave": official/instances/octopus-cave.md
           - "Old Glast Heim": official/instances/old-glast-heim.md
+          - "Ominous Dark Whisper": official/instances/ominous-dark-whisper.md
           - "Orc's Memory": official/instances/orc-s-memory.md
           - "OS Occupation": official/instances/os-occupation.md
           - "Oz Labyrinth": official/instances/oz-labyrinth.md
@@ -243,9 +250,12 @@ nav:
           - "Sara's Memories": official/instances/sara-s-memories.md
           - "Sealed Catacomb": official/instances/sealed-catacomb.md
           - "Sealed OS": official/instances/sealed-os.md
+          - "Secret Altar": official/instances/secret-altar.md
           - "Security Area 1": official/instances/security-area-1.md
           - "Security Area 2": official/instances/security-area-2.md
           - "Separated Sanctuary": official/instances/separated-sanctuary.md
+          - "Silent Sanctuary": official/instances/silent-sanctuary.md
+          - "Simulated Dark Whisper": official/instances/simulated-dark-whisper.md
           - "Simulation Battle": official/instances/simulation-battle.md
           - "Sky Fortress Invasion": official/instances/sky-fortress-invasion.md
           - "Sticky Sea": official/instances/sticky-sea.md

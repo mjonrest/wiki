@@ -16,6 +16,7 @@ import yaml
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "tools"))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import rodb  # noqa: E402
+import ydb  # noqa: E402
 from rodb import ROOT, item_name, item_id, mob_name  # noqa: E402
 import official  # noqa: E402
 
@@ -388,8 +389,8 @@ def slot_enchanter(rel, npc, title_prefix="Group"):
 
 
 def item_enchant(eid):
-    """Render one entry of db/re/item_enchant.yml (official-style enchant UI)."""
-    for rel in ("db/import/item_enchant.yml", "db/re/item_enchant.yml"):
+    """Render one entry of the item_enchant database (official-style enchant UI)."""
+    for rel in reversed(ydb.files("db/item_enchant.yml")[1:]):
         data = _enchant_db(rel)
         if eid in data:
             e = data[eid]
