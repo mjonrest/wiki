@@ -8,10 +8,11 @@
   var cache = {};
   var meta = null;
   var icons = null; // img/icons.json: where each item and skill icon sits in the sprite sheets
+  var npcPics = {}; // img/npcs.json: the NPC sprites that have a picture
 
   function get(path) {
     if (!cache[path]) {
-      cache[path] = fetch(DATA + path).then(function (r) {
+      cache[path] = fetch(DATA + path, { cache: "no-cache" }).then(function (r) {
         if (!r.ok) throw new Error(path + ": " + r.status);
         return r.json();
       });
@@ -34,7 +35,7 @@
     return '<img class="' + cls + '" src="' + BASE + "img/" + kind + "/" + id + '.png" alt="" loading="lazy" onerror="this.remove()">';
   }
   function loadIcons() {
-    return fetch(BASE + "img/icons.json").then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+    return fetch(BASE + "img/icons.json", { cache: "no-cache" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
       if (!d) return;
       icons = { cols: d.cols, rows: d.rows };
       ["items", "skills"].forEach(function (k) {
@@ -43,6 +44,11 @@
         icons[k] = m;
       });
     }).catch(function () { icons = null; });
+  }
+  function loadNpcPics() {
+    return fetch(BASE + "img/npcs.json", { cache: "no-cache" }).then(function (r) { return r.ok ? r.json() : []; }).then(function (a) {
+      a.forEach(function (id) { npcPics[id] = 1; });
+    }).catch(function () {});
   }
 
   function esc(s) {
@@ -70,7 +76,7 @@
     return (s ? pic("skills", s.id, "ico") : "") + '<a href="' + page("skills") + "#" + esc(aegis) + '">' + esc(s ? s.name : nice(aegis)) + "</a>";
   }
   // NPC sprites: monster pictures for monster-shaped NPCs, otherwise the saved NPC picture.
-  function npcPic(sprite, cls) { return sprite >= 1001 && sprite < 4000 ? pic("mobs", sprite, cls) : sprite > 0 ? pic("npcs", sprite, cls) : ""; }
+  function npcPic(sprite, cls) { return sprite >= 1001 && sprite < 4000 ? pic("mobs", sprite, cls) : npcPics[sprite] ? pic("npcs", sprite, cls) : ""; }
   function npcLink(id, npcs) {
     var n = npcs && npcs[id];
     return (n ? npcPic(n[5], "ico") : "") + '<a href="' + page("npcs") + "#" + id + '">' + esc(n ? n[1] : "NPC " + id) + "</a>";
@@ -637,7 +643,7 @@
     root.addEventListener("click", function (e) {
       if (e.target.closest && e.target.closest(".db-back")) { e.preventDefault(); history.pushState(null, "", location.pathname); route(root, kind); }
     });
-    Promise.all([get("meta.json"), loadIcons()]).then(function (a) {
+    Promise.all([get("meta.json"), loadIcons(), loadNpcPics()]).then(function (a) {
       meta = a[0];
       route(root, kind);
       window.addEventListener("hashchange", function () { route(root, kind); });

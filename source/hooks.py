@@ -1,5 +1,6 @@
 """MkDocs hooks: writes the Database JSON (tools/gen_db.py) into the built site, and links each enchanter guide to
 its Database entry."""
+import hashlib
 import os
 import re
 import sys
@@ -22,3 +23,11 @@ def on_page_markdown(markdown, page, **kwargs):
     note = (f'!!! tip "In the Database"\n    Every item this enchanter works on, the enchants it adds and the NPC on the map: '
             f'[open its Database entry]({up}db/enchants.md#G{name[:-3]}). Item pages link back here too.\n')
     return re.sub(r"^(# .*\n)", lambda m: m.group(1) + "\n" + note + "\n", markdown, count=1, flags=re.M)
+
+
+def on_post_page(output, page, config, **kwargs):
+    """Adds the script's checksum to its URL, so browsers load the new db.js after an update."""
+    path = os.path.join(config["docs_dir"], "assets", "db.js")
+    with open(path, "rb") as f:
+        version = hashlib.sha1(f.read()).hexdigest()[:10]
+    return output.replace('assets/db.js"', f'assets/db.js?v={version}"')
