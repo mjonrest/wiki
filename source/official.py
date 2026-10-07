@@ -13,6 +13,7 @@ import yaml
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "tools"))
 from rodb import ROOT  # noqa: E402
+import ydb  # noqa: E402
 
 NPC_START = re.compile(
     r"^(?:(?P<map>[\w@-]+),(?P<x>\d+),(?P<y>\d+),\d+|-|function)\t"
@@ -96,9 +97,9 @@ def _yaml_body(rels):
 
 @functools.lru_cache(None)
 def instance_db():
-    """{name: entry} from db/re + db/import instance_db.yml (import overrides)."""
+    """{name: entry} from every file db/instance_db.yml imports (later files override)."""
     out = {}
-    for e in _yaml_body(["db/re/instance_db.yml", "db/import/instance_db.yml"]):
+    for e in _yaml_body(ydb.files("db/instance_db.yml")[1:]):
         if e.get("Name"):
             out[e["Name"]] = e
     return out
@@ -108,7 +109,7 @@ def instance_db():
 def quest_db():
     """{id: {Title, TimeLimit}}; read by regex since quest_db.yml has tabs PyYAML rejects."""
     out = {}
-    for rel in ("db/re/quest_db.yml", "db/import/quest_db.yml"):
+    for rel in ydb.files("db/quest_db.yml")[1:]:
         if not os.path.exists(os.path.join(ROOT, rel)):
             continue
         cur = None
@@ -156,12 +157,17 @@ def instances():
             if val in db:
                 vars_.setdefault(v, []).append(val)
         for hdr, body in blks:
+            # .@ variables are local to one NPC, so a value set in this block wins over the rest of the file.
+            local = {}
+            for v, val in STR_ASSIGN.findall(body):
+                if val in db:
+                    local.setdefault(v, []).append(val)
             for kind, arg, mode in INSTANCE_CALL.findall(body):
                 arg = arg.strip()
                 if arg.startswith('"'):
                     names = [arg.strip('"')]
                 else:
-                    names = vars_.get(arg) or literals
+                    names = local.get(arg) or vars_.get(arg) or literals
                 for name in names:
                     if name in db:
                         _note(found, name, rel, hdr, body, kind, mode)
