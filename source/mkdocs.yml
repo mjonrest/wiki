@@ -31,8 +31,8 @@ theme:
       toggle:
         icon: material/weather-sunny
         name: Light mode
-  icon:
-    logo: material/sword-cross
+  logo: assets/logo.png
+  favicon: assets/favicon.png
 
 extra_css:
   - assets/miracle.css
