@@ -529,15 +529,19 @@ def _server_rate(iid, rate, m, mvp_reward):
 
 def _drops_table(mid):
     m = official.mob_db()[mid]
-    rows, seen = [], set()
+    rows, seen = [], {}
     for kind, drops in (("MVP reward", m["mvp_drops"]), ("", m["drops"])):
         for aegis, rate in drops:
-            if (aegis, rate, kind) in seen:
+            if (aegis, rate, kind) in seen:  # the same drop listed twice drops twice
+                row = seen[(aegis, rate, kind)]
+                row[3] += 1
+                row[1] = f"{row[4]} (×{row[3]})"
                 continue
-            seen.add((aegis, rate, kind))
             iid = item_id(aegis)
             chance = _rate(_server_rate(iid, rate, m, bool(kind))) if iid else _rate(rate)
-            rows.append([item(iid) if iid else aegis, chance, kind])
+            row = seen[(aegis, rate, kind)] = [item(iid) if iid else aegis, chance, kind, 1, chance]
+            rows.append(row)
+    rows = [r[:3] for r in rows]
     return _table(["Item", "Chance", ""], rows) if rows else "_No drops._"
 
 

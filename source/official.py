@@ -227,38 +227,26 @@ def visible_npcs(rel):
 # ---------------------------------------------------------------------------
 # Per-script details for the instance pages.
 
-from rodb import MOB_DBS, MOB_ENTRY, item_id as _item_id, items as _items  # noqa: E402
+from rodb import item_id as _item_id, items as _items  # noqa: E402
 
 
 @functools.lru_cache(None)
 def mob_db():
-    """{id: {name, aegis, level, hp, race, element, size, class, mvp, drops:[(aegis, rate)], mvp_drops:[...]}}"""
+    """{id: {name, aegis, level, hp, race, element, size, class, mvp, drops:[(aegis, rate)], mvp_drops:[...]}}
+
+    Read with the full YAML loader (tools/ydb.py), so entries with commented-out drop lines are not lost."""
+    import ydb
     out = {}
-    for rel in MOB_DBS:
-        path = os.path.join(ROOT, rel)
-        if not os.path.exists(path):
-            continue
-        for m in MOB_ENTRY.finditer(_read(rel)):
-            body = m.group(2).replace("\t", "  ")
-            try:
-                e = yaml.safe_load("Id: 0\n" + "\n".join(l[4:] for l in body.splitlines())) or {}
-            except yaml.YAMLError:
-                continue
-            mid = int(m.group(1))
-            prev = out.get(mid, {})
-            rec = dict(prev)
-            rec.update(
-                name=e.get("Name") or prev.get("name") or e.get("AegisName") or f"Monster #{m.group(1)}", aegis=e.get("AegisName", prev.get("aegis")),
-                level=e.get("Level", prev.get("level", 1)), hp=e.get("Hp", prev.get("hp", 1)),
-                race=e.get("Race", prev.get("race", "Formless")),
-                element=f'{e.get("Element", "Neutral")} {e.get("ElementLevel", 1)}' if "Element" in e or not prev
-                else prev.get("element"),
-                size=e.get("Size", prev.get("size", "Small")), cls=e.get("Class", prev.get("cls", "Normal")),
-                mvp=bool(e.get("MvpExp")) or bool(e.get("MvpDrops")) or prev.get("mvp", False),
-                drops=[(d["Item"], d["Rate"]) for d in e.get("Drops") or []] or prev.get("drops", []),
-                mvp_drops=[(d["Item"], d["Rate"]) for d in e.get("MvpDrops") or []] or prev.get("mvp_drops", []),
-            )
-            out[mid] = rec
+    for mid, e in ydb.mobs().items():
+        out[int(mid)] = dict(
+            name=e.get("Name") or e.get("AegisName") or f"Monster #{mid}", aegis=e.get("AegisName"),
+            level=e.get("Level", 1), hp=e.get("Hp", 1), race=e.get("Race", "Formless"),
+            element=f'{e.get("Element", "Neutral")} {e.get("ElementLevel", 1)}',
+            size=e.get("Size", "Small"), cls=e.get("Class", "Normal"),
+            mvp=bool(e.get("MvpExp")) or bool(e.get("MvpDrops")),
+            drops=[(d["Item"], d["Rate"]) for d in e.get("Drops") or [] if d.get("Item") and d.get("Rate")],
+            mvp_drops=[(d["Item"], d["Rate"]) for d in e.get("MvpDrops") or [] if d.get("Item") and d.get("Rate")],
+        )
     return out
 
 
@@ -304,9 +292,82 @@ def _split_args(s):
 def _setarrays(text):
     """{var: [values]} for every setarray in a script (later ones extend earlier ones)."""
     out = {}
-    for var, vals in re.findall(r"setarray\s+([.'$@\w]+?)(?:\[\d+\])?\s*,\s*([^;]+);", text):
+    for var, vals in re.findall(r"setarray\s+([.'$@\w]+?)(?:\[\d+\])?\s*,\s*([^;]+);", text, re.I):
         out.setdefault(var, []).extend(_split_args(vals))
     return out
+
+
+class _Resolver:
+    """Possible values of a script expression, as tokens (ids or aegis names): numbers, names, arrays, variables
+    (from their assignments and for loops), rand(a,b), F_Rand(...), base+variable and getarg(n) of a callsub."""
+
+    def __init__(self, text):
+        self.text = text
+        self.arrays = _setarrays(text)
+
+    def _assigned(self, var, scope):
+        v = re.escape(var)
+        out = re.findall(r"(?<![\w.'$@])" + v + r"\s*=(?!=)\s*([^;]+);", scope)
+        out += re.findall(r"\bset\s+" + v + r"\s*,\s*([^;]+);", scope)
+        for a, op, b in re.findall(r"for\s*\(\s*" + v + r"\s*=\s*(\d+)\s*;\s*" + v + r"\s*(<=?)\s*(\d+)", scope):
+            hi = int(b) + (op == "<=")
+            if 0 < hi - int(a) <= 40:
+                out += [str(i) for i in range(int(a), hi)]
+        return out
+
+    def values(self, expr, scope, depth=0):
+        expr = re.sub(r"\s+", " ", expr).strip()
+        while expr.startswith("(") and expr.endswith(")") and expr.count("(") == 1:
+            expr = expr[1:-1].strip()
+        expr = re.sub(r"^atoi\((.*)\)$", r"\1", expr).strip().strip('"')
+        if depth > 4 or not expr:
+            return []
+        if re.fullmatch(r"\d+|[A-Za-z][A-Za-z0-9_]*", expr) and not re.fullmatch(r"getarg|rand", expr):
+            return [expr]
+        m = re.fullmatch(r"rand\(\s*(\d+)\s*,\s*(\d+)\s*\)", expr)
+        if m:
+            a, b = int(m.group(1)), int(m.group(2))
+            return [str(i) for i in range(a, b + 1)] if 0 <= b - a <= 40 else []
+        m = re.fullmatch(r"(?:callfunc\s*\(?\s*\"F_Rand\"\s*,|F_Rand\s*\()(.*)\)", expr)
+        if m:
+            return [v for a in _split_args(m.group(1)) for v in self.values(a, scope, depth + 1)]
+        m = re.fullmatch(r"([.'$@]*\w+\$?)\[.*\]", expr) or re.fullmatch(r"getelementofarray\(\s*([.'$@]*\w+)", expr)
+        if m:
+            return [v for a in self.arrays.get(m.group(1), []) for v in self.values(a, scope, depth + 1)]
+        m = re.fullmatch(r"\(?\s*(\d+)\s*\+\s*\(\s*\(?[.'$@\w]+\s*-\s*1\)?\s*%\s*(\d+)\s*\)\s*\)?", expr)
+        if m:  # base + ((n-1) % k)
+            return [str(int(m.group(1)) + i) for i in range(int(m.group(2)))] if int(m.group(2)) <= 40 else []
+        m = re.fullmatch(r"(\d+)\s*\+\s*(.+)|(.+?)\s*\+\s*(\d+)", expr)
+        if m:
+            base, var = (m.group(1), m.group(2)) if m.group(1) else (m.group(4), m.group(3))
+            offs = [int(v) for v in self.values(var, scope, depth + 1) if v.isdigit() and int(v) < 100]
+            return [str(int(base) + o) for o in sorted(set(offs))]
+        m = re.fullmatch(r'get_instance_var\(\s*"([^"]*)"(.*)\)', expr)
+        if m:  # set_instance_var("name", value), or a name built from the same first part
+            key, rest = re.escape(m.group(1)), m.group(2)
+            vals = re.findall(r'set_instance_var\(\s*"' + key + (r'"' if not rest.strip() else r'[^,]*') + r"\s*,\s*([^;]+?)\)\s*;", self.text)
+            return [v for a in vals for v in self.values(a, scope, depth + 1)]
+        m = re.fullmatch(r"getarg\(\s*(\d+)\s*(?:,[^)]*)?\)", expr)
+        if m:
+            return [v for a in self._args(int(m.group(1)), scope) for v in self.values(a, scope, depth + 1)]
+        if re.fullmatch(r"[.'$@]+\w+\$?", expr):
+            found = self._assigned(expr, scope)
+            if not found and scope is not self.text:
+                found = self._assigned(expr, self.text)
+            return [v for a in found for v in self.values(a, scope, depth + 1)]
+        return []
+
+    def _args(self, n, scope):
+        """Argument n of every callsub/callfunc into the label or function this getarg sits in."""
+        names = re.findall(r"^\s*(\w+)\s*:", scope, re.M) + re.findall(r"^function\s+script\s+(\w+)", scope, re.M) + \
+            re.findall(r"^function\t\w+\t(\w+)", scope, re.M)
+        out = []
+        for name in set(names):
+            for call in re.findall(r"\bcall(?:sub|func)\s*\(?\s*\"?" + re.escape(name) + r"\"?\s*,([^;]*);", self.text):
+                args = _split_args(call.rstrip().rstrip(")"))
+                if len(args) > n:
+                    out.append(args[n])
+        return out
 
 
 @functools.lru_cache(None)
@@ -314,10 +375,6 @@ def script_details(rel):
     """Monsters spawned, items given and shops of one official script file."""
     text = "\n".join(b for _, b in blocks(rel))
     arrays = _setarrays(text)
-    scalars = {}
-    for var, val in re.findall(r"""([.'$@]+\w+\$?)\s*=\s*"?([A-Z0-9_]+)"?\s*;""", text) + \
-            re.findall(r"""\bset\s+([.'$@]+\w+\$?)\s*,\s*"?([A-Z0-9_]+)"?\s*;""", text):
-        scalars.setdefault(var, []).append(val)
     mobs = []
 
     def add_mob(tok):
@@ -325,21 +382,15 @@ def script_details(rel):
         if mid and mid not in mobs:
             mobs.append(mid)
 
-    for cmd, call in re.findall(r"\b(monster|areamonster|bg_monster)\s+([^;]+);", text):
-        args = _split_args(call)
-        pos = {"monster": 4, "areamonster": 6, "bg_monster": 5}[cmd]
-        if len(args) <= pos:
-            continue
-        mob_arg = re.sub(r"^atoi\((.*)\)$", r"\1", args[pos]).strip()
-        m = re.match(r"([.'$@\w]+)\[", mob_arg)
-        if m and m.group(1) in arrays:
-            for v in arrays[m.group(1)]:
+    res = _Resolver(text)
+    for _, body in blocks(rel):
+        for cmd, call in re.findall(r"\b(monster|areamonster|bg_monster)\b\s*\(?\s*([^;]+);", body):
+            args = _split_args(call)
+            pos = {"monster": 4, "areamonster": 6, "bg_monster": 5}[cmd]
+            if len(args) <= pos:
+                continue
+            for v in res.values(args[pos], body):
                 add_mob(v)
-        elif mob_arg in scalars:
-            for v in scalars[mob_arg]:
-                add_mob(v)
-        else:
-            add_mob(mob_arg)
     # Spawn helpers (callfunc "F_Tower_Monster_Summon", ...): a monster label followed by its id.
     for label, tok in re.findall(r'"([^"]*)"\s*,\s*("?[A-Z0-9_]+"?)\s*,', text):
         mid = _mob_ref(tok)
@@ -355,16 +406,16 @@ def script_details(rel):
                 add_mob(v)
 
     rewards = OrderedDict()
-    for call in re.findall(r"\b(?:getitem|getitem2|rentitem|getitembound|makeitem)\s+([^;]+);", text):
-        args = _split_args(call)
-        if len(args) < 2:
-            continue
-        m = re.match(r"([.'$@\w]+)\[", args[0])
-        ids = [_item_ref(v) for v in arrays.get(m.group(1), [])] if m else [_item_ref(args[0])]
-        amt = args[1] if args[1].isdigit() else ""
-        for iid in ids:
-            if iid and iid not in rewards:
-                rewards[iid] = amt
+    for _, body in blocks(rel):
+        for call in re.findall(r"\b(?:getitem2|getitembound2|getitembound|getitem|rentitem2|rentitem|makeitem2|makeitem)\b\s*\(?\s*([^;]+);", body):
+            args = _split_args(call)
+            if len(args) < 2:
+                continue
+            amt = args[1] if args[1].isdigit() else ""
+            for v in res.values(args[0], body):
+                iid = _item_ref(v)
+                if iid and iid not in rewards:
+                    rewards[iid] = amt
     for var, vals in arrays.items():
         if re.search(r"reward|prize|box|item", var, re.I) and not re.search(r"amount|count|cost|req", var, re.I):
             for v in vals:
