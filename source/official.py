@@ -292,7 +292,7 @@ def _split_args(s):
 def _setarrays(text):
     """{var: [values]} for every setarray in a script (later ones extend earlier ones)."""
     out = {}
-    for var, vals in re.findall(r"setarray\s+([.'$@\w]+?)(?:\[\d+\])?\s*,\s*([^;]+);", text):
+    for var, vals in re.findall(r"setarray\s+([.'$@\w]+?)(?:\[\d+\])?\s*,\s*([^;]+);", text, re.I):
         out.setdefault(var, []).extend(_split_args(vals))
     return out
 
@@ -316,7 +316,7 @@ class _Resolver:
         return out
 
     def values(self, expr, scope, depth=0):
-        expr = expr.strip()
+        expr = re.sub(r"\s+", " ", expr).strip()
         while expr.startswith("(") and expr.endswith(")") and expr.count("(") == 1:
             expr = expr[1:-1].strip()
         expr = re.sub(r"^atoi\((.*)\)$", r"\1", expr).strip().strip('"')
@@ -334,12 +334,20 @@ class _Resolver:
         m = re.fullmatch(r"([.'$@]*\w+\$?)\[.*\]", expr) or re.fullmatch(r"getelementofarray\(\s*([.'$@]*\w+)", expr)
         if m:
             return [v for a in self.arrays.get(m.group(1), []) for v in self.values(a, scope, depth + 1)]
+        m = re.fullmatch(r"\(?\s*(\d+)\s*\+\s*\(\s*\(?[.'$@\w]+\s*-\s*1\)?\s*%\s*(\d+)\s*\)\s*\)?", expr)
+        if m:  # base + ((n-1) % k)
+            return [str(int(m.group(1)) + i) for i in range(int(m.group(2)))] if int(m.group(2)) <= 40 else []
         m = re.fullmatch(r"(\d+)\s*\+\s*(.+)|(.+?)\s*\+\s*(\d+)", expr)
         if m:
             base, var = (m.group(1), m.group(2)) if m.group(1) else (m.group(4), m.group(3))
             offs = [int(v) for v in self.values(var, scope, depth + 1) if v.isdigit() and int(v) < 100]
             return [str(int(base) + o) for o in sorted(set(offs))]
-        m = re.fullmatch(r"getarg\(\s*(\d+)\s*\)", expr)
+        m = re.fullmatch(r'get_instance_var\(\s*"([^"]*)"(.*)\)', expr)
+        if m:  # set_instance_var("name", value), or a name built from the same first part
+            key, rest = re.escape(m.group(1)), m.group(2)
+            vals = re.findall(r'set_instance_var\(\s*"' + key + (r'"' if not rest.strip() else r'[^,]*') + r"\s*,\s*([^;]+?)\)\s*;", self.text)
+            return [v for a in vals for v in self.values(a, scope, depth + 1)]
+        m = re.fullmatch(r"getarg\(\s*(\d+)\s*(?:,[^)]*)?\)", expr)
         if m:
             return [v for a in self._args(int(m.group(1)), scope) for v in self.values(a, scope, depth + 1)]
         if re.fullmatch(r"[.'$@]+\w+\$?", expr):
@@ -376,7 +384,7 @@ def script_details(rel):
 
     res = _Resolver(text)
     for _, body in blocks(rel):
-        for cmd, call in re.findall(r"\b(monster|areamonster|bg_monster)\s*\(?\s*([^;]+);", body):
+        for cmd, call in re.findall(r"\b(monster|areamonster|bg_monster)\b\s*\(?\s*([^;]+);", body):
             args = _split_args(call)
             pos = {"monster": 4, "areamonster": 6, "bg_monster": 5}[cmd]
             if len(args) <= pos:
@@ -399,7 +407,7 @@ def script_details(rel):
 
     rewards = OrderedDict()
     for _, body in blocks(rel):
-        for call in re.findall(r"\b(?:getitem|getitem2|rentitem|getitembound|makeitem)\s*\(?\s*([^;]+);", body):
+        for call in re.findall(r"\b(?:getitem2|getitembound2|getitembound|getitem|rentitem2|rentitem|makeitem2|makeitem)\b\s*\(?\s*([^;]+);", body):
             args = _split_args(call)
             if len(args) < 2:
                 continue
