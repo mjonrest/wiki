@@ -10,3 +10,11 @@ you need. Items bought here are announced to the server.
 
 {{ quest_shop(loop.index) }}
 {% endfor %}
+
+## Quest Expert
+
+**Location:** {{ npc_where("Quest Expert") }} · Quest Room, next to the Quest Shop
+
+The Quest Expert is a barter shop: it swaps materials, coins and Zeny straight for the item, with no tabs.
+
+{{ shop("Quest_5", "Quest Expert", collapsed=False) }}

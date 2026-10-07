@@ -5,6 +5,7 @@ Most custom shops are in the **Quest Room** (`moc_para01`). Use the **Quest Area
 | Shop | Location | Pays with | Sells |
 |---|---|---|---|
 | [Quest Shop](quest-shop.md) | {{ npc_where("Quest Shop") }} | Coins and items | Mid-game and end-game equipment |
+| [Quest Expert](quest-shop.md#quest-expert) | {{ npc_where("Quest Expert") }} | Materials, coins and Zeny | Barter gear such as Tyrant of Earth |
 | [Instance Point Merchant](instance-point-merchant.md) | {{ npc_where("Instance Point Merchant") }} | Instance Points | Instance gear by slot, instance materials |
 | [World Boss Merchant](world-boss-merchant.md) | {{ npc_where("World Boss Merchant") }} | {{ item_name(30007) }} | Shadow gear, enchant stones, skill packs |
 | [Master Shadow](master-shadow.md) | {{ npc_where("Master Shadow") }} | Shadow essences, +10 shadows | Master Shadows, 4th job shadows |
