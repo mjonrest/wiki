@@ -13,7 +13,7 @@ Octopus Cave is a light-hearted Malangdo memorial. A perverted octopus has been 
 | NPC | **Starfish** at `/navi mal_dun01 151/235` |
 | Entrance | **Weird Entrance** at `/navi mal_dun01 153/237` |
 | Time limit | 1 hour |
-| Cooldown | 1 hour, starting when you enter |
+| Cooldown | 1 hour, starting when you enter. While it runs you can only re-enter the cave you entered, not a new one. |
 
 The leader talks to the Starfish and picks **Ask to open the gate.** Then everyone uses the Weird Entrance and picks **Go in.**
 
@@ -50,7 +50,7 @@ The leader talks to the Starfish and picks **Ask to open the gate.** Then everyo
 
 | Reward | Who | Notes |
 |---|---|---|
-| 20–40 Instance Points | Each player who uses an exit and picks **Yes!** | Random amount. Counts toward the daily 1,200 point cap. You are then warped to `/navi mal_dun01 153/233`. |
+| 20–40 Instance Points | Each player who uses an exit and picks **Yes!** | Random amount. Counts toward the daily 1,200 point cap. You are then warped to `/navi mal_dun01 153/233`. Picking **No!** gives nothing and keeps your claim. |
 
 The boss and the octopus monsters drop their normal loot; see the tables below.
 

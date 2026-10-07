@@ -15,7 +15,7 @@ trap boxes around Cor, defeats the illusion monsters that come out of each, and 
   `/navi sp_cor 113/130`. The first time, a short scene with Elyumina plays.
 - **Party:** you must be in a party. The **party leader** picks *Ready* to create the instance, then everyone picks
   *Enter*.
-- **Cooldown:** entering gives you *Pure Backstab (Standby)*, a **4-hour** cooldown. Once it has passed, talk to the
+- **Cooldown:** entering gives you *Pure Backstab (Standby)*, a daily cooldown that resets at **04:00** server time. Once it has passed, talk to the
   Rebellion soldier to clear it.
 - **Time limit:** the instance lasts **2 hours**.
 

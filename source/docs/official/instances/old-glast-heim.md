@@ -102,7 +102,7 @@ fight, and they vanish when the next 30-second cycle starts.
 
 Normal and Hard each have their own "first time".
 
-When you talk to Hugin again and pick *Please let me out*, you get **20–40 Instance Points** (+50 with
+When you talk to Hugin again and pick *Please let me out*, you get **20–40 Instance Points** on Normal or **40–60** on Hard (+50 with
 {{ item(30034) }}, within the daily Instance Point limit) and go back to `glast_01`. Leaving this way after a
 **Normal** clear is what unlocks Hard mode.
 

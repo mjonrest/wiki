@@ -104,7 +104,7 @@ random, roughly in these ranges:
 
 **Oscar.** Only the **party leader** can talk to him. This counts the clear for the leader and opens the **Exit**.
 
-**Exit.** Each player who uses it returns to `glast_01` and earns Instance Points: **20 per 10 clears of their own**,
-minimum 20, maximum 200 (100 or more clears). Instance Points count toward the daily cap of 1,200.
+**Exit.** Each player who uses it returns to `glast_01` and earns Instance Points: **20 per stage** of the Contaminated Magic Stage fought this run
+(20 for stage 1, up to 200 for stage 10). Instance Points count toward the daily cap of 1,200.
 
 {{ instance_page("glastheim-challenge-mode") }}

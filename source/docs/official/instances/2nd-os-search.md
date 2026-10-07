@@ -15,7 +15,7 @@ S-class mutant {{ mob(20346) }}.
   Search*, then every member talks to him and picks *Enter*.
 - **Quest:** the first time, the Operation Officer gives you *More Search Operations*. You need this quest active to
   get the reward at the end. He gives it again on your next visit after you have turned it in.
-- **Cooldown:** entering gives you *Operation Waiting*, a **4-hour** cooldown. Once it has passed, talk to the
+- **Cooldown:** entering gives you *Operation Waiting*, a daily cooldown that resets at **04:00** server time. Once it has passed, talk to the
   Operation Officer to clear it.
 - **Time limit:** the instance lasts **2 hours**.
 

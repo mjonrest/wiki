@@ -16,6 +16,7 @@ bring back buy and enchant **King Schmidt's** armor, manteau and insignias next 
 - **Cooldown:** Normal and Hard have **separate** cooldowns. Each starts when you enter and ends at the next
   **04:00** server time.
 - **Time limit:** 1 hour.
+- **Late joining:** you can't enter once the Cursed King is defeated.
 
 | | Normal | Hard |
 |---|---|---|

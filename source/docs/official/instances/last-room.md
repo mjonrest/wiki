@@ -9,7 +9,7 @@ The Last Room is a short instance behind a sealed door underground. You follow V
 - **NPC:** Mark, `/navi un_myst 163/38`.
 - **Level:** Base Level 150 or higher.
 - **Party:** You need a party. The party leader picks **"Open door."**. Then everyone picks **"Go in."**.
-- **Cooldown:** Entering starts a **4 hour** cooldown ("Final Room"). Talk to Mark once after it ends to clear it.
+- **Cooldown:** Entering starts a daily cooldown that resets at **04:00** server time ("Final Room"). Talk to Mark once after it ends to clear it.
 - On your first entry you also get the hunting quest "Final Room", which asks you to defeat T_W_O.
 
 ### Step 1: First protocol

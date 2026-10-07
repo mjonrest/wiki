@@ -13,6 +13,7 @@ Somatology materials and Instance Points. The materials are spent at the Edda en
 - **Level:** the script has no level check.
 - **Cooldown:** entering starts the *Road of Battle* quest, which ends at the next **04:00** server time.
 - **Time limit:** 1 hour.
+- **Late joining:** you can't enter once the boss is defeated.
 
 ### Walkthrough
 
@@ -60,7 +61,7 @@ When the boss dies, a **treasure box** appears south of Sierra and Sierra comes 
 
 | Source | Reward (each player) |
 |---|---|
-| Treasure box | 1 random Edda weapon (38 possible weapons), once per entry |
+| Treasure box | 1 random Edda weapon (38 possible weapons), once per character per instance (relogging does not give another) |
 | Sierra | 9 {{ item(25786) }} and 15 {{ item(25787) }} |
 | Sierra | 100-200 {{ item(25786) }} and the same amount of {{ item(25787) }} |
 | Sierra | 1 {{ item(23806) }} |

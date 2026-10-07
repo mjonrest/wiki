@@ -13,8 +13,9 @@ pick the difficulty yourself by choosing a seat class at the start.
   unlocks the instance.
 - **Party:** you must be in a party. Any member clicks the Rope and picks *Rope to Airship* to create the instance,
   then everyone clicks it again and picks *Enter using rope*.
-- **Cooldown:** entering gives you *Neutralization of Unfairness*, a **4-hour** cooldown. When it has passed,
+- **Cooldown:** entering gives you *Neutralization of Unfairness*, a daily cooldown that resets at **04:00** server time. When it has passed,
   click the Rope once to clear it.
+- **Late joining:** you can't enter once the airship has been neutralized (Aquila defeated).
 - **Time limit:** the instance lasts **1 hour** and closes after 5 minutes with nobody inside.
 
 ### Choosing the difficulty

@@ -108,6 +108,7 @@ Each player who completed the hunting quest for the beast (it counts the kill) r
 | Energy of the beast's season ({{ item(1001440) }}, {{ item(1001441) }}, {{ item(1001442) }} or {{ item(1001443) }}) | 5 |
 | {{ item(1001414) }} | 10 |
 | {{ item(1001415) }} | 1 |
+| Instance Points | 40-60 (random) |
 
 The key is consumed when you enter the Hall of Life, so one Lake of Fire per day means one Hall of Life entry per day.
 

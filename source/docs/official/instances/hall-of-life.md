@@ -55,7 +55,8 @@ the mechanics below.
 Your barrier level is the number stored on your {{ item(420231) }} (levels **1 to 20**). When the fight starts the
 **party leader** talks to the criminal and chooses *Release Level N Barrier*, where N can be anything from 1 up to the
 **leader's** own barrier level. Everyone's reward and level-up afterwards is based on the level the leader picked,
-not on their own blessing.
+but a clear only counts **up to one level above your own blessing**. A level-3 player who clears level 10 is treated
+as having cleared level 4.
 
 **How to raise your level**
 
@@ -70,26 +71,30 @@ the blessing equipped) and picks **one** of these:
 
 | Cleared level compared with your blessing | Raise to |
 |---|---|
-| Cleared level is **higher** than yours | The cleared level (you can jump several levels at once) |
+| Cleared level is **higher** than yours | Your level + 1 (a clear counts at most one level above yours) |
 | Cleared level is **equal** to yours | Your level + 1 (up to 20) |
 | Cleared level is **lower** than yours | Cannot raise; you can only claim the reward |
 
-So a player at level 3 who clears level 10 with a level-10 leader can go straight to level 10.
+So a player at level 3 who clears level 10 with a level-10 leader goes up to level 4, not 10.
+
+!!! note "Only players who were inside count"
+    The portal only accepts characters who were inside when the leader released the barrier. A player who walks in
+    after the fight started (or after the clear) gets nothing from the portal.
 
 **How you lose a level**
 
-Every time you enter, you are marked as "in a correction". Only **raising your level** removes that mark. If it is
-still there the next time you click the gate (you failed, timed out, left without choosing, or **claimed the reward**),
-Rigel lowers your barrier level by **1** instead of letting you in. Click the gate again to actually enter. At level 1
-nothing is lowered.
+Every time you enter, you are marked as "in a correction". **Raising your level** or **claiming the reward** removes
+that mark, and so does talking to the portal after a clear when you have already claimed this week. If it is still
+there the next time you click the gate (you failed, timed out, or left without choosing), Rigel lowers your barrier
+level by **1** instead of letting you in. Click the gate again to actually enter. At level 1 nothing is lowered.
 
-!!! warning "Claiming the reward costs one level"
-    The portal says claiming "locks" your level until the weekly reset. What really happens is that claiming does not
-    clear the mark above, so the next time you enter your blessing drops by 1. The portal also says the weekly reset is
-    on Friday; the reward actually resets on **Monday at 04:00** server time.
+!!! note "Claiming locks your level for the week"
+    After you claim, your level cannot be raised until the weekly reset on **Monday at 04:00** server time. Claiming
+    no longer lowers your level on the next entry. On later clears that week, still talk to the portal so the clear
+    is counted and your level is kept.
 
 A simple weekly plan: raise your level with every clear up to the level you want, and claim on your last clear of the
-week. Next week you will start one level lower, clear that level once to get back up, then claim again.
+week.
 
 ### What the level changes
 
@@ -199,7 +204,9 @@ Garden*.
 
 ### Rewards
 
-The reward is for the barrier level the leader picked, given once per account per week (resets **Monday 04:00**).
+The reward is for the barrier level the leader picked (at most one above your own), given once per account per week
+(resets **Monday 04:00**). The claim also gives **Instance Points**: 40-60 at level 1, plus 5 per level above 1
+(level 10: 85-105, level 20: 135-155).
 
 | Level | {{ item(1001456) }} | {{ item(1001457) }} | {{ item(1001458) }} | {{ item(1001459) }} | {{ item(1001460) }} | {{ item(1001601) }} | {{ item(1001593) }} |
 |---|---|---|---|---|---|---|---|

@@ -17,9 +17,10 @@ Meteorite materials and treasure boxes you get.
   starts the *Destroyed Tower* quest and is needed before he will open the tower.
 - **Party:** you must be in a party. The **party leader** talks to Oscar and picks *Create Constellation Tower*,
   then every member talks to him again and picks *Enter*.
-- **Cooldown:** entering gives you *Aftereffects of Tower Entry/Exit*, a **4-hour** cooldown. Once it has passed,
+- **Cooldown:** entering gives you *Aftereffects of Tower Entry/Exit*, a daily cooldown that resets at **04:00** server time. Once it has passed,
   talk to Oscar to clear it and you can enter again.
 - **Time limit:** the instance lasts **1 hour** and closes after 5 minutes with nobody inside.
+- **Late joining:** you can't enter once Betelgeuse is defeated.
 
 ### Climbing the tower
 
@@ -94,6 +95,7 @@ On floor 50 the boss starts fully sealed (0%). On floor 75 every ability starts 
     Your rewards use the total that the altar last **saved**, and the altar only saves it when the party leader
     opens its menu (choosing *Quit* is enough). On floor 75 the boss already has 3–5 stars everywhere, but if the
     leader never opens the altar, the run is counted as **0%**. Always open the altar once after your last change.
+    Once the Betelgeuse fight has started, the altar can no longer change the stars.
 
 A sealed ability stays at 0 stars: later rerolls and maximizes leave it alone, and the 5-star maximize can't target it.
 

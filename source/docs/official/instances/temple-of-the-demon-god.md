@@ -14,7 +14,7 @@ The Temple of the Demon God is the Episode 14.3 finale: your party storms Morroc
 | **Prerequisite** | Finish the Morse's Cave part of Episode 14.3 |
 | **Party** | Required. The party leader creates the instance and must carry the *Demon God Subjugation* quest |
 | **Time limit** | 60 minutes (closes after 5 minutes with nobody inside) |
-| **Cooldown** | 4 hours (*Caged God*), starting when you report to Commander Hibba Agip |
+| **Cooldown** | Once per day (*Caged God*), starting when you enter the temple. Resets at 04:00 server time. While it runs you can only re-enter the same temple, not a new one. |
 
 1. Talk to Commander Hibba Agip to accept **Demon God Subjugation** (kill Despair God Morroc).
 2. The party leader talks to Guardian Nidhogg and picks **Enter now.** to create the temple.
@@ -99,6 +99,6 @@ In the hall, the **party leader** walks up to the **Strange Young Man** (`98/123
 | Commander Hibba Agip (first clear) | {{ item(22567) }}, {{ item(6715) }}, 1,000,000 Base / 500,000 Job EXP | Each player who completed the quest |
 | Commander Hibba Agip (repeat clears) | {{ item(22567) }}, 1,000,000 Base / 500,000 Job EXP | Each player who completed the quest |
 
-After reporting to Hibba Agip you get the *Caged God* cooldown. When it runs out, talk to him again to clear it, then accept *Demon God Subjugation* again.
+The *Caged God* cooldown already started when you entered; reporting to Hibba Agip does not restart it. When it runs out, talk to him again to clear it, then accept *Demon God Subjugation* again.
 
 {{ instance_page("temple-of-the-demon-god") }}

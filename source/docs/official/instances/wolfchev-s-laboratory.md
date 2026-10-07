@@ -12,11 +12,11 @@ Wolfchev's Laboratory is the hidden experiment wing of the Lighthalzen Bio Lab. 
 | **Getting there** | Take the warp at `lhz_dun03 239/78` down to the 4th floor |
 | **Party** | Required. Only the party leader can create the instance |
 | **Time limit** | 4 hours (closes after 5 minutes with nobody inside) |
-| **Cooldown** | 4 hours (*Laboratory Restricted Access*), starting when you **enter** |
+| **Cooldown** | Once per day (*Laboratory Restricted Access*), starting when you **enter**. Resets at 04:00 server time. |
 
 1. Talk to the Researcher once to receive the thirteen *[Rest]* boss quests (one per experiment).
 2. The party leader talks to the Researcher again, picks **Going into the laboratory** and creates the instance.
-3. Everyone clicks the Laboratory Entrance and picks **Go inside**. This starts your personal 4 hour cooldown.
+3. Everyone clicks the Laboratory Entrance and picks **Go inside**. This starts your personal daily cooldown.
 
 !!! note
     When your cooldown has expired, click the Laboratory Entrance once to clear it, then click again to enter. The leader cannot create a new instance while still on cooldown. The Researcher, the Entrance and Wolfchev all want at least 1,000 free weight before they talk to you.

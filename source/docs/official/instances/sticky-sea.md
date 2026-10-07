@@ -13,7 +13,7 @@ Sticky Sea is the Episode 20 snail pit reached through Cocopo. You first visit i
 | **Prerequisite** | Finish the *Copo's Secret Base* side story and report back to Laraha |
 | **Party** | Required. Only the party leader can create the instance |
 | **Time limit** | 30 minutes (closes after 5 minutes with nobody inside) |
-| **Cooldown** | 4 hours (*Escargot! - Wait*), starting when you claim the reward |
+| **Cooldown** | Once per day (*Escargot! - Wait*), starting when you claim the reward. Resets at 04:00 server time. |
 
 1. Talk to Laraha and pick **Escargo!** to receive the quest. She sends you to Cocopo.
 2. The party leader talks to Cocopo and picks **Look at the entrance to the pit.** to create the instance.

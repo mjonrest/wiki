@@ -9,7 +9,7 @@ Faceworm's Nest is a time attack instance with five stages. Your party follows C
 - **Where:** the Dimensional Gap, `/navi dali 80/60`.
 - **Level:** Base Level 140 or higher.
 - **Party:** You need a party, even if you go alone. The party leader talks to the **Magic Scholar** (`dali 80/60`) and picks **"Reserve Faceworm's Nest"**. Then everyone enters through the **Interdimensional Device** next to him (`/navi dali 72/55`).
-- **Cooldown:** Entering starts a **4 hour** cooldown ("Faceworm's Nest after-effects"). After it ends, talk to the Magic Scholar or the device once to clear it.
+- **Cooldown:** Entering starts a daily cooldown that resets at **04:00** server time ("Faceworm's Nest after-effects"). After it ends, talk to the Magic Scholar or the device once to clear it.
 - The **Old Sign** at `/navi dali 83/67` shows the server's best clear time and the size of the party that set it.
 
 ### Stage 1: The forest path
@@ -78,7 +78,7 @@ When she dies, the final chest appears. Talk to Chaos (step near `212/156`) and 
 
 ### Payon side quests
 
-Four NPCs in Payon take the quest items from the boxes. Each turn-in gives **70,000 Base EXP and 55,000 Job EXP**. Each NPC can be done once every **4 hours**, and you need Base Level 140.
+Four NPCs in Payon take the quest items from the boxes. Each turn-in gives **70,000 Base EXP and 55,000 Job EXP**. Each NPC can be done once a day (resets at **04:00** server time), and you need Base Level 140.
 
 | NPC | Location | Takes |
 |---|---|---|

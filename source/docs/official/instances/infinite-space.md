@@ -68,7 +68,7 @@ on the floor around it (see the mode table above). The hard-mode weapons are the
 ### Finishing
 
 After floor 50, talk to the Reckless Explorer who appears at the end (366/392). She sends you back to `cmd_fild07`
-and gives **50 ~ 100 Instance Points** (see [Instance Points](../../content/instances.md)).
+and gives **50 ~ 100 Instance Points** on Normal or **70 ~ 120** on Hard (see [Instance Points](../../content/instances.md)).
 
 !!! warning
     The instance only lasts one hour. A party that cannot clear 50 floors in time gets the floor-10/20/30/40 chests

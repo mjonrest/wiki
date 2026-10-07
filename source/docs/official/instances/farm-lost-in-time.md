@@ -10,7 +10,7 @@ The Farm Lost in Time is a short daily instance in Varmundt's Mansion (Episode 1
 - **Level:** Base Level 150 or higher.
 - **Story:** You must have reached the Episode 17.2 main quest point where you can visit the farm. Talk to Luina twice to finish her introduction ("Keeping Breeding Ground").
 - **Party:** You need a party, even for one person. The party leader picks **"Create Farm Lost in Time"**. Then everyone picks **"Enter the dungeon."**.
-- **Cooldown:** Entering starts a **4 hour** cooldown ("Daily farm experience - Standby"). Talk to Luina once after it ends to clear it.
+- **Cooldown:** Entering starts a daily cooldown that resets at **04:00** server time ("Daily farm experience - Standby"). Talk to Luina once after it ends to clear it.
 - **Inventory:** You need room for 20 Barmil Tickets.
 
 !!! note

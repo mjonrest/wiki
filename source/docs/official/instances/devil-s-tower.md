@@ -19,7 +19,7 @@ All three NPCs stand together in `dali02`:
 - **Level:** 130 or higher.
 - **Party:** required. The leader makes all the key story choices.
 - **Re-entry:** you can go back in through the device until you leave the first room with Assassin Dewey. After
-  that you cannot get back in.
+  that you cannot get back in. Nobody can enter once the boss is defeated.
 
 ### Cooldown and EXP reward
 

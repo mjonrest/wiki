@@ -9,7 +9,7 @@ Professor Bernhard sends you back in time to Glast Heim, to the battle between F
 - **NPC:** Professor Bernhard in the Dimensional Gap, `/navi dali02 97/142`. The **Dimensional Device** is right next to him at `/navi dali02 99/148`.
 - **Level:** Base Level 145 or higher.
 - **Party:** The party leader talks to Bernhard and answers **"Yes"** to create the instance. Then everyone enters through the Dimensional Device.
-- **Reporting back:** After every run, talk to Bernhard again. Until you do, the device will not let you back in. Reporting back starts a **4 hour** cooldown ("Go back to Professor Bernhard"). He says a week in his dialogue, but the cooldown is 4 hours.
+- **Reporting back:** After every run, talk to Bernhard again. Until you do, the device will not let you back in. Reporting back starts a daily cooldown ("Go back to Professor Bernhard") that resets at **04:00** server time. He says a week in his dialogue, but the cooldown is one day.
 
 ### Walkthrough
 
