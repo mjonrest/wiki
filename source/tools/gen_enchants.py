@@ -2,6 +2,8 @@
 
 Used by gen_db.build(); item pages link to the systems an item takes part in, NPC pages to the systems they open.
 """
+import html as html_lib
+import os
 import re
 from collections import defaultdict
 
@@ -123,3 +125,57 @@ def build(by_aegis, groups, npc_enchants, from_npc):
             role(t, "laphineTarget", key)
         rows.append([key, "Laphine upgrade", iid, len(targets), e.get("MinimumRefine", 0), 0])
     return rows, detail, {iid: {k: v[:60] for k, v in r.items()} for iid, r in roles.items()}
+
+
+GUIDE_DIRS = ("enchants", "official/enchanters")
+TARGET_TYPES = ("Weapon", "Armor", "ShadowGear")
+ITEM_LINK = re.compile(r'href="[^"]*db/items(?:/|\.html)#(\d+)"')
+
+
+def _guide_html(site_dir, rel):
+    stem = rel[:-3]
+    for path in (os.path.join(site_dir, stem, "index.html"), os.path.join(site_dir, stem + ".html")):
+        if os.path.exists(path):
+            return open(path, encoding="utf-8").read()
+    return None
+
+
+def guides(site_dir, docs_dir, items, npc_detail):
+    """Enchanters written as NPC scripts rather than db/item_enchant.yml, read from the built enchanter guide pages:
+    (rows, {key: detail}, {item id: {role: [keys]}}, {page: key}).
+
+    Every item a page links to is sorted by type: equipment is something the NPC enchants, cards (enchant stones
+    are cards) are the enchants it adds, and everything else is a material. The NPCs are the ones whose guide is
+    that page.
+    """
+    rows, detail, pages = [], {}, {}
+    roles = defaultdict(lambda: defaultdict(list))
+    npcs_of = defaultdict(list)
+    for nid, d in npc_detail.items():
+        if d.get("page"):
+            npcs_of[d["page"]].append(nid)
+    for folder in GUIDE_DIRS:
+        path = os.path.join(docs_dir, folder)
+        for fn in sorted(os.listdir(path)) if os.path.isdir(path) else []:
+            if not fn.endswith(".md") or fn == "index.md":
+                continue
+            rel = f"{folder}/{fn}"
+            html = _guide_html(site_dir, rel)
+            if html is None:
+                continue
+            m = re.search(r"<h1[^>]*>(.*?)</h1>", html, re.S)
+            title = html_lib.unescape(re.sub(r"<[^>]+>", "", m.group(1))).replace("\u00b6", "").strip() if m \
+                else fn[:-3].replace("-", " ").title()
+            ids = [i for i in dict.fromkeys(int(x) for x in ITEM_LINK.findall(html)) if i in items]
+            targets = [i for i in ids if items[i].get("Type") in TARGET_TYPES]
+            results = [i for i in ids if items[i].get("Type") == "Card"]
+            mats = [i for i in ids if i not in targets and i not in results]
+            key = "G" + fn[:-3]
+            pages[rel] = key
+            detail[key] = {"title": title, "page": rel, "npcs": npcs_of.get(rel, []), "targets": targets,
+                           "results": results, "mats": mats}
+            for kind, lst in (("enchantTarget", targets), ("enchantResult", results), ("enchantMaterial", mats)):
+                for i in lst:
+                    roles[i][kind].append(key)
+            rows.append([key, "NPC enchanter", (targets or results or mats or [0])[0], len(targets), 0, len(results)])
+    return rows, detail, roles, pages

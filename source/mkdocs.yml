@@ -101,6 +101,8 @@ nav:
       - Armor Enchanter (Desmond): enchants/desmond.md
       - Wing Enchanters: enchants/wing-enchanters.md
       - Special & Memory Enchanters: enchants/special.md
+  - Special:
+      - Tomb of the Fallen: special/tomb-of-the-fallen.md
   - Content:
       - Hunting Missions: content/hunting-missions.md
       - Daily Quests: content/daily-quests.md

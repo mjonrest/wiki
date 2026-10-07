@@ -118,18 +118,17 @@ def guide_pages(docs_dir):
     """({NPC name: page} for Miracle NPCs a page shows with npc_where("Name"),
     {NPC name: page} for official NPCs a page lists in a `<!-- npcs: A; B -->` comment)."""
     custom, official_npcs = {}, {}
-    for root, _, names in os.walk(docs_dir):
-        for fn in sorted(names):
-            if fn.endswith(".md"):
-                path = os.path.join(root, fn)
-                text = open(path, encoding="utf-8").read()
-                rel = os.path.relpath(path, docs_dir).replace(os.sep, "/")
-                for name in re.findall(r'npc_where\(\s*"([^"]+)"', text):
-                    custom.setdefault(name, rel)
-                for group in re.findall(r"<!--\s*npcs:(.*?)-->", text, re.S):
-                    names = [n.strip() for n in group.split(";") if n.strip()]
-                    for name in names:
-                        official_npcs.setdefault(name, (rel, names))
+    paths = [os.path.join(root, fn) for root, _, names in os.walk(docs_dir) for fn in names if fn.endswith(".md")]
+    # An NPC's own page wins over an overview (index.md) that also mentions it.
+    for path in sorted(paths, key=lambda p: (os.path.basename(p) == "index.md", p)):
+        text = open(path, encoding="utf-8").read()
+        rel = os.path.relpath(path, docs_dir).replace(os.sep, "/")
+        for name in re.findall(r'npc_where\(\s*"([^"]+)"', text):
+            custom.setdefault(name, rel)
+        for group in re.findall(r"<!--\s*npcs:(.*?)-->", text, re.S):
+            names = [n.strip() for n in group.split(";") if n.strip()]
+            for name in names:
+                official_npcs.setdefault(name, (rel, names))
     return custom, official_npcs
 
 

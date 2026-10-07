@@ -204,10 +204,41 @@ def build(out, dir_urls=True):
     in_box, box_has = _boxes(items, by_aegis)
     groups = box_has.pop("_groups")
     ench_rows, ench_detail, ench_roles = gen_enchants.build(by_aegis, groups, enchanters, set(shops) | set(given_by))
-    for r in ench_rows:  # [key, type, item id, item name, count, minimum refine]
-        it = items.get(r[2]) or {}
-        r[3:3] = [it.get("Name") or it.get("AegisName") or ""]
-        del r[6:]
+    site = os.path.dirname(os.path.dirname(os.path.abspath(out)))
+    g_rows, g_detail, g_roles, g_pages = gen_enchants.guides(site, docs, items, npc_detail)
+    ench_rows += g_rows
+    ench_detail.update(g_detail)
+    for iid, r in g_roles.items():
+        mine = ench_roles.setdefault(iid, {})
+        for kind, keys in r.items():
+            mine[kind] = (mine.get(kind, []) + keys)[:60]
+    # NPCs link to their enchanter entry, and enchant systems to the guide of the NPC that opens them.
+    npc_rows = {r[0]: r for r in npc_index}
+    for nid, d in npc_detail.items():
+        key = g_pages.get(d.get("page"))
+        if key:
+            d["enchantGuide"] = key
+            kinds = npc_rows[nid][6].split("|") if npc_rows[nid][6] else []
+            if "Enchanter" not in kinds:
+                npc_rows[nid][6] = "|".join(kinds + ["Enchanter"])
+    for key, d in ench_detail.items():
+        if key[0] == "E":
+            pages = [npc_detail[n]["page"] for n in d["npcs"] if npc_detail.get(n, {}).get("page")]
+            if pages:
+                d["page"] = pages[0]
+                if pages[0] in g_pages:
+                    d["guide"] = g_pages[pages[0]]
+
+    def item_name(i):
+        it = items.get(i) or {}
+        return it.get("Name") or it.get("AegisName") or ""
+
+    # [key, type, item id, name, count, minimum refine, search text (every item it works on)]
+    for r in ench_rows:
+        d = ench_detail[r[0]]
+        r[3:3] = [d["title"] if "title" in d else item_name(r[2])]
+        names = [item_name(i) for i in d.get("targets") or [r[0] for r in d.get("reqs") or []]]
+        r[6:] = [" ".join(dict.fromkeys(names)).lower()]
     item_index, item_detail = [], defaultdict(dict)
     job_names = sorted({j for it in items.values() for j in _flags(it.get("Jobs")) if j != "All"})
     job_pos = {j: i for i, j in enumerate(job_names)}
@@ -309,6 +340,12 @@ def build(out, dir_urls=True):
     for k, v in mob_detail.items():
         dump(f"mobs/{k}.json", v)
     dump("npcs.json", npc_index)
+    # Sprite names for the NPC pictures (fetch_images.py looks them up by name).
+    names = {}
+    for name, sid in gen_npcs.sprite_ids().items():
+        names.setdefault(sid, name)
+    used = {r[5] for r in npc_index}
+    dump("npc_sprites.json", {str(k): v for k, v in sorted(names.items()) if k in used})
     dump("enchants.json", ench_rows)
     dump("enchants_detail.json", ench_detail)
     npc_chunks = defaultdict(dict)
