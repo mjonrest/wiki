@@ -10,6 +10,13 @@ World Boss and Hell Raid events, and daily activities that reward you for simply
 This wiki explains every custom NPC and system on the server, with prices and item lists taken straight from the
 server's own scripts.
 
+<div class="posters" markdown>
+
+[![The 4th Job Era: all 20 fourth jobs and the new Alitea job](assets/posters/4th-job-alitea.jpg)](assets/posters/4th-job-alitea.jpg)
+[![New job: Alitea, Druid to Karnos to Alitea](assets/posters/alitea.jpg)](assets/posters/alitea.jpg)
+
+</div>
+
 | Server | |
 |---|---|
 | **Base / Job EXP** | {{ server.exp_rate }} |
