@@ -17,6 +17,7 @@ import shutil
 import tempfile
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from collections import defaultdict
 
@@ -34,7 +35,7 @@ SOURCES = {
              ["http://nn.ai4rei.net/dev/npclist/i/{name}.gif"]),
 }
 # Bump a kind's number when its URLs change, so the ids the old URLs had no picture for are tried again.
-SOURCE_VERSION = {"npcs": 2}
+SOURCE_VERSION = {"npcs": 3}
 
 
 # Divine Pride answers ids it has no picture for with this "no image" picture instead of a 404.
@@ -57,24 +58,45 @@ def fetch(urls, path):
     return result
 
 
+# A browser-like request: some picture hosts turn away unknown clients.
+HEADERS = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 "
+                         "MiracleWiki-ImageSync/1.1",
+           "Accept": "image/avif,image/webp,image/png,image/gif,image/*;q=0.8,*/*;q=0.5"}
+REFERERS = {"nn.ai4rei.net": "https://nn.ai4rei.net/dev/npclist/"}
+failures = []  # the first few reasons a download found no picture, printed at the end
+
+
+def _note(url, why):
+    if len(failures) < 8:
+        failures.append(f"{url}: {why}")
+
+
 def _fetch_one(url, path):
-    req = urllib.request.Request(url, headers={"User-Agent": "MiracleWiki-ImageSync/1.0"})
+    headers = dict(HEADERS)
+    host = urllib.parse.urlsplit(url).hostname or ""
+    if host in REFERERS:
+        headers["Referer"] = REFERERS[host]
+    req = urllib.request.Request(url, headers=headers)
     for attempt in range(3):
         try:
             with urllib.request.urlopen(req, timeout=30) as r:
                 data = r.read()
+                kind = r.headers.get("Content-Type", "")
             if data.startswith(b"GIF8"):
                 return _save_gif(data, path)
             if not data.startswith(b"\x89PNG") or _placeholder(data):
+                _note(url, f"not a picture ({kind}, {len(data)} bytes, starts {data[:16]!r})")
                 return False
             with open(path, "wb") as f:
                 f.write(data)
             return True
         except urllib.error.HTTPError as e:
-            if e.code in (403, 404):
+            if e.code in (403, 404, 410):
+                _note(url, f"HTTP {e.code}")
                 return False
-        except (urllib.error.URLError, TimeoutError, ConnectionError):
-            pass
+            _note(url, f"HTTP {e.code}, retrying")
+        except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
+            _note(url, f"{type(e).__name__}: {e}, retrying")
         time.sleep(2 ** attempt)
     return None
 
@@ -176,8 +198,15 @@ def main():
         out = {k: sorted(v) for k, v in sorted(missing.items())}
         out["_versions"] = SOURCE_VERSION
         json.dump(out, f, separators=(",", ":"))
+    # The NPC pictures that exist, so the pages only ask for those.
+    folder = os.path.join(img, "npcs")
+    have = sorted(int(f[:-4]) for f in os.listdir(folder) if f.endswith(".png")) if os.path.isdir(folder) else []
+    with open(os.path.join(img, "npcs.json"), "w") as f:
+        json.dump(have, f, separators=(",", ":"))
     for kind in SOURCES:
         print(f"{kind}: saved {saved[kind]}, no picture for {len(missing.get(kind, ()))}")
+    for line in failures:
+        print("  e.g.", line)
 
 
 if __name__ == "__main__":
