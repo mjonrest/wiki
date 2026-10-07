@@ -62,6 +62,7 @@ This works the same way, also for **3 minutes**, but each wave adds more {{ mob(
 |---|---|---|
 | Using the exit portal after the Necromancer dies | 20 to 40 Instance Points (random) | Each player who uses the portal |
 | Reporting back to the **Senior Tracker** | {{ item(6684) }} x1 (only if you were credited with the second-form Necromancer kill) | Each player |
+| When the second-form Necromancer ({{ mob(3000) }}) dies | 2 {{ item(22537) }} dropped on the ground | Whoever loots them |
 
 Reporting to the Senior Tracker after a run is required either way. It closes your current quest and starts the daily cooldown.
 

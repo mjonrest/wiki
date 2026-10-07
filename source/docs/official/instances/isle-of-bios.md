@@ -50,6 +50,9 @@ When Ankou is dead, **each party member** talks to **Vrid** to claim their rewar
 | {{ item(6684) }} | 1 |
 | Instance Points | 20 to 40 (random) |
 
+{{ mob(3029) }} also always drops a {{ item(22537) }} on the ground when it dies, so loot it before talking to Vrid.
+The box gives one random reward; open the item to see what's inside.
+
 !!! tip "Instance Points"
     Instance Points can be earned once per device for each instance run, up to 1200 per account per day. A rented {{ item(30034) }} adds 50 points per claim. Use `@instancepoints` to see your total.
 
