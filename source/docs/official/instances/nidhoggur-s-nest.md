@@ -18,7 +18,7 @@ Nidhoggur's Nest is the classic two-floor memorial dungeon behind the Yggdrasil 
 Once you have access, the leader talks to the Gatekeeper and picks **Please allow me to enter.**, then everyone talks to the Gatekeeper and picks **I want to go in.**
 
 !!! note "Cooldown"
-    Both timers start on your first entry. While the leader's timers are running, the Gatekeeper will not open a new nest. During the 3-day lockout you can still re-enter a nest your party has already opened.
+    Both timers start on your first entry. While the leader's timers are running, the Gatekeeper will not open a new nest. During the 3-day lockout you can only re-enter the nest you entered; you cannot join a different one.
 
 ### Access quest
 

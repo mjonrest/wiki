@@ -71,7 +71,7 @@ When Freyja dies, a glowing box appears under the chandelier. **Each player** op
 |---|---|
 | {{ item(1000405) }} | 8 (10 with 5000 Grey Wolf Village reputation) |
 | {{ item(1000471) }} | 1, 10% chance (needed to open Advanced mode) |
-| Instance Points | 20 to 40 (random), given when you choose **Exit** |
+| Instance Points | 20 to 40 (random) on Normal, 40 to 60 on Advanced, given when you choose **Exit** |
 
 Both modes give the same box rewards.
 

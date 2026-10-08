@@ -10,7 +10,7 @@ The Horror Toy Factory is a Christmas-themed instance in Lutie with four parts. 
 - **Level:** Base Level 140 or higher.
 - **First time:** Talk to Catherine and go through her story to accept the quest "Skull-faced Girl". Talk to her again to finish it. After that she offers the instance.
 - **Party:** You need a party. The party leader picks **"Unlock Horror Toy Factory"**. Then every member enters through the portal.
-- **Cooldown:** Entering starts a **4 hour** cooldown ("Trail of Toy Factory"). When it ends, talk to Catherine or the portal once to clear it.
+- **Cooldown:** Entering starts a daily cooldown that resets at **04:00** server time ("Trail of Toy Factory"). When it ends, talk to Catherine or the portal once to clear it.
 - You can't talk to these NPCs while you are transformed.
 
 ### Factory No.1: Disguise and clear the line

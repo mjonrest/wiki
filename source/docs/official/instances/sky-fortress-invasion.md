@@ -9,7 +9,7 @@ A fortress floating above invaded Prontera keeps spawning undead. Scientist Doye
 - **NPC:** Scientist Doyeon in invaded Prontera, `/navi prt_q 249/79`. The **Fortress Entry Warp Portal** is next to her at `/navi prt_q 243/75`.
 - **Level:** Base Level 145 or higher. You also need some free inventory space to talk to Doyeon.
 - **Party:** The party leader talks to Doyeon and picks **"Enter the Sky Fortress."** (later runs: **"Yes"**). Then everyone steps into the portal.
-- **Cooldown:** After your first run, talk to Doyeon again to report. This completes the quest and starts a **3 day 4 hour** cooldown ("Attack Sky Fortress Invading Prontera"). The first time you report, you also get a 1-hour {{ item(14505) }}.
+- **Cooldown:** After your first run, talk to Doyeon again to report. This completes the quest and starts a cooldown that ends at **04:00** server time three days later ("Attack Sky Fortress Invading Prontera"). The first time you report, you also get a 1-hour {{ item(14505) }}.
 - **Skipping the cooldown:** With a **Sky Fortress Ticket** ({{ item(14505) }} or {{ item(14506) }}), the leader can pick **"Show the -Dungeon Pass-"** to open the fortress during the cooldown. Members use **"Put the - Dungeon Pass - near to the warp"** at the portal. A second portal in the Dimensional Gap (`/navi dali02 115/61`) also takes ticket holders in. Entering with a ticket does not change your cooldown, and the ticket is not used up.
 
 ### Step 1: The courtyard

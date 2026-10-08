@@ -10,7 +10,7 @@ Security Area 2 is the hard daily mode of the Flower Garden's security zone in V
 - **Requirement:** Finish the [Hidden Flower Garden](hidden-flower-garden.md) story instance first ("Security Clearance").
 - **Level:** Base Level **180** or higher.
 - **Party:** The party leader picks **"Identity Authentication"** and then **"2nd Security Zone."**. Then everyone picks **"Enter Zone"** and **"2nd Security Zone."**.
-- **Cooldown:** Entering starts a **4 hour** cooldown ("Security Clearance - Waiting"). It is **shared with Security Area 1**. After it ends, talk to the manager once to clear it.
+- **Cooldown:** Entering starts a daily cooldown that resets at **04:00** server time ("Security Clearance - Waiting"). It is **shared with Security Area 1**. After it ends, talk to the manager once to clear it.
 
 ### Walkthrough
 

@@ -74,7 +74,7 @@ Hard mode uses stronger "Senior" monsters and spawns more of them:
 
 ### Rewards
 
-- Talk to **Velkina** after the boss dies. She warps you out and gives **20 to 40 Instance Points**.
+- Talk to **Velkina** after the boss dies. She warps you out and gives **20 to 40 Instance Points** on Normal or **40 to 60** on Hard.
 - **Daily quest "Searching for Gardener"** from **Seihyu** at `/navi ba_maison 239/47`: accept it before your run, get the {{ item(1000099) }} from the gardener in the maze, then hand it in for {{ item(1000103) }} x4 and 800,000 Base / 500,000 Job EXP.
 
 !!! tip "Instance Points"

@@ -15,6 +15,7 @@ minimap marks, and the run ends with a fight against the combat unit {{ mob(3124
   *Open the dimensional portal*. Then everyone picks *Enter the Charleston Factory*.
 - **Cooldown:** entering gives you *Charleston Factory - Hold*. It ends at the next **04:00** server time. The
   machine says "20 hours", but the real reset is 04:00. When it has ended, click the machine once to clear it.
+- **Late joining:** you can't enter once the boss is defeated.
 
 !!! tip "Bring an Explosive Powder"
     Partway through you have to hand over 1× {{ item(6213) }}. {{ mob(3125) }} in the factory drop it, but it is

@@ -9,7 +9,7 @@ Geffen Night Arena is a **solo** boss-rush tournament. You face up to 10 rounds 
 | | |
 |---|---|
 | Level | Base Level 210 or higher |
-| Party | You must be the leader of a party with **only yourself** in it. |
+| Party | You must be the leader of a party with **only yourself** in it. The portal refuses you if anyone else has joined the party. |
 | NPC | **Greedy Looking Man** at `/navi geffen_in 82/62` |
 | Entrance | **Portal** at `/navi dali02 79/60` |
 | Cooldown | Once per day. Entering starts the cooldown, which resets at 04:00 server time. |

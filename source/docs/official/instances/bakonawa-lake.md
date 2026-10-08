@@ -10,7 +10,7 @@ Bakonawa Lake is a three-phase boss fight against the sea serpent Bakonawa, who 
 - **Level:** Base Level 140 or higher.
 - **Party:** You need a party. The party leader picks **"Please weave a rope."** to create the instance. Then every member picks **"Now I will go down."** to enter.
 - **Inventory:** You need at least 1,000 free weight and some free inventory slots, or Taho refuses to talk to you. The same check applies when you claim the reward at the end.
-- **Cooldown:** Entering starts a **4 hour** cooldown. Until it ends, Taho tells you the rope is broken. Once it has passed, talk to Taho once to clear it, then talk to Taho again to enter.
+- **Cooldown:** Entering starts a daily cooldown that resets at **04:00** server time. Until it ends, Taho tells you the rope is broken. Once it has passed, talk to Taho once to clear it, then talk to Taho again to enter.
 - **Time limit:** The instance closes after 2 hours.
 
 !!! note

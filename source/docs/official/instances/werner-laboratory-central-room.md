@@ -13,7 +13,7 @@ The Central Room of Werner's laboratory is part of the Terra Gloria (Episode 16.
 | **Prerequisite** | Story run: Terra Gloria main quest at the Central Room step. Daily: Terra Gloria main quest finished |
 | **Party** | Required. Only the party leader can create the instance |
 | **Time limit** | 60 minutes (closes after 5 minutes with nobody inside) |
-| **Cooldown** | Daily quest: 4 hours (*Sweeping the remnants (Standby)*), starting when you hand it in |
+| **Cooldown** | Daily quest: once per day (*Sweeping the remnants (Standby)*), starting when you hand it in. Resets at 04:00 server time. |
 
 **Daily run:**
 

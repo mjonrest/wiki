@@ -56,7 +56,7 @@ When Lasgand dies, a {{ mob(22004) }} (Normal) or {{ mob(22005) }} (Hard) appear
 | Antiquity box | {{ item(102567) }} | {{ item(102568) }} |
 | Base / Job EXP | 34,152,989 / 5,567,916 | 34,152,989 / 5,567,916 |
 | White Cat Alliance reputation | +20 | +20 |
-| Instance Points | 40–60 | 40–60 |
+| Instance Points | 40–60 | 60–80 |
 
 Afterwards, pick **Go outside** to return to `jor_twig`.
 

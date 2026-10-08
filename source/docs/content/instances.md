@@ -5,11 +5,13 @@ Clearing a supported instance gives **Instance Points**, spent at the
 
 | | |
 |---|---|
-| **Points per clear** | Usually 20~40, depending on the instance |
+| **Points per clear** | Usually 20~40; harder modes and levels give up to ~150 (a few give more, up to 500) |
 | **Daily cap** | 1,200 points per account (resets at 00:00) |
 | **Limit** | Each computer can claim each instance run once |
 | **Bonus** | +50 points per clear while {{ item(30034) }} is active |
 | **Check** | `@instancepoints` shows today's total |
+
+See [Instance Points](instance-points.md) for how many points every instance gives.
 
 Instance clears also count towards an **Instance** [Daily Quest](daily-quests.md).
 

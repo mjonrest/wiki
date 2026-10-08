@@ -237,7 +237,7 @@ In total that is 200 {{ item(1001972) }}, about 2.87 billion Base EXP and 97.9 m
     - *Formal Grave* from **Two** (`ch1_sf02 114/46`): 50 Tulips, 50 Calendulas and 20 {{ item(1001975) }}. Reward: 10 {{ item(1001972) }}, 82,232,200 Base EXP, 5,724,800 Job EXP.
     - *Cat in a Separate Dimension* from **Three** (`ch1_sf02 111/271`): 20 Nyaise. Reward: 5 {{ item(1001972) }}, 16,364,720 Base EXP, 11,449,600 Job EXP.
     - *Remove Them Too* from **Four** (`ch1_sf02 45/54`): 10 Shadow Jailers. Reward: 5 {{ item(1001972) }}, 8,528,760 Base EXP, 5,955,240 Job EXP.
-- After step 73: [Simulated Dark Whisper](../instances/simulated-dark-whisper.md) from the **Wizard Professor** (`hem_dun01 205/248`). You can enter once every three days (the wait ends at 4:00). Level 1 is open to everyone. Each clear unlocks the next level, up to level 5, and levels 2 to 5 need Base Level 265. A clear gives 10 {{ item(1001972) }}, plus {{ item(104006) }} at level 2, {{ item(104007) }} at level 3, {{ item(104008) }} at level 4 and {{ item(104009) }} at level 5.
+- After step 73: [Simulated Dark Whisper](../instances/simulated-dark-whisper.md) from the **Wizard Professor** (`hem_dun01 205/248`). You can enter once every three days (the wait ends at 4:00). Level 1 is open to everyone. Clearing your highest unlocked level unlocks the next one, up to level 5, and levels 2 to 5 need Base Level 265. A clear gives 10 {{ item(1001972) }}, plus {{ item(104006) }} at level 2, {{ item(104007) }} at level 3, {{ item(104008) }} at level 4 and {{ item(104009) }} at level 5.
 
 All dailies in this chapter reset at 4:00.
 
@@ -278,7 +278,7 @@ Ruined Verus (`ch1fild1`) hides an abandoned homunculus laboratory. Newt sends y
 
 The exit of every sector leads back to `ch1fild1 104/26`.
 
-**Repeatable quests.** **Robin** (`ch1fild1 101/84`) gives one cleanup quest per sector. Defeat the listed number of monsters in that sector and report back to him. Each cleanup can be taken again 4 hours after you hand it in. There are no weekly quests.
+**Repeatable quests.** **Robin** (`ch1fild1 101/84`) gives one cleanup quest per sector. Defeat the listed number of monsters in that sector and report back to him. Each cleanup can be done once a day: after you hand it in, it opens again at 04:00 server time. There are no weekly quests.
 
 | Quest | Base Level | Hunt | Reward |
 |---|---|---|---|

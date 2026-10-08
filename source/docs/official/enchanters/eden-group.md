@@ -53,7 +53,7 @@ same list, so both can be the same. Any enchants the item already had are replac
 | {{ item(4788) }} | 8.33% |
 | {{ item(4789) }} | 8.33% |
 
-After an enchant you must wait **4 hours**, then talk to Thorn under **Personal Request** to clear the
+After an enchant you must wait until the next **04:00** server time, then talk to Thorn under **Personal Request** to clear the
 timer and take a new errand. Every new enchant replaces the old pair, so this is also the way to re-roll.
 
 ## Weapons Expert BK
