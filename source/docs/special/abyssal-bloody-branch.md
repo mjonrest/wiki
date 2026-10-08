@@ -12,6 +12,13 @@ list of **{{ mvps | length }}** bosses next to you.
 - **No repeats from the normal Bloody Branch.** Nothing that the normal Bloody Branch can summon is on this list.
 - **Almost all of them drop a card.** That includes the new Episode 21 and Chapter 1 MVPs.
 
+{% set cash = cash_shop_price("EP16_20_Bloody_Branch") %}
+{% if cash %}
+## How to get it
+
+It is sold in the **Cash Shop**, under the **{{ cash[0] }}** tab, for **{{ fmt(cash[1]) }} Cash Points**.
+
+{% endif %}
 ## Where you can use it
 
 It works on the same maps as a normal Bloody Branch. On maps that block branches, and on WoE, GvG and
