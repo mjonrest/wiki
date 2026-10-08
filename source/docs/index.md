@@ -12,8 +12,7 @@ server's own scripts.
 
 <div class="posters" markdown>
 
-[![The 4th Job Era: all 20 fourth jobs and the new Alitea job](assets/posters/4th-job-alitea.jpg)](assets/posters/4th-job-alitea.jpg)
-[![New job: Alitea, Druid to Karnos to Alitea](assets/posters/alitea.jpg)](assets/posters/alitea.jpg)
+[![Episode 21 is live: Age of Heroes and Chapter 1, Call of the World Tree](assets/posters/episode-21.jpg)](assets/posters/episode-21.jpg)
 
 </div>
 

@@ -5,8 +5,8 @@
 .md-typeset details.shop > summary .count { font-weight: 400; color: var(--md-default-fg-color--light); font-size: .85em; margin-left: .4em; }
 .md-typeset details.shop table:not([class]) { font-size: .72rem; }
 
-/* Home page posters: side by side on wide screens, stacked on phones. */
-.md-typeset .posters { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr)); gap: 1rem; margin: 1.2em 0 1.6em; }
+/* Home page poster. */
+.md-typeset .posters { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr)); gap: 1rem; max-width: 34rem; margin: 1.2em auto 1.6em; }
 .md-typeset .posters p { display: contents; }
 .md-typeset .posters a { display: block; border-radius: .5rem; overflow: hidden; box-shadow: 0 .3rem 1.2rem rgba(0,0,0,.35); transition: transform .15s; }
 .md-typeset .posters a:hover { transform: translateY(-3px); }
