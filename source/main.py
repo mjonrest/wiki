@@ -370,22 +370,50 @@ def quest_shop_tabs():
 
 
 def slot_enchanter(rel, npc, title_prefix="Group"):
-    """Aulion / Desmond style enchanters: GroupItemIDn + GroupSlot{2,3,4}_n pools."""
+    """Slot enchanters: GroupItemIDn + GroupSlot{4,3,2}_n pools (+ optional GroupRefinen: slot 4, 3, 2)."""
     arr = arrays(rel, npc)
     out = []
     n = 1
     while f"GroupItemID{n}" in arr:
         ids = arr[f"GroupItemID{n}"]
+        refine = arr.get(f"GroupRefine{n}")
         rows = []
-        for slot in (2, 3, 4):
-            pool = [p for p in arr.get(f"GroupSlot{slot}_{n}", []) if p]
-            if pool:
-                rows.append((f"Slot {slot}", items_list(pool)))
+        for k, slot in enumerate((4, 3, 2) if refine else (2, 3, 4)):
+            pool = list(OrderedDict.fromkeys(p for p in arr.get(f"GroupSlot{slot}_{n}", []) if p))
+            if not pool or (refine and refine[k] < 0):
+                continue
+            row = (f"Slot {slot}",)
+            if refine:
+                row += (f"+{refine[k]}" if refine[k] else "any",)
+            rows.append(row + (items_list(pool),))
         names = ", ".join(item_name(i) for i in ids[:3]) + (f" +{len(ids) - 3} more" if len(ids) > 3 else "")
-        body = "**Equipment:** " + items_list(ids) + "\n\n" + _table(["Slot", "Possible enchants (equal chance)"], rows)
-        out.append(_details(f"{names}", body))
+        header = ["Slot"] + (["Refine"] if refine else []) + ["Possible enchants (equal chance)"]
+        body = "**Equipment:** " + items_list(ids) + "\n\n" + _table(header, rows)
+        out.append((_slot_category(ids[0]), _details(f"{names}", body)))
         n += 1
-    return "\n".join(out)
+    if not any(arr.get(f"GroupRefine{i}") for i in range(1, n)):
+        return "\n".join(b for _, b in out)
+    md = []
+    for cat in SLOT_CATEGORIES:
+        blocks = [b for c, b in out if c == cat]
+        if blocks:
+            md.append(f"### {cat}\n\n" + "\n".join(blocks))
+    return "\n\n".join(md)
+
+
+SLOT_CATEGORIES = ["Headgear", "Armor", "Weapons", "Shields", "Garments", "Shoes", "Accessories", "Other"]
+
+
+def _slot_category(iid):
+    loc = ydb.items().get(int(iid), {}).get("Locations") or {}
+    if any(k.startswith("Head_") for k in loc):
+        return "Headgear"
+    for key, cat in (("Armor", "Armor"), ("Right_Hand", "Weapons"), ("Both_Hand", "Weapons"), ("Left_Hand", "Shields"),
+                     ("Garment", "Garments"), ("Shoes", "Shoes"), ("Both_Accessory", "Accessories"),
+                     ("Right_Accessory", "Accessories"), ("Left_Accessory", "Accessories")):
+        if key in loc:
+            return cat
+    return "Other"
 
 
 def item_enchant(eid):
