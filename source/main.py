@@ -801,11 +801,20 @@ def endless_tower():
     return "\n".join(out)
 
 
+def cash_shop_price(aegis):
+    """(tab, price) of an item in the cash shop (db/import/item_cash.yml), or None."""
+    for tab in (yaml.safe_load(_read("db/import/item_cash.yml")) or {}).get("Body") or []:
+        for it in tab.get("Items") or []:
+            if it.get("Item") == aegis:
+                return tab.get("Tab"), it.get("Price")
+    return None
+
+
 def define_env(env):
     global ENV
     ENV = env
     for fn in (item, shops_in, items_table, items_list, shop, barter, quest_shop, quest_shop_tabs, slot_enchanter,
                item_enchant, array_seq, event_schedule, costume_drops, npc_directory, npc_where, arrays, scalar,
                fmt, item_name, mob_name, official_instances, official_instance_count,
-               official_npcs, instance_page, mob, endless_tower):
+               official_npcs, instance_page, mob, endless_tower, cash_shop_price):
         env.macro(fn)
