@@ -15,8 +15,9 @@ shoes and accessories. It replaces the old Aulion and Desmond enchanters.
   random enchant from that slot's list. Every enchant in a list has the same chance.
 - Some slots need the item to be refined first. The **Refine** column shows the lowest refine for that slot.
 - Slots that are card slots of the item (for example slot 2 of a weapon with 2 card slots) are never enchanted.
-- **Reset** removes every enchant (cards stay) so you can start again. Refine, grade and random options are kept.
-- Rental items, signed or forged items and equipped items can't be enchanted. Take the item off first.
+- **Reset** removes every enchant (cards stay) so you can start again. Refine, grade and random options are kept,
+  so an item can have JRO enchants and iRO Enchanter options at the same time.
+- Rental items, bound items, signed or forged items and equipped items can't be enchanted. Take the item off first.
 
 ## Equipment and enchant lists
 
