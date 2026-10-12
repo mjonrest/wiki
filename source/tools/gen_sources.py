@@ -18,21 +18,30 @@ def _read(rel):
 
 
 def quest_shop(out):
-    """["quest", tab name, amount, [[cost item, amount]...], zeny, cash points] from Euphy's Quest Shop."""
+    """["quest", tab name, amount, [[cost item, amount]...], zeny, points, NPC name, points name] from every
+    Euphy-style quest shop the server loads (a script with `function Add;` and Add(shop, reward, amount, zeny,
+    points, item, amount, ...) lines): the Quest Shop, the Sample Items NPCs and any copy of them."""
     import main
-    rel = "npc/miracle/quest_shop.txt"
-    if rel not in main.enabled_scripts():
-        return
-    text = _read(rel)
-    tabs = main.arrays(rel).get("Shops$", [])
-    for m in re.finditer(r"^\s*Add\(([^)]*)\);", text, re.M):
-        try:
-            a = [int(x) for x in m.group(1).split(",")]
-        except ValueError:
+    for rel in main.enabled_scripts():
+        text = _read(rel)
+        if "function Add" not in text or not re.search(r"^\s*Add\(\s*\d", text, re.M):
             continue
-        tab = tabs[a[0] - 1] if 0 < a[0] <= len(tabs) else f"Tab {a[0]}"
-        cost = [[a[i], a[i + 1]] for i in range(5, len(a) - 1, 2)]
-        out[a[1]].append(["quest", str(tab).strip('"'), a[2], cost, a[3], a[4]])
+        arr = main.arrays(rel)
+        tabs = arr.get("Shops$", [])
+        points = arr.get("Points$", [])
+        pname = str(points[1]) if len(points) > 1 else "points"
+        visible = [n["name"] for n in main.npcs() if n["file"] == rel and n["map"] and not n["name"].startswith(".")]
+        npc = visible[0] if visible else os.path.basename(rel)
+        for m in re.finditer(r"^\s*Add\(([^)]*)\);", text, re.M):
+            try:
+                a = [int(x) for x in m.group(1).split(",")]
+            except ValueError:
+                continue
+            if len(a) < 5:
+                continue
+            tab = tabs[a[0] - 1] if 0 < a[0] <= len(tabs) else f"Tab {a[0]}"
+            cost = [[a[k], a[k + 1]] for k in range(5, len(a) - 1, 2)]
+            out[a[1]].append(["quest", str(tab).strip('"').lstrip("~ ").strip(), a[2], cost, a[3], a[4], npc, pname])
 
 
 def instances(out):
@@ -126,6 +135,20 @@ def crafting(out, items):
         out[iid].append(["craft", p[3], p[4], mats])
 
 
+def reform(out, by_aegis):
+    """["reform", reform item id, base item id, [[material, amount]...]] from item_reform.yml: using the reform
+    item on the base item turns it into this one."""
+    for rel in ydb.files("db/item_reform.yml"):
+        for e in ydb.load(rel).get("Body") or []:
+            tool = by_aegis.get(str(e.get("Item")))
+            for b in e.get("BaseItems") or []:
+                iid, base = by_aegis.get(str(b.get("ResultItem"))), by_aegis.get(str(b.get("BaseItem")))
+                if iid is None or base is None or tool is None:
+                    continue
+                mats = [[by_aegis.get(str(m.get("Material"))), m.get("Amount", 1)] for m in b.get("Materials") or []]
+                out[iid].append(["reform", tool, base, [m for m in mats if m[0] is not None]])
+
+
 KILL_BONUS_NPCS = ("MobExtraDrops", "MobDropModifier")
 
 
@@ -161,6 +184,7 @@ def build(items, by_aegis, mobs):
     mob_by_aegis = {m.get("AegisName"): mid for mid, m in mobs.items()}
     for step in (lambda: quest_shop(out), lambda: instances(out), lambda: cash_shop(out, by_aegis),
                  lambda: map_drops(out, by_aegis), lambda: quest_drops(out, by_aegis, mob_by_aegis),
-                 lambda: achievements(out, by_aegis), lambda: attendance(out, by_aegis), lambda: crafting(out, items)):
+                 lambda: achievements(out, by_aegis), lambda: attendance(out, by_aegis), lambda: crafting(out, items),
+                 lambda: reform(out, by_aegis)):
         step()
     return {k: v for k, v in out.items() if k in items}

@@ -126,14 +126,25 @@ def shops():
 
 @functools.lru_cache(None)
 def barters():
+    """Every barter shop the server loads: npc/barters.yml and every file its Footer imports (renewal mode),
+    recursively, so the per-content files in npc/re/merchants/barters/ are included. Later files win."""
     out = {}
-    for rel in ("npc/re/merchants/barters.yml", "npc/custom/barters.yml"):
-        path = os.path.join(ROOT, rel)
-        if not os.path.exists(path):
+    queue, seen = ["npc/barters.yml", "npc/re/merchants/barters.yml", "npc/custom/barters.yml"], set()
+    while queue:
+        rel = queue.pop(0)
+        if rel in seen or not os.path.exists(os.path.join(ROOT, rel)):
             continue
-        data = yaml.safe_load(_read(rel)) or {}
+        seen.add(rel)
+        try:
+            data = yaml.safe_load(_read(rel).replace("\t", "  ")) or {}
+        except yaml.YAMLError:
+            continue
         for shop in data.get("Body") or []:
-            out[shop["Name"]] = shop
+            if isinstance(shop, dict) and shop.get("Name"):
+                out[shop["Name"]] = shop
+        imports = [i for i in (data.get("Footer") or {}).get("Imports") or []
+                   if i.get("Path") and i.get("Mode", "Renewal") == "Renewal"]
+        queue[0:0] = [i["Path"] for i in imports]  # imports load right after the file that lists them
     return out
 
 
