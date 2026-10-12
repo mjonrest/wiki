@@ -10,8 +10,8 @@ Gives Follower equipment and OCP accessories **2 or 3 random options**, like the
 | **Options 1 and 2** | Always given, rolled separately (the same option can appear twice) |
 | **Option 3** | {{ scalar("npc/miracle/follower_enchant.txt", "ThirdChance") }}% chance |
 | **Re-rolling** | Enchanting again **replaces all** current options |
-| **Kept** | Refine, enchant grade, cards and bound status |
-| **Not allowed** | Equipped items and rental items |
+| **Kept** | Refine, enchant grade and cards (including JRO enchants) |
+| **Not allowed** | Equipped items, rental items and bound items |
 
 Three-option results are announced to the server.
 
