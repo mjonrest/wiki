@@ -133,7 +133,7 @@
   // Ways to get an item, as letters in column 12 of items.json (tools/gen_db.py).
   var HOW = { D: "Monster drop", S: "NPC shop", X: "Barter / exchange", N: "NPC or quest reward", E: "Script event",
     B: "Box or album", L: "Laphine synthesis", Q: "Quest Shop", I: "Instance reward", C: "Cash Shop", M: "Map drop",
-    U: "Quest drop", A: "Achievement", T: "Attendance", R: "Crafting" };
+    U: "Quest drop", A: "Achievement", T: "Attendance", R: "Crafting", F: "Reform" };
   function howList(code) {
     return code ? code.split("").map(function (c) { return HOW[c] || c; }) : ["No known source"];
   }
@@ -436,14 +436,14 @@
         return "<p>Worn together: " + names + "</p>" + (c[1].length ? fxList(c[1]) : "") + (c[2] ? scriptBox(c[2]) : "");
       }).join("");
       h += '<h2 id="how-to-get">How to get</h2>' + (r[12] ? "<p>" + chips(howList(r[12])) + "</p>" :
-        "<p><small>No way to get this item was found in the server's NPC scripts, shops, boxes or drop tables. " +
-        "It may come from a GM, an event, or not be in the game.</small></p>");
+        "<p><small>The wiki's scan of the server files found no source for this item. That usually means it is not " +
+        "handed out on Miracle (or only by a GM or a one-off event), but a script the scan can't read may still give it.</small></p>");
       if (d.drops) h += "<h3>Dropped by</h3>" + table(["Monster", "Level", "Chance"], d.drops.map(function (x) {
         var m = mobs[x[0]];
         return [mobLink(x[0], mobs) + (x[2] === "mvp" ? ' <span class="db-chip db-mvp">MVP reward</span>' : x[2] === "bonus" ? ' <span class="db-chip">Kill bonus</span>' : ""), m ? m[2] : "", pct(x[1])];
       }));
       if (d.shops) h += "<h3>Sold by</h3>" + table(["NPC", "Where", "Price"], d.shops.map(function (s) {
-        var loc = s[1] ? where(s[1], s[2], s[3]) : "<small>opened from another NPC</small>";
+        var loc = s[1] ? where(s[1], s[2], s[3]) : "<small>" + esc(s[7] || "opened from another NPC") + "</small>";
         var price;
         if (s[5] && s[5].barter) {
           price = s[5].barter.map(function (c) { return c[0] === "zeny" ? num(c[1]) + " z" : c[1] + " × " + itemLink(c[0], items); }).join("<br>");
@@ -460,12 +460,12 @@
       if (d.boxes) {
         var seenBox = {};
         h += "<h3>Found in</h3>" + table(["Box", "Chance"], d.boxes.filter(function (b) { var k = b.join(); return seenBox[k] ? false : (seenBox[k] = 1); }).map(function (b) {
-          return [itemLink(b[0], items) + (b[2] === "bonus" ? ' <span class="db-chip">Bonus roll</span>' : ""), b[1] == null ? "always" : b[1] + "%"];
+          return [itemLink(b[0], items) + (b[2] === "bonus" ? ' <span class="db-chip">Bonus roll</span>' : ""), b[2] === "script" ? "when used" : b[1] == null ? "always" : b[1] + "%"];
         }));
       }
       if (d.enchant) h += '<div class="db-enchanting"></div>';
       if (d.contains) h += "<h3>Contents</h3>" + table(["Item", "Amount", "Chance"], d.contains.map(function (b) {
-        return [itemLink(b[0], items) + (b[3] === "bonus" ? ' <span class="db-chip">Bonus roll</span>' : ""), b[2], b[1] == null ? "always" : b[1] + "%"];
+        return [itemLink(b[0], items) + (b[3] === "bonus" ? ' <span class="db-chip">Bonus roll</span>' : ""), b[2], b[3] === "script" ? "by script" : b[1] == null ? "always" : b[1] + "%"];
       }));
       root.innerHTML = h;
       var crafts = root.querySelectorAll("[data-skill]");
@@ -486,14 +486,14 @@
     var by = {}, h = "";
     (d.obtain || []).forEach(function (r) { (by[r[0]] = by[r[0]] || []).push(r); });
     var list = function (k) { return by[k] || []; };
-    var costList = function (c, zeny, cash) {
+    var costList = function (c, zeny, pts, ptsName) {
       var out = (c || []).map(function (x) { return x[1] + " × " + itemLink(x[0], items); });
       if (zeny) out.push(num(zeny) + " z");
-      if (cash) out.push(num(cash) + " Cash Points");
+      if (pts) out.push(num(pts) + " " + esc(ptsName || "Cash Points"));
       return out.join("<br>") || "free";
     };
-    if (list("quest").length) h += '<h3>Quest Shop</h3><p><small>Trade in the materials at the <a href="' + guideUrl("shops/quest-shop.md") +
-      '">Quest Shop</a>.</small></p>' + table(["Tab", "You get", "Costs"], list("quest").map(function (r) { return [esc(r[1]), r[2], costList(r[3], r[4], r[5])]; }));
+    if (list("quest").length) h += '<h3>Quest shops</h3><p><small>Trade in the materials at these NPCs (the main one is the <a href="' + guideUrl("shops/quest-shop.md") +
+      '">Quest Shop</a>).</small></p>' + table(["NPC", "Tab", "You get", "Costs"], list("quest").map(function (r) { return [esc(r[6] || "Quest Shop"), esc(r[1]), r[2], costList(r[3], r[4], r[5], r[7])]; }));
     if (list("instance").length) h += "<h3>Instance reward</h3><p><small>Handed out by the NPCs of these instances (as a reward or a quest item).</small></p>" +
       table(["Instance"], list("instance").map(function (r) { return ['<a href="' + guideUrl("official/instances/" + r[1] + ".md") + '">' + esc(r[2]) + "</a>"]; }));
     if (list("cash").length) h += "<h3>Cash Shop</h3>" + table(["Tab", "Price"], list("cash").map(function (r) { return [esc(r[1]), num(r[2]) + " Cash Points"]; }));
@@ -506,8 +506,10 @@
     if (list("craft").length) h += "<h3>Crafting</h3>" + table(["Skill", "Materials"], list("craft").map(function (r) {
       return ['<span data-skill="' + esc(r[1]) + '">Skill ' + esc(r[1]) + "</span>" + (+r[2] > 1 ? " <small>Lv " + esc(r[2]) + "</small>" : ""), costList(r[3])];
     }));
-    if (d.events) h += "<h3>Script events</h3><p><small>Given by a hidden script, for example while mining or after a kill.</small></p>" +
-      table(["Script", "When", "File"], d.events.map(function (e) { return [esc(e[0]), esc(e[1]), "<code>" + esc(e[2]) + "</code>"]; }));
+    if (list("reform").length) h += "<h3>Reform</h3><p><small>Use the reform item on the base item to turn it into this one.</small></p>" +
+      table(["Reform item", "Base item", "Also needs"], list("reform").map(function (r) { return [itemLink(r[1], items), itemLink(r[2], items), costList(r[3]).replace("free", "—")]; }));
+    if (d.events) h += "<h3>Script events</h3><p><small>Given by a hidden script: a spot you click or walk on, mining, a kill bonus and so on.</small></p>" +
+      table(["Script", "When", "Where"], d.events.map(function (e) { return [esc(e[0]), esc(e[1]), e[3] ? where(e[3], e[4], e[5]) : "<code>" + esc(e[2]) + "</code>"]; }));
     return h;
   }
 

@@ -96,7 +96,7 @@ CALLFUNC = re.compile(r'\bcallfunc\s*\(?\s*"(\w+)"')
 SKIP_FUNCS = {"F_Rand", "F_GetWeaponType", "F_GetArmorType", "F_InsertComma", "F_ShuffleNumbers"}
 
 
-def _resolve_gives(text, by_aegis, items, cap=300):
+def _resolve_gives(text, by_aegis, items, cap=3000):
     """Item ids every getitem-style command in `text` can give, following arrays, variables, rand() and
     F_Rand() (official._Resolver)."""
     import official
@@ -116,6 +116,7 @@ def _resolve_gives(text, by_aegis, items, cap=300):
 
 
 _func_gives = {}
+FUNCS = {}  # script functions of the last build(), for item scripts that call them (gen_db)
 
 
 def script_gives(body, by_aegis, items, funcs):
@@ -127,11 +128,15 @@ def script_gives(body, by_aegis, items, funcs):
         if name not in _func_gives:
             _func_gives[name] = _resolve_gives(funcs[name], by_aegis, items)
         out += [i for i in _func_gives[name] if i not in out]
-    return out[:300]
+    return out[:3000]
 
 
 def _event_kind(body):
-    for label, kind in (("OnNPCKillEvent", "Monster kill bonus"), ("OnPCLoginEvent", "Login reward"),
+    if "bindatcmd" in body:
+        cmd = re.search(r'bindatcmd\s*\(?\s*"(\w+)"', body)
+        return f"Command @{cmd.group(1)}" if cmd else "Chat command"
+    for label, kind in (("OnGoldPcClick", "Hourly points button"), ("OnNPCKillEvent", "Monster kill bonus"),
+                        ("OnPCLoginEvent", "Login reward"), ("OnTouch", "Walk-on trigger"),
                         ("OnPCLoadMapEvent", "Map event"), ("OnClock", "Timed event"), ("OnHour", "Timed event"),
                         ("OnMinute", "Timed event"), ("OnTimer", "Timed event"), ("OnPCStatCalcEvent", "Script")):
         if label + ":" in body or re.search(r"\b" + label + r"\d*:", body):
@@ -210,6 +215,8 @@ def build(items, by_aegis, docs_dir=None):
             if d["map"]:
                 order.append(d)
 
+    FUNCS.clear()
+    FUNCS.update(funcs)
     barters = main.barters()
     floating_sells = {}
     for ex, d in defs.items():
@@ -272,9 +279,9 @@ def build(items, by_aegis, docs_dir=None):
                 elif shop in barters:
                     trades += barter_rows(barters[shop])
             if sells:
-                n["sells"] = sells[:400]
+                n["sells"] = sells[:3000]
             if trades:
-                n["barter"] = trades[:400]
+                n["barter"] = trades[:3000]
     for name, shop in barters.items():
         if shop.get("Map"):
             spr = _sprite(str(shop.get("Sprite", "4_M_MERCHANT")), ids)
@@ -283,18 +290,29 @@ def build(items, by_aegis, docs_dir=None):
                                        "locs": [[shop["Map"], shop.get("X", 0), shop.get("Y", 0)]],
                                        "barter": barter_rows(shop)}
 
-    # Hidden scripts (no map, or an invisible sprite) in Miracle's own files: kill bonuses, login rewards, timers.
-    events = defaultdict(list)
+    # Hidden scripts (no map, or an invisible sprite): kill bonuses, login rewards, timers, walk-on triggers, and
+    # windows opened from the client (the hourly points button). Templates that visible NPCs duplicate are skipped:
+    # their items already show under those NPCs.
+    duplicated = {d["type"][len("duplicate("):-1] for d in defs.values() if d["type"].startswith("duplicate(")}
+    events, hidden_sells = defaultdict(list), defaultdict(list)
     for ex, d in defs.items():
-        if not d["file"].startswith(("npc/miracle/", "npc/custom/")) or not d["type"].startswith("script"):
+        if not d["type"].startswith("script") or ex in duplicated:
             continue
         if d["map"] and _sprite(d["rest"].split(",")[0], ids) not in HIDDEN_SPRITES:
             continue
         kind = _event_kind(d["body"])
+        if kind == "Script" and d["map"]:
+            kind = "Hidden spot (click it)"
+        name = d["name"] or ex
         for iid in script_gives(d["body"], by_aegis, items, funcs):
-            row = [d["name"] or ex, kind, os.path.basename(d["file"])]
+            row = [name, kind, os.path.basename(d["file"]), d["map"] or "", d["x"], d["y"]]
             if row not in events[iid]:
                 events[iid].append(row)
+        for shop in dict.fromkeys(CALLSHOP.findall(d["body"])):
+            for iid, price, cur in floating_sells.get(shop, []):
+                hidden_sells[iid].append([name, "", 0, 0, price, cur, None, kind])
+            for iid, cost in barter_rows(barters[shop]) if shop in barters else []:
+                hidden_sells[iid].append([name, "", 0, 0, 0, {"barter": cost}, None, kind])
 
     custom, official_npcs = guide_pages(docs_dir) if docs_dir else ({}, {})
     files_of = defaultdict(set)
@@ -327,4 +345,6 @@ def build(items, by_aegis, docs_dir=None):
             given_by[iid].append(nid)
         for e in n.get("enchants", []):
             enchanters[e].append(nid)
+    for iid, rows in hidden_sells.items():
+        sold_by[iid].extend(rows)
     return index, detail, sold_by, given_by, enchanters, events

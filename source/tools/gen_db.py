@@ -214,6 +214,17 @@ def build(out, dir_urls=True):
         box_has[box] = (box_has.get(box) or []) + [[i, c, 1, "bonus"] for i, c in rows]
         for i, c in rows:
             in_box[i].append([box, c, "bonus"])
+    # Items whose own script hands out items: getitem in the item script, or a script function it calls.
+    for box, it in items.items():
+        script = str(it.get("Script") or "")
+        if not re.search(r"\b(?:getitem|getitembound|rentitem|getnameditem|makeitem)|callfunc", script):
+            continue
+        have = {r[0] for r in box_has.get(box) or []}
+        got = [i for i in gen_npcs.script_gives(script, by_aegis, items, gen_npcs.FUNCS) if i not in have and i != box]
+        if got:
+            box_has[box] = (box_has.get(box) or []) + [[i, None, 1, "script"] for i in got]
+            for i in got:
+                in_box[i].append([box, None, "script"])
     for mid, iid, rate in gen_sources.kill_bonus(mobs):
         dropped_by[iid].append([mid, rate, "bonus"])
         mob_detail[mid // CHUNK][mid]["drops"].append([iid, rate, "bonus", False])
@@ -271,7 +282,8 @@ def build(out, dir_urls=True):
             ("X", any(isinstance(s[5], dict) for s in sells)), ("N", given_by.get(iid)), ("E", events.get(iid)),
             ("B", in_box.get(iid)), ("L", laphine), ("Q", "quest" in kinds), ("I", "instance" in kinds),
             ("C", "cash" in kinds), ("M", "mapdrop" in kinds), ("U", "questdrop" in kinds),
-            ("A", "achievement" in kinds), ("T", "attendance" in kinds), ("R", "craft" in kinds)) if has)
+            ("A", "achievement" in kinds), ("T", "attendance" in kinds), ("R", "craft" in kinds),
+            ("F", "reform" in kinds)) if has)
         jobs = _flags(it.get("Jobs"))
         jobs = "*" if "All" in jobs or (not jobs and t in ("Weapon", "Armor", "ShadowGear")) else ".".join(str(job_pos[j]) for j in jobs if j in job_pos)
         item_index.append([iid, it.get("Name") or it.get("AegisName"), t, it.get("SubType", ""), it.get("Slots", 0),
