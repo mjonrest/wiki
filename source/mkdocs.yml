@@ -98,13 +98,13 @@ nav:
   - Enchants:
       - enchants/index.md
       - iRO Enchanter: enchants/iro-enchanter.md
-      - Accessory Enchanter (Aulion): enchants/aulion.md
-      - Armor Enchanter (Desmond): enchants/desmond.md
+      - JRO Enchanter: enchants/jro-enchanter.md
       - Wing Enchanters: enchants/wing-enchanters.md
       - Special & Memory Enchanters: enchants/special.md
   - Special:
       - Tomb of the Fallen: special/tomb-of-the-fallen.md
       - Abyssal Bloody Branch: special/abyssal-bloody-branch.md
+      - jRO Cards from Card Albums: special/jro-card-album.md
   - Content:
       - Hunting Missions: content/hunting-missions.md
       - Daily Quests: content/daily-quests.md

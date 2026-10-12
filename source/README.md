@@ -39,6 +39,15 @@ in the wiki folder. If the address changes, update `site_url` in `mkdocs.yml`.
 New official instances get a page with `python3 tools/gen_instance_pages.py` (run in `source/`). It only adds
 missing pages and rewrites the Instances menu, so text written by hand on a page stays.
 
+## Item descriptions
+
+The in-game item descriptions (shown on item pages and used by "Also search descriptions") come from the game
+client's `itemInfo.lua`, saved as `data/item_text.json`. When the client's itemInfo changes, refresh it and rebuild:
+
+```sh
+python3 tools/iteminfo.py /path/to/itemInfo.lua
+```
+
 ## Writing pages
 
 Useful macros (see `main.py` for all of them):

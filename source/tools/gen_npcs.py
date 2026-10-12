@@ -89,6 +89,56 @@ def _items(rx, body, by_aegis, items):
     return out[:40]
 
 
+GIVE_CALL = re.compile(r"\b(?:getitem2|getitembound2|getitembound|getitem|rentitem2|rentitem|getnameditem|makeitem2|makeitem)\b\s*\(?\s*([^;]+);")
+CALLFUNC = re.compile(r'\bcallfunc\s*\(?\s*"(\w+)"')
+# Helper functions that hand out whatever they are passed (the caller's own getitem is resolved instead), or
+# that only exist to give a fixed starter kit.
+SKIP_FUNCS = {"F_Rand", "F_GetWeaponType", "F_GetArmorType", "F_InsertComma", "F_ShuffleNumbers"}
+
+
+def _resolve_gives(text, by_aegis, items, cap=300):
+    """Item ids every getitem-style command in `text` can give, following arrays, variables, rand() and
+    F_Rand() (official._Resolver)."""
+    import official
+    res = official._Resolver(text)
+    out = []
+    for call in GIVE_CALL.findall(text):
+        args = official._split_args(call)
+        if not args or not args[0]:
+            continue
+        for v in res.values(args[0], text):
+            iid = int(v) if v.isdigit() else by_aegis.get(v)
+            if iid in items and iid not in out:
+                out.append(iid)
+                if len(out) >= cap:
+                    return out
+    return out
+
+
+_func_gives = {}
+
+
+def script_gives(body, by_aegis, items, funcs):
+    """Items a script body gives, including what the script functions it calls give (one level deep)."""
+    out = _resolve_gives(body, by_aegis, items)
+    for name in dict.fromkeys(CALLFUNC.findall(body)):
+        if name in SKIP_FUNCS or name not in funcs:
+            continue
+        if name not in _func_gives:
+            _func_gives[name] = _resolve_gives(funcs[name], by_aegis, items)
+        out += [i for i in _func_gives[name] if i not in out]
+    return out[:300]
+
+
+def _event_kind(body):
+    for label, kind in (("OnNPCKillEvent", "Monster kill bonus"), ("OnPCLoginEvent", "Login reward"),
+                        ("OnPCLoadMapEvent", "Map event"), ("OnClock", "Timed event"), ("OnHour", "Timed event"),
+                        ("OnMinute", "Timed event"), ("OnTimer", "Timed event"), ("OnPCStatCalcEvent", "Script")):
+        if label + ":" in body or re.search(r"\b" + label + r"\d*:", body):
+            return kind
+    return "Script"
+
+
 def _shop_sells(t, rest, items, currencies):
     parts = [p.strip() for p in rest.rstrip(";").split(",") if p.strip()][1:]
     if t == "itemshop":
@@ -134,7 +184,7 @@ def guide_pages(docs_dir):
 
 def build(items, by_aegis, docs_dir=None):
     """(index rows, {id: detail}, {item id: [shop rows]}, {item id: [npc ids that give it]},
-    {enchant system id: [npc ids that open it]})."""
+    {enchant system id: [npc ids that open it]}, {item id: [[hidden script name, kind, file]]})."""
     import main
     import official
 
@@ -144,10 +194,12 @@ def build(items, by_aegis, docs_dir=None):
              if os.path.exists(os.path.join(ROOT, f))]
 
     # Pass 1: every definition, by unique name, so duplicates and callshop can find their source.
-    defs, order = {}, []
+    defs, order, funcs = {}, [], {}
     for rel in files:
         for m, body in official.blocks(rel):
             head = body.split("\n", 1)[0].split("\t")
+            if len(head) >= 3 and head[0] == "function":
+                funcs.setdefault(head[2].strip(), body)
             if len(head) < 4 or head[0] == "function":
                 continue
             raw = head[2]
@@ -206,7 +258,7 @@ def build(items, by_aegis, docs_dir=None):
             n["sells"] = floating_sells.get(src["raw"].split("::")[-1]) or _shop_sells(src["type"], src["rest"], items, main.CURRENCIES)
         if body:
             for k, v in (("says", _says(body)), ("menu", _options(body)),
-                         ("gives", _items(GIVE, body, by_aegis, items)), ("takes", _items(TAKE, body, by_aegis, items)),
+                         ("gives", script_gives(body, by_aegis, items, funcs)), ("takes", _items(TAKE, body, by_aegis, items)),
                          ("warps", list(dict.fromkeys(w for w in WARP.findall(body) if w not in ("SavePoint", "Random")))[:20]),
                          ("instances", list(dict.fromkeys(INSTANCE.findall(body)))),
                          ("enchants", [int(e) for e in dict.fromkeys(ENCHANT_UI.findall(body))]),
@@ -230,6 +282,19 @@ def build(items, by_aegis, docs_dir=None):
                                        "file": "npc/custom/barters.yml",
                                        "locs": [[shop["Map"], shop.get("X", 0), shop.get("Y", 0)]],
                                        "barter": barter_rows(shop)}
+
+    # Hidden scripts (no map, or an invisible sprite) in Miracle's own files: kill bonuses, login rewards, timers.
+    events = defaultdict(list)
+    for ex, d in defs.items():
+        if not d["file"].startswith(("npc/miracle/", "npc/custom/")) or not d["type"].startswith("script"):
+            continue
+        if d["map"] and _sprite(d["rest"].split(",")[0], ids) not in HIDDEN_SPRITES:
+            continue
+        kind = _event_kind(d["body"])
+        for iid in script_gives(d["body"], by_aegis, items, funcs):
+            row = [d["name"] or ex, kind, os.path.basename(d["file"])]
+            if row not in events[iid]:
+                events[iid].append(row)
 
     custom, official_npcs = guide_pages(docs_dir) if docs_dir else ({}, {})
     files_of = defaultdict(set)
@@ -262,4 +327,4 @@ def build(items, by_aegis, docs_dir=None):
             given_by[iid].append(nid)
         for e in n.get("enchants", []):
             enchanters[e].append(nid)
-    return index, detail, sold_by, given_by, enchanters
+    return index, detail, sold_by, given_by, enchanters, events

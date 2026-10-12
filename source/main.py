@@ -370,22 +370,50 @@ def quest_shop_tabs():
 
 
 def slot_enchanter(rel, npc, title_prefix="Group"):
-    """Aulion / Desmond style enchanters: GroupItemIDn + GroupSlot{2,3,4}_n pools."""
+    """Slot enchanters: GroupItemIDn + GroupSlot{4,3,2}_n pools (+ optional GroupRefinen: slot 4, 3, 2)."""
     arr = arrays(rel, npc)
     out = []
     n = 1
     while f"GroupItemID{n}" in arr:
         ids = arr[f"GroupItemID{n}"]
+        refine = arr.get(f"GroupRefine{n}")
         rows = []
-        for slot in (2, 3, 4):
-            pool = [p for p in arr.get(f"GroupSlot{slot}_{n}", []) if p]
-            if pool:
-                rows.append((f"Slot {slot}", items_list(pool)))
+        for k, slot in enumerate((4, 3, 2) if refine else (2, 3, 4)):
+            pool = list(OrderedDict.fromkeys(p for p in arr.get(f"GroupSlot{slot}_{n}", []) if p))
+            if not pool or (refine and refine[k] < 0):
+                continue
+            row = (f"Slot {slot}",)
+            if refine:
+                row += (f"+{refine[k]}" if refine[k] else "any",)
+            rows.append(row + (items_list(pool),))
         names = ", ".join(item_name(i) for i in ids[:3]) + (f" +{len(ids) - 3} more" if len(ids) > 3 else "")
-        body = "**Equipment:** " + items_list(ids) + "\n\n" + _table(["Slot", "Possible enchants (equal chance)"], rows)
-        out.append(_details(f"{names}", body))
+        header = ["Slot"] + (["Refine"] if refine else []) + ["Possible enchants (equal chance)"]
+        body = "**Equipment:** " + items_list(ids) + "\n\n" + _table(header, rows)
+        out.append((_slot_category(ids[0]), _details(f"{names}", body)))
         n += 1
-    return "\n".join(out)
+    if not any(arr.get(f"GroupRefine{i}") for i in range(1, n)):
+        return "\n".join(b for _, b in out)
+    md = []
+    for cat in SLOT_CATEGORIES:
+        blocks = [b for c, b in out if c == cat]
+        if blocks:
+            md.append(f"### {cat}\n\n" + "\n".join(blocks))
+    return "\n\n".join(md)
+
+
+SLOT_CATEGORIES = ["Headgear", "Armor", "Weapons", "Shields", "Garments", "Shoes", "Accessories", "Other"]
+
+
+def _slot_category(iid):
+    loc = ydb.items().get(int(iid), {}).get("Locations") or {}
+    if any(k.startswith("Head_") for k in loc):
+        return "Headgear"
+    for key, cat in (("Armor", "Armor"), ("Right_Hand", "Weapons"), ("Both_Hand", "Weapons"), ("Left_Hand", "Shields"),
+                     ("Garment", "Garments"), ("Shoes", "Shoes"), ("Both_Accessory", "Accessories"),
+                     ("Right_Accessory", "Accessories"), ("Left_Accessory", "Accessories")):
+        if key in loc:
+            return cat
+    return "Other"
 
 
 def item_enchant(eid):
@@ -810,11 +838,72 @@ def cash_shop_price(aegis):
     return None
 
 
+def _short_desc(iid, limit=3):
+    """First lines of the in-game description (data/item_text.json), up to the stats footer."""
+    import iteminfo
+    lines = []
+    for line in (iteminfo.load().get(int(iid)) or {}).get("d", []):
+        if re.match(r"^(Type|Compound on|Weight|Requirement|Class|Location)\s*:", line):
+            break
+        lines.append(_md_text(line))
+    more = " …" if len(lines) > limit else ""
+    return "<br>".join(lines[:limit]) + more
+
+
+def _compound_on(iid):
+    import iteminfo
+    for line in (iteminfo.load().get(int(iid)) or {}).get("d", []):
+        m = re.match(r"^Compound on\s*:\s*(.+)$", line)
+        if m:
+            return _md_text(m.group(1))
+    locs = [k for k, v in (rodb_item(iid).get("Locations") or {}).items() if v]
+    return ", ".join(l.replace("_", " ") for l in locs)
+
+
+def rodb_item(iid):
+    return ydb.items().get(int(iid)) or {}
+
+
+def bonus_roll_boxes():
+    """Item ids of boxes with a scripted bonus roll (tools/albums.py)."""
+    import albums
+    return [b for r in albums.bonus_rolls() for b in r["boxes"]]
+
+
+def bonus_roll_table(*boxes):
+    """Tiers and per-item chances of the scripted bonus roll of these boxes, side by side (one column per box)."""
+    import albums
+    rolls = [r for r in albums.bonus_rolls() if set(r["boxes"]) & {int(b) for b in boxes}]
+    if not rolls:
+        return "*No bonus roll found.*\n"
+    out = []
+    head_boxes = [b for r in rolls for b in r["boxes"] if b in {int(x) for x in boxes}]
+    summary = []
+    for r in rolls:
+        box = r["boxes"][0]
+        total = sum(t["chance"] for t in r["tiers"])
+        summary.append([item(box), *[f"{t['chance']:g}%" for t in r["tiers"]], f"**{total:g}%**"])
+    names = [t["name"] for t in rolls[0]["tiers"]]
+    out += ["### Chance per album", "", _table(["Album", *names, "Any card"], summary), ""]
+    for k, name in enumerate(names):
+        cards = list(dict.fromkeys(i for r in rolls if k < len(r["tiers"]) for i in r["tiers"][k]["items"]))
+        rows = []
+        for cid in cards:
+            cells = []
+            for r in rolls:
+                t = r["tiers"][k] if k < len(r["tiers"]) else None
+                cells.append(f"{t['chance'] / len(t['items']):.4g}%" if t and cid in t["items"] else "—")
+            rows.append([item(cid), _compound_on(cid), _short_desc(cid), *cells])
+        out += [f"### {name} ({len(cards)} cards)", "",
+                _table(["Card", "Slot", "Effect", *[item_name(r["boxes"][0]) for r in rolls]], rows), ""]
+    return "\n".join(out)
+
+
 def define_env(env):
     global ENV
     ENV = env
     for fn in (item, shops_in, items_table, items_list, shop, barter, quest_shop, quest_shop_tabs, slot_enchanter,
                item_enchant, array_seq, event_schedule, costume_drops, npc_directory, npc_where, arrays, scalar,
                fmt, item_name, mob_name, official_instances, official_instance_count,
-               official_npcs, instance_page, mob, endless_tower, cash_shop_price):
+               official_npcs, instance_page, mob, endless_tower, cash_shop_price, bonus_roll_table, bonus_roll_boxes):
         env.macro(fn)

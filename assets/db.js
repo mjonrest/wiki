@@ -130,12 +130,23 @@
   }
   function isMain(j) { return !/^Baby|^Super_Baby/.test(j.job) && !/\d$/.test(j.job); }
 
+  // Ways to get an item, as letters in column 12 of items.json (tools/gen_db.py).
+  var HOW = { D: "Monster drop", S: "NPC shop", X: "Barter / exchange", N: "NPC or quest reward", E: "Script event",
+    B: "Box or album", L: "Laphine synthesis", Q: "Quest Shop", I: "Instance reward", C: "Cash Shop", M: "Map drop",
+    U: "Quest drop", A: "Achievement", T: "Attendance", R: "Crafting" };
+  function howList(code) {
+    return code ? code.split("").map(function (c) { return HOW[c] || c; }) : ["No known source"];
+  }
+
   var KINDS = {
     items: {
       index: "items.json",
-      searchHint: "Item name or id, e.g. Elunium or 985",
+      searchHint: "Item name, id or words from its description, e.g. Elunium, 985 or \"perfect dodge\"",
       text: function (r) { return (r[0] + " " + r[1]).toLowerCase(); },
+      descIndex: "items_text.json",
       filters: [
+        { label: "How to get", type: "select", get: function (r) { return howList(r[12]); } },
+        { label: "Server", type: "select", get: function (r) { return r[13] || ""; } },
         { label: "Type", type: "select", get: function (r) { return r[2]; } },
         { label: "Sub-type", type: "select", get: function (r) { return r[3]; } },
         { label: "Equips on", type: "select", get: function (r) { return r[6] ? r[6].split("|") : []; } },
@@ -258,7 +269,8 @@
         K.filters.forEach(function (f, i) { if (f.def) state.f[i] = f.def; });
       }
       var h = '<form class="db-bar" role="search"><input type="search" class="db-q" placeholder="' + esc(K.searchHint || "Search by name or id") +
-        '" aria-label="Search"><button type="submit" class="md-button md-button--primary db-go">Search</button></form>' +
+        '" aria-label="Search"><button type="submit" class="md-button md-button--primary db-go">Search</button>' +
+        (K.descIndex ? '<label class="db-desc"><input type="checkbox" class="db-desc-on"> Also search descriptions</label>' : "") + "</form>" +
         '<div class="db-filters">';
       K.filters.forEach(function (f, i) {
         h += '<label class="db-filter"><span>' + esc(f.label) + "</span>";
@@ -282,6 +294,22 @@
 
       var q = root.querySelector(".db-q");
       q.value = state.q;
+      // Description search: items_text.json (in-game descriptions, lower case) loads the first time it is ticked.
+      var descBox = root.querySelector(".db-desc-on"), descText = null;
+      if (descBox) {
+        if (state.desc == null) { try { state.desc = localStorage.getItem("db-desc") === "1"; } catch (e) { state.desc = false; } }
+        descBox.checked = state.desc;
+        var loadDesc = function () {
+          if (!state.desc || descText) return;
+          root.querySelector(".db-count").textContent = "Loading descriptions…";
+          get(K.descIndex).then(function (t) { descText = t; draw(); }).catch(function () { descBox.checked = state.desc = false; draw(); });
+        };
+        descBox.addEventListener("change", function () {
+          state.desc = descBox.checked;
+          try { localStorage.setItem("db-desc", state.desc ? "1" : "0"); } catch (e) {}
+          state.shown = 100; if (state.desc && !descText) loadDesc(); else draw();
+        });
+      }
       root.querySelectorAll("[data-i]").forEach(function (el) {
         var i = +el.getAttribute("data-i"), end = el.getAttribute("data-end"), v = state.f[i];
         el.value = end ? (v && v[end] != null ? v[end] : "") : (v || "");
@@ -301,9 +329,14 @@
         return true;
       }
       function draw() {
-        var words = state.q.toLowerCase().split(/\s+/).filter(Boolean);
+        // Words match anywhere; "quoted words" must appear together.
+        var words = [], re = /"([^"]+)"|(\S+)/g, m;
+        while ((m = re.exec(state.q.toLowerCase()))) words.push((m[1] || m[2]).trim());
+        words = words.filter(Boolean);
+        var useDesc = state.desc && descText;
         var hits = rows.filter(function (r) {
           var t = K.text(r);
+          if (useDesc && words.length) t += " " + (descText[r[0]] || "");
           return words.every(function (w) { return t.indexOf(w) >= 0; }) && matches(r);
         });
         var key = K.cols[state.sort].sort, dir = state.dir;
@@ -311,7 +344,7 @@
           var x = key(a), y = key(b);
           return (typeof x === "string" ? x.localeCompare(y) : x - y) * dir;
         });
-        root.querySelector(".db-count").textContent = num(hits.length) + " found";
+        root.querySelector(".db-count").textContent = num(hits.length) + " found" + (useDesc && words.length ? " (names and descriptions)" : "");
         var head = K.cols.map(function (c, i) {
           return '<button type="button" class="db-sort' + (i === state.sort ? " on" : "") + '" data-col="' + i + '">' + c.h +
             (i === state.sort ? (dir > 0 ? " ▲" : " ▼") : "") + "</button>";
@@ -346,6 +379,7 @@
       });
       root.querySelector(".db-more").addEventListener("click", function () { state.shown += 200; draw(); });
       draw();
+      if (descBox) loadDesc();
     });
   }
 
@@ -391,6 +425,7 @@
         ["Buy / sell", d.Buy || d.Sell ? num(d.Buy || (d.Sell || 0) * 2) + " / " + num(d.Sell || Math.floor((d.Buy || 0) / 2)) + " z" : ""],
         ["Trade limits", d.Trade ? chips(d.Trade) : ""],
       ]);
+      if (d.desc) h += '<h3>In-game description</h3><blockquote class="db-desc-text">' + d.desc.map(esc).join("<br>") + "</blockquote>";
       if (d.Jobs) h += "<h3>Jobs</h3><p>" + (d.Jobs.indexOf("All") >= 0 ? "All jobs" : chips(d.Jobs)) + (d.Classes ? "<br><small>Classes: " + esc(d.Classes.map(nice).join(", ")) + "</small>" : "") + "</p>";
       [["Script", "fx", "Effect"], ["EquipScript", "fxEquip", "When equipped"], ["UnEquipScript", "fxUnequip", "When taken off"]].forEach(function (s) {
         if (!d[s[0]]) return;
@@ -400,9 +435,12 @@
         var names = c[0].map(function (i) { return i == id ? "<strong>" + esc(items[i] ? items[i][1] : "Item " + i) + "</strong>" : itemLink(i, items); }).join(" + ");
         return "<p>Worn together: " + names + "</p>" + (c[1].length ? fxList(c[1]) : "") + (c[2] ? scriptBox(c[2]) : "");
       }).join("");
+      h += '<h2 id="how-to-get">How to get</h2>' + (r[12] ? "<p>" + chips(howList(r[12])) + "</p>" :
+        "<p><small>No way to get this item was found in the server's NPC scripts, shops, boxes or drop tables. " +
+        "It may come from a GM, an event, or not be in the game.</small></p>");
       if (d.drops) h += "<h3>Dropped by</h3>" + table(["Monster", "Level", "Chance"], d.drops.map(function (x) {
         var m = mobs[x[0]];
-        return [mobLink(x[0], mobs) + (x[2] === "mvp" ? ' <span class="db-chip db-mvp">MVP reward</span>' : ""), m ? m[2] : "", pct(x[1])];
+        return [mobLink(x[0], mobs) + (x[2] === "mvp" ? ' <span class="db-chip db-mvp">MVP reward</span>' : x[2] === "bonus" ? ' <span class="db-chip">Kill bonus</span>' : ""), m ? m[2] : "", pct(x[1])];
       }));
       if (d.shops) h += "<h3>Sold by</h3>" + table(["NPC", "Where", "Price"], d.shops.map(function (s) {
         var loc = s[1] ? where(s[1], s[2], s[3]) : "<small>opened from another NPC</small>";
@@ -418,10 +456,22 @@
       }));
       if (d.givenBy) h += "<h3>Given by NPC</h3><p><small>These NPCs hand out this item, for example as a quest reward or exchange.</small></p>" +
         table(["NPC", "Where"], d.givenBy.map(function (n) { var x = npcs[n]; return [npcLink(n, npcs), x ? where(x[2], x[3], x[4]) : ""]; }));
+      h += obtainHtml(d, items, mobs);
+      if (d.boxes) {
+        var seenBox = {};
+        h += "<h3>Found in</h3>" + table(["Box", "Chance"], d.boxes.filter(function (b) { var k = b.join(); return seenBox[k] ? false : (seenBox[k] = 1); }).map(function (b) {
+          return [itemLink(b[0], items) + (b[2] === "bonus" ? ' <span class="db-chip">Bonus roll</span>' : ""), b[1] == null ? "always" : b[1] + "%"];
+        }));
+      }
       if (d.enchant) h += '<div class="db-enchanting"></div>';
-      if (d.boxes) h += "<h3>Found in</h3>" + table(["Box", "Chance"], d.boxes.map(function (b) { return [itemLink(b[0], items), b[1] == null ? "always" : b[1] + "%"]; }));
-      if (d.contains) h += "<h3>Contents</h3>" + table(["Item", "Amount", "Chance"], d.contains.map(function (b) { return [itemLink(b[0], items), b[2], b[1] == null ? "always" : b[1] + "%"]; }));
+      if (d.contains) h += "<h3>Contents</h3>" + table(["Item", "Amount", "Chance"], d.contains.map(function (b) {
+        return [itemLink(b[0], items) + (b[3] === "bonus" ? ' <span class="db-chip">Bonus roll</span>' : ""), b[2], b[1] == null ? "always" : b[1] + "%"];
+      }));
       root.innerHTML = h;
+      var crafts = root.querySelectorAll("[data-skill]");
+      if (crafts.length) skillsData().then(function (skills) {
+        crafts.forEach(function (el) { var s = skills.byId[el.getAttribute("data-skill")]; if (s) el.innerHTML = skillLink(s.aegis, skills); });
+      });
       if (d.enchant) return enchantLinks(d.enchant).then(function (names) {
         var e = d.enchant, link = function (k) { return '<a href="' + page("enchants") + "#" + k + '">' + esc(names[k] || k) + "</a>"; };
         var parts = [["enchantTarget", "Can be enchanted at"], ["enchantResult", "Is an enchant from"], ["enchantMaterial", "Used to enchant at"],
@@ -429,6 +479,36 @@
         root.querySelector(".db-enchanting").innerHTML = "<h3>Enchanting</h3>" + facts(parts.map(function (p) { return [p[1], e[p[0]] ? e[p[0]].map(link).join("<br>") : ""]; }));
       });
     });
+  }
+
+  // The "How to get" rows of tools/gen_sources.py and the hidden scripts of gen_npcs.py, one table per kind.
+  function obtainHtml(d, items, mobs) {
+    var by = {}, h = "";
+    (d.obtain || []).forEach(function (r) { (by[r[0]] = by[r[0]] || []).push(r); });
+    var list = function (k) { return by[k] || []; };
+    var costList = function (c, zeny, cash) {
+      var out = (c || []).map(function (x) { return x[1] + " × " + itemLink(x[0], items); });
+      if (zeny) out.push(num(zeny) + " z");
+      if (cash) out.push(num(cash) + " Cash Points");
+      return out.join("<br>") || "free";
+    };
+    if (list("quest").length) h += '<h3>Quest Shop</h3><p><small>Trade in the materials at the <a href="' + guideUrl("shops/quest-shop.md") +
+      '">Quest Shop</a>.</small></p>' + table(["Tab", "You get", "Costs"], list("quest").map(function (r) { return [esc(r[1]), r[2], costList(r[3], r[4], r[5])]; }));
+    if (list("instance").length) h += "<h3>Instance reward</h3><p><small>Handed out by the NPCs of these instances (as a reward or a quest item).</small></p>" +
+      table(["Instance"], list("instance").map(function (r) { return ['<a href="' + guideUrl("official/instances/" + r[1] + ".md") + '">' + esc(r[2]) + "</a>"]; }));
+    if (list("cash").length) h += "<h3>Cash Shop</h3>" + table(["Tab", "Price"], list("cash").map(function (r) { return [esc(r[1]), num(r[2]) + " Cash Points"]; }));
+    if (list("mapdrop").length) h += "<h3>Map drop</h3><p><small>Any monster killed on the map can drop it (or only the one named).</small></p>" +
+      table(["Map", "Monster", "Chance"], list("mapdrop").map(function (r) { return ["<code>" + esc(r[1]) + "</code>", r[3] ? mobLink(r[3], mobs) : "any", pct(r[2])]; }));
+    if (list("questdrop").length) h += "<h3>Quest drop</h3><p><small>Drops only while you have the quest.</small></p>" +
+      table(["Quest", "Monster", "Chance"], list("questdrop").map(function (r) { return [esc(r[2] || "Quest " + r[1]), r[3] ? mobLink(r[3], mobs) : "any", pct(r[4])]; }));
+    if (list("achievement").length) h += "<h3>Achievement reward</h3>" + table(["Achievement"], list("achievement").map(function (r) { return [esc(r[2] || "Achievement " + r[1])]; }));
+    if (list("attendance").length) h += "<h3>Attendance reward</h3>" + table(["Day"], list("attendance").map(function (r) { return [r[1]]; }));
+    if (list("craft").length) h += "<h3>Crafting</h3>" + table(["Skill", "Materials"], list("craft").map(function (r) {
+      return ['<span data-skill="' + esc(r[1]) + '">Skill ' + esc(r[1]) + "</span>" + (+r[2] > 1 ? " <small>Lv " + esc(r[2]) + "</small>" : ""), costList(r[3])];
+    }));
+    if (d.events) h += "<h3>Script events</h3><p><small>Given by a hidden script, for example while mining or after a kill.</small></p>" +
+      table(["Script", "When", "File"], d.events.map(function (e) { return [esc(e[0]), esc(e[1]), "<code>" + esc(e[2]) + "</code>"]; }));
+    return h;
   }
 
   // {enchant key: name} for links: NPC enchanters by their guide's title, enchant systems by the NPC that opens them.
@@ -465,7 +545,7 @@
         ["Behaviour", d.modes.filter(function (m) { return m !== "Mvp"; }).length ? chips(d.modes.filter(function (m) { return m !== "Mvp"; })) : ""], ["Aegis name", "<code>" + esc(d.aegis) + "</code>"],
       ]);
       if (d.drops.length) h += "<h3>Drops</h3>" + table(["Item", "Chance", ""], d.drops.map(function (x) {
-        return [itemLink(x[0], items), pct(x[1]), (x[2] === "mvp" ? '<span class="db-chip db-mvp">MVP reward</span> ' : "") + (x[3] ? "<small>can't be stolen</small>" : "")];
+        return [itemLink(x[0], items), pct(x[1]), (x[2] === "mvp" ? '<span class="db-chip db-mvp">MVP reward</span> ' : x[2] === "bonus" ? '<span class="db-chip">Kill bonus</span> ' : "") + (x[3] ? "<small>can't be stolen</small>" : "")];
       }));
       h += "<h3>Where to find</h3>" + (d.spawns.length ? table(["Map", "Amount"], d.spawns.map(function (sp) { return ["<code>" + esc(sp[0]) + "</code>", sp[1]]; }))
         : "<p>No permanent spawn. It appears in instances, events or by summon.</p>");

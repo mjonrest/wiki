@@ -17,6 +17,9 @@ import ydb  # noqa: E402
 import gen_npcs  # noqa: E402
 import gen_enchants  # noqa: E402
 import describe  # noqa: E402
+import albums  # noqa: E402
+import gen_sources  # noqa: E402
+import iteminfo  # noqa: E402
 from rodb import ROOT  # noqa: E402
 
 CHUNK = 1000  # detail files hold the ids id//CHUNK*CHUNK .. +CHUNK-1
@@ -200,9 +203,22 @@ def build(out, dir_urls=True):
 
     # Items.
     docs = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "docs")
-    npc_index, npc_detail, shops, given_by, enchanters = gen_npcs.build(items, by_aegis, docs)
+    npc_index, npc_detail, shops, given_by, enchanters, events = gen_npcs.build(items, by_aegis, docs)
+    # The kill bonuses of mob_drop.txt are listed under "Dropped by" instead.
+    events = {i: [e for e in rows if e[0] not in gen_sources.KILL_BONUS_NPCS] for i, rows in events.items()}
+    events = {i: rows for i, rows in events.items() if rows}
     in_box, box_has = _boxes(items, by_aegis)
     groups = box_has.pop("_groups")
+    # Scripted bonus rolls of boxes (the jRO card roll of the card albums).
+    for box, rows in albums.box_rows().items():
+        box_has[box] = (box_has.get(box) or []) + [[i, c, 1, "bonus"] for i, c in rows]
+        for i, c in rows:
+            in_box[i].append([box, c, "bonus"])
+    for mid, iid, rate in gen_sources.kill_bonus(mobs):
+        dropped_by[iid].append([mid, rate, "bonus"])
+        mob_detail[mid // CHUNK][mid]["drops"].append([iid, rate, "bonus", False])
+    obtain = gen_sources.build(items, by_aegis, mobs)
+    text = iteminfo.load()
     ench_rows, ench_detail, ench_roles = gen_enchants.build(by_aegis, groups, enchanters, set(shops) | set(given_by))
     site = os.path.dirname(os.path.dirname(os.path.abspath(out)))
     g_rows, g_detail, g_roles, g_pages = gen_enchants.guides(site, docs, items, npc_detail)
@@ -243,14 +259,25 @@ def build(out, dir_urls=True):
     job_names = sorted({j for it in items.values() for j in _flags(it.get("Jobs")) if j != "All"})
     job_pos = {j: i for i, j in enumerate(job_names)}
     combos = item_combos(by_aegis)
+    search_text = {}
     for iid, it in sorted(items.items()):
         t = it.get("Type", "Etc")
+        info = text.get(iid) or {}
+        sells = shops.get(iid, [])
+        laphine = (ench_roles.get(iid) or {}).get("laphineReward")
+        kinds = {r[0] for r in obtain.get(iid, [])}
+        how = "".join(k for k, has in (
+            ("D", dropped_by.get(iid)), ("S", any(not isinstance(s[5], dict) for s in sells)),
+            ("X", any(isinstance(s[5], dict) for s in sells)), ("N", given_by.get(iid)), ("E", events.get(iid)),
+            ("B", in_box.get(iid)), ("L", laphine), ("Q", "quest" in kinds), ("I", "instance" in kinds),
+            ("C", "cash" in kinds), ("M", "mapdrop" in kinds), ("U", "questdrop" in kinds),
+            ("A", "achievement" in kinds), ("T", "attendance" in kinds), ("R", "craft" in kinds)) if has)
         jobs = _flags(it.get("Jobs"))
         jobs = "*" if "All" in jobs or (not jobs and t in ("Weapon", "Armor", "ShadowGear")) else ".".join(str(job_pos[j]) for j in jobs if j in job_pos)
         item_index.append([iid, it.get("Name") or it.get("AegisName"), t, it.get("SubType", ""), it.get("Slots", 0),
                            it.get("EquipLevelMin", 0), "|".join(_flags(it.get("Locations"))), jobs,
                            it.get("Attack", 0), it.get("MagicAttack", 0), it.get("Defense", 0),
-                           round((it.get("Weight") or 0) / 10, 1)])
+                           round((it.get("Weight") or 0) / 10, 1), how, info.get("s", "")])
         d = {k: it[k] for k in ("AegisName", "SubType", "Buy", "Sell", "Weight", "Attack", "MagicAttack", "Defense",
                                 "Range", "Slots", "Gender", "WeaponLevel", "ArmorLevel", "EquipLevelMin",
                                 "EquipLevelMax", "Refineable", "Gradable", "View", "Script", "EquipScript",
@@ -264,9 +291,21 @@ def build(out, dir_urls=True):
                 d[key] = describe.describe(it[k])
         if combos.get(iid):
             d["combos"] = combos[iid][:30]
+        if info.get("d"):
+            d["desc"] = info["d"]
+        # Text for "search descriptions": the in-game description, else the plain-English effects.
+        words = info.get("d") or [x if isinstance(x, str) else x[0] if isinstance(x, list) else ""
+                                  for k in ("fx", "fxEquip") for x in d.get(k, [])]
+        if info.get("n") and info["n"] != (it.get("Name") or ""):
+            words = [info["n"]] + list(words)
+        flat = re.sub(r"⟦\w:[^|⟧]*\|([^⟧]*)⟧", r"\1", " ".join(words))
+        flat = re.sub(r"\s+", " ", flat).strip().lower()
+        if flat:
+            search_text[iid] = flat
         for k, v in (("drops", sorted(dropped_by.get(iid, []), key=lambda x: -x[1])[:80]),
                      ("shops", shops.get(iid, [])[:60]), ("givenBy", given_by.get(iid, [])[:40]), ("boxes", in_box.get(iid, [])[:60]),
-                     ("contains", box_has.get(iid)), ("enchant", ench_roles.get(iid))):
+                     ("contains", box_has.get(iid)), ("enchant", ench_roles.get(iid)),
+                     ("obtain", obtain.get(iid, [])[:80]), ("events", events.get(iid, [])[:20])):
             if v:
                 d[k] = v
         item_detail[iid // CHUNK][iid] = d
@@ -332,6 +371,7 @@ def build(out, dir_urls=True):
             json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
 
     dump("items.json", item_index)
+    dump("items_text.json", {str(k): v for k, v in search_text.items()})
     dump("mobs.json", mob_index)
     dump("skills.json", skill_out)
     dump("jobs.json", jobs)

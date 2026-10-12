@@ -82,3 +82,6 @@
 .md-typeset .db-el-undead { background: #455a64; }
 .md-typeset .db-el-poison { background: #7cb342; }
 .md-typeset .db-el-neutral { background: #9e9e9e; }
+.md-typeset .db-bar .db-desc { flex: 1 0 100%; display: flex; align-items: center; gap: .4em; font-size: .75rem; color: var(--md-default-fg-color--light); cursor: pointer; }
+.md-typeset .db-bar .db-desc input { flex: none; width: auto; margin: 0; padding: 0; }
+.md-typeset blockquote.db-desc-text { font-size: .76rem; }

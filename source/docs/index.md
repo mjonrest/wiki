@@ -42,7 +42,7 @@ server's own scripts.
 
 -   :material-auto-fix: **[Enchants](enchants/index.md)**
 
-    iRO Enchanter, Aulion, Desmond and the wing enchanters, with every possible result.
+    iRO Enchanter, JRO Enchanter and the wing enchanters, with every possible result.
 
 -   :material-sword: **[Content](content/hunting-missions.md)**
 
