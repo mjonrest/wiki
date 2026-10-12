@@ -1,1 +1,1 @@
-{"1210000":{"AegisName":"IDTest_canon","SubType":"CannonBall","Weight":10,"Attack":10,"Locations":["Ammo"],"Flags":["BuyingStore"]}}
+{"1210000":{"AegisName":"IDTest_canon","SubType":"CannonBall","Weight":10,"Attack":10,"Locations":["Ammo"],"Flags":["BuyingStore"],"desc":["A consumable item to used by Mechanic and Genetic skills.","Type: Cannonball","Attack: 10","Weight: 1","Element: Neutral"]}}

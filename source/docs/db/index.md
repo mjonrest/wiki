@@ -7,7 +7,8 @@ the wiki is built, including Miracle's custom items, monsters and jobs, so it ma
 
 -   :material-sword: **[Items](items.md)**
 
-    Stats, effects, equip jobs, which monsters drop it, which NPCs sell it and which boxes contain it.
+    Stats, effects, the in-game description and every way to get it: drops, shops, exchanges, quest and instance
+    rewards, boxes, the Cash Shop and more. Search by name or by words from the description.
 
 -   :material-ghost: **[Monsters](monsters.md)**
 

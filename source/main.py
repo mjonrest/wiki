@@ -838,11 +838,72 @@ def cash_shop_price(aegis):
     return None
 
 
+def _short_desc(iid, limit=3):
+    """First lines of the in-game description (data/item_text.json), up to the stats footer."""
+    import iteminfo
+    lines = []
+    for line in (iteminfo.load().get(int(iid)) or {}).get("d", []):
+        if re.match(r"^(Type|Compound on|Weight|Requirement|Class|Location)\s*:", line):
+            break
+        lines.append(_md_text(line))
+    more = " …" if len(lines) > limit else ""
+    return "<br>".join(lines[:limit]) + more
+
+
+def _compound_on(iid):
+    import iteminfo
+    for line in (iteminfo.load().get(int(iid)) or {}).get("d", []):
+        m = re.match(r"^Compound on\s*:\s*(.+)$", line)
+        if m:
+            return _md_text(m.group(1))
+    locs = [k for k, v in (rodb_item(iid).get("Locations") or {}).items() if v]
+    return ", ".join(l.replace("_", " ") for l in locs)
+
+
+def rodb_item(iid):
+    return ydb.items().get(int(iid)) or {}
+
+
+def bonus_roll_boxes():
+    """Item ids of boxes with a scripted bonus roll (tools/albums.py)."""
+    import albums
+    return [b for r in albums.bonus_rolls() for b in r["boxes"]]
+
+
+def bonus_roll_table(*boxes):
+    """Tiers and per-item chances of the scripted bonus roll of these boxes, side by side (one column per box)."""
+    import albums
+    rolls = [r for r in albums.bonus_rolls() if set(r["boxes"]) & {int(b) for b in boxes}]
+    if not rolls:
+        return "*No bonus roll found.*\n"
+    out = []
+    head_boxes = [b for r in rolls for b in r["boxes"] if b in {int(x) for x in boxes}]
+    summary = []
+    for r in rolls:
+        box = r["boxes"][0]
+        total = sum(t["chance"] for t in r["tiers"])
+        summary.append([item(box), *[f"{t['chance']:g}%" for t in r["tiers"]], f"**{total:g}%**"])
+    names = [t["name"] for t in rolls[0]["tiers"]]
+    out += ["### Chance per album", "", _table(["Album", *names, "Any card"], summary), ""]
+    for k, name in enumerate(names):
+        cards = list(dict.fromkeys(i for r in rolls if k < len(r["tiers"]) for i in r["tiers"][k]["items"]))
+        rows = []
+        for cid in cards:
+            cells = []
+            for r in rolls:
+                t = r["tiers"][k] if k < len(r["tiers"]) else None
+                cells.append(f"{t['chance'] / len(t['items']):.4g}%" if t and cid in t["items"] else "—")
+            rows.append([item(cid), _compound_on(cid), _short_desc(cid), *cells])
+        out += [f"### {name} ({len(cards)} cards)", "",
+                _table(["Card", "Slot", "Effect", *[item_name(r["boxes"][0]) for r in rolls]], rows), ""]
+    return "\n".join(out)
+
+
 def define_env(env):
     global ENV
     ENV = env
     for fn in (item, shops_in, items_table, items_list, shop, barter, quest_shop, quest_shop_tabs, slot_enchanter,
                item_enchant, array_seq, event_schedule, costume_drops, npc_directory, npc_where, arrays, scalar,
                fmt, item_name, mob_name, official_instances, official_instance_count,
-               official_npcs, instance_page, mob, endless_tower, cash_shop_price):
+               official_npcs, instance_page, mob, endless_tower, cash_shop_price, bonus_roll_table, bonus_roll_boxes):
         env.macro(fn)
