@@ -1,0 +1,47 @@
+# Can players enter an instance again, or only once? Checked by hand against the server scripts.
+#
+#   entry: once     a story instance: the entrance only opens while one story step is active, and clearing the
+#                   instance moves the story on, so it closes for good. You can retry until you clear it.
+#   entry: repeat   it can be run again.
+#   cooldown: [quest ids]   the wait quests to show, when the script check the wiki reads (checkquest(N, PLAYTIME) at
+#                   the entrance) finds the wrong one or none. [] means it has no cooldown.
+#   note:           one extra sentence shown on the instance page.
+#
+# Instances not listed here are repeatable when their entrance checks a wait quest. Every instance the server loads
+# should be covered by one or the other; the build prints a warning for any that is not.
+
+# Story instances (no cooldown, entrance gated by the story)
+Bagot Laboratory: {entry: once, note: "Run again in Simulation Battle."}
+Canyon Exploration: {entry: once}
+Confused Snake's Nest: {entry: once}
+Drift Ice Zone: {entry: once}
+Eclage Interior: {entry: once}
+Final Battle: {entry: once, note: "After the story, Heine opens Final Battle (Normal) and (Hard) as repeatable runs."}
+Gimli Infiltration: {entry: once}
+Hidden Flower Garden: {entry: once, note: "Run again in Security Area 1 and 2."}
+High Priest's Villa: {entry: once}
+Nest of Twigs: {entry: once}
+Ominous Dark Whisper: {entry: once, note: "Run again in Simulated Dark Whisper."}
+OS Occupation: {entry: once, note: "Run again in 2nd OS Search."}
+Oz Labyrinth: {entry: once}
+Regenschirm: {entry: once}
+Ritual of Blessing: {entry: once}
+Sealed OS: {entry: once}
+Secret Altar: {entry: once}
+Separated Sanctuary: {entry: once}
+Silent Sanctuary: {entry: once, cooldown: []}
+Thor Military Base: {entry: once}
+Twilight Garden: {entry: once}
+Werner Laboratory central room#1: {entry: once}
+
+# Repeatable ones the script check misses
+Old Glast Heim: {entry: repeat, cooldown: [12317]}
+Old Glast Heim Advanced: {entry: repeat, cooldown: [12334]}
+Sticky Sea: {entry: repeat, cooldown: [11950], note: "Take the daily quest *Escargot!* first; finishing it starts the wait."}
+Wave Mode - Forest: {entry: repeat, cooldown: []}
+Wave Mode - Sky: {entry: repeat, cooldown: []}
+Werner Laboratory central room#2: {entry: repeat, cooldown: [], note: "Rookie opens it while you have the daily hunting quest *Sweeping the remnants*."}
+Hall of Life: {entry: repeat, cooldown: [12619], note: "The weekly reward resets on Monday at 04:00."}
+Mysterious Ghost Ship: {entry: repeat, note: "The first run is part of the story; Nillem offers the daily runs after that."}
+Final Battle(Normal): {entry: repeat, cooldown: [12647]}
+Final Battle(Hard): {entry: repeat, cooldown: [12648], note: "Hard needs 1,000 reputation with all seven Episode 21 factions."}

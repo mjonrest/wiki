@@ -125,7 +125,10 @@ def quest_db():
 
 
 def duration(text_or_secs):
-    """'4h' / '+3d' / '4:00' / 7200 -> readable string."""
+    """'+4h' / '4h' / '3d 4h' / 'Monday 4h' / '4:00' / 7200 -> readable string.
+
+    quest_db TimeLimits without a '+' are a clock time, not a length: '4h' ends at the next 04:00,
+    '3d 4h' at 04:00 three days later and 'Monday 4h' on the next Monday at 04:00."""
     if text_or_secs is None:
         return ""
     if isinstance(text_or_secs, int):
@@ -135,12 +138,41 @@ def duration(text_or_secs):
     t = str(text_or_secs).strip()
     if re.fullmatch(r"\d+:\d+", t):
         return f"resets daily at {t}"
-    t = t.lstrip("+")
     names = {"d": "day", "h": "hour", "mn": "min", "m": "min", "s": "sec"}
     parts = re.findall(r"(\d+)(d|h|mn|m|s)", t)
+    if not t.startswith("+"):
+        clock = {u: int(n) for n, u in parts}
+        at = f"{clock.get('h', 0):02d}:{clock.get('mn', clock.get('m', 0)):02d}"
+        day = re.match(r"([A-Za-z]+day)\b", t)
+        if day:
+            return f"resets {day.group(1).capitalize()} at {at}"
+        if clock.get("d"):
+            return f"resets at {at} after {clock['d']} days"
+        if parts:
+            return f"resets daily at {at}"
     if not parts:
-        return t
+        return t.lstrip("+")
     return " ".join(f"{n} {names[u]}{'s' if int(n) > 1 and names[u] in ('day', 'hour') else ''}" for n, u in parts)
+
+
+@functools.lru_cache(None)
+def instance_entry():
+    """{instance name: {entry, cooldown, note}} checked by hand, from data/instance_entry.yml."""
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "instance_entry.yml")
+    with open(path, encoding="utf-8") as f:
+        return yaml.safe_load(f) or {}
+
+
+def entry_text(rec, short=False):
+    """'Once (story)' / 'Repeatable, resets daily at 04:00' for one instance record."""
+    if rec["entry"] == "once":
+        return "Once (story)" if short else ("**Once per character.** It is part of the story: the entrance only opens "
+                                             "while that story step is active, and you can retry until you clear it")
+    if rec["entry"] == "repeat":
+        cd = rec["cooldown"]
+        wait = (cd if cd.startswith("resets") else f"cooldown {cd}") if cd else "no cooldown"
+        return f"Repeatable, {wait}" if short else f"**Repeatable**, {wait}"
+    return "—" if short else ""
 
 
 @functools.lru_cache(None)
@@ -184,18 +216,31 @@ def instances():
         e = db[rec["name"]]
         rec["time_limit"] = e.get("TimeLimit", 3600)
         rec["id"] = e.get("Id")
+        manual = instance_entry().get(rec["name"], {})
+        if "cooldown" in manual:
+            rec["cooldowns"] = list(manual["cooldown"])
         cds = [quest_db().get(q, {}).get("TimeLimit") for q in rec["cooldowns"]]
         cds = [c for c in cds if c]
         rec["cooldown"] = duration(max(cds, key=_seconds)) if cds else ""
+        rec["entry"] = manual.get("entry") or ("repeat" if rec["cooldowns"] else None)
+        rec["entry_note"] = manual.get("note", "")
+        if not rec["entry"]:
+            print(f"WARNING: no once/repeatable entry for instance {rec['name']!r}; add it to data/instance_entry.yml")
     return sorted(found.values(), key=lambda r: (r["level"] is None, r["level"] or 0, r["name"]))
 
 
 def _seconds(t):
-    t = str(t).lstrip("+")
+    """Longest wait a TimeLimit can mean, to pick the cooldown that matters most."""
+    t = str(t).strip()
+    mult = {"d": 86400, "h": 3600, "mn": 60, "m": 60, "s": 1}
+    parts = re.findall(r"(\d+)(d|h|mn|m|s)", t)
+    if t.startswith("+"):
+        return sum(int(n) * mult[u] for n, u in parts)
+    if re.match(r"[A-Za-z]+day\b", t):
+        return 7 * 86400
     if re.fullmatch(r"\d+:\d+", t):
         return 86400
-    mult = {"d": 86400, "h": 3600, "mn": 60, "m": 60, "s": 1}
-    return sum(int(n) * mult[u] for n, u in re.findall(r"(\d+)(d|h|mn|m|s)", t))
+    return 86400 + sum(int(n) * 86400 for n, u in parts if u == "d")
 
 
 def _note(found, name, rel, hdr, body, kind, mode):

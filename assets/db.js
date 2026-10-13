@@ -294,7 +294,7 @@
 
       var q = root.querySelector(".db-q");
       q.value = state.q;
-      // Description search: items_text.json (in-game descriptions, lower case) loads the first time it is ticked.
+      // Description search: items_text.json (effects translated from the item scripts, lower case) loads the first time it is ticked.
       var descBox = root.querySelector(".db-desc-on"), descText = null;
       if (descBox) {
         if (state.desc == null) { try { state.desc = localStorage.getItem("db-desc") === "1"; } catch (e) { state.desc = false; } }
@@ -425,7 +425,6 @@
         ["Buy / sell", d.Buy || d.Sell ? num(d.Buy || (d.Sell || 0) * 2) + " / " + num(d.Sell || Math.floor((d.Buy || 0) / 2)) + " z" : ""],
         ["Trade limits", d.Trade ? chips(d.Trade) : ""],
       ]);
-      if (d.desc) h += '<h3>In-game description</h3><blockquote class="db-desc-text">' + d.desc.map(esc).join("<br>") + "</blockquote>";
       if (d.Jobs) h += "<h3>Jobs</h3><p>" + (d.Jobs.indexOf("All") >= 0 ? "All jobs" : chips(d.Jobs)) + (d.Classes ? "<br><small>Classes: " + esc(d.Classes.map(nice).join(", ")) + "</small>" : "") + "</p>";
       [["Script", "fx", "Effect"], ["EquipScript", "fxEquip", "When equipped"], ["UnEquipScript", "fxUnequip", "When taken off"]].forEach(function (s) {
         if (!d[s[0]]) return;

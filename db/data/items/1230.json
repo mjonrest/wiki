@@ -1,1 +1,1 @@
-{"1230000":{"AegisName":"IDTest_ammo","SubType":"Dagger","Weight":10,"Attack":10,"Locations":["Ammo"],"Flags":["BuyingStore"],"combos":[[[1230000,800000],["DEX +1"],"bonus bDex,1;"]],"desc":["When equipped with IDTest Gun:","DEX +1","Type: Ammo","Attack: 10","Weight: 1","Element: Neutral"]}}
+{"1230000":{"AegisName":"IDTest_ammo","SubType":"Dagger","Weight":10,"Attack":10,"Locations":["Ammo"],"Flags":["BuyingStore"],"combos":[[[1230000,800000],["DEX +1"],"bonus bDex,1;"]]}}

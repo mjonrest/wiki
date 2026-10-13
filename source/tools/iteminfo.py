@@ -1,6 +1,7 @@
-"""Item descriptions from the game client's itemInfo.lua, for the Database pages and the description search.
+"""Server tags (e.g. jRO) from the game client's itemInfo.lua, for the Database "Server" filter.
 
-The client file is too big to keep here (25 MB), so this saves just the text players read in game:
+Item descriptions are not taken from the client: the wiki shows and searches the effects it translates from the
+item scripts instead (tools/describe.py). The client file is too big to keep here (25 MB), so this saves the tags:
 
     python3 tools/iteminfo.py PATH/TO/itemInfo.lua    # writes data/item_text.json
 
@@ -62,15 +63,8 @@ def main(path):
     data = parse(path)
     out = {}
     for iid, d in sorted(data.items()):
-        lines = [l for l in d["desc"] if l and not re.fullmatch(r"_+", l)]
-        if not lines and not d["server"]:
-            continue
-        row = {"d": lines}
-        if d["name"]:
-            row["n"] = d["name"]
         if d["server"]:
-            row["s"] = d["server"]
-        out[str(iid)] = row
+            out[str(iid)] = {"s": d["server"]}
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
@@ -79,7 +73,7 @@ def main(path):
 
 @__import__("functools").lru_cache(None)
 def load():
-    """{item id: {"d": [lines], "n": client name, "s": server tag}}, or {} before the file exists."""
+    """{item id: {"s": server tag}}, or {} before the file exists."""
     if not os.path.exists(OUT):
         return {}
     with open(OUT, encoding="utf-8") as f:
