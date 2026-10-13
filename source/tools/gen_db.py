@@ -27,6 +27,16 @@ CHUNK = 1000  # detail files hold the ids id//CHUNK*CHUNK .. +CHUNK-1
 
 # ---------------------------------------------------------------- set bonuses
 
+def _fx_words(lines):
+    """Every text line of plain-English effects, nested conditions included (code boxes skipped)."""
+    for x in lines:
+        if isinstance(x, str):
+            yield x
+        elif isinstance(x, list):
+            yield x[0]
+            yield from _fx_words(x[1])
+
+
 def item_combos(by_aegis):
     """{item id: [[[ids in the set], effects, script], ...]} from the combo database; a later file's entry for
     the same set of items replaces an earlier one, as on the server."""
@@ -303,13 +313,8 @@ def build(out, dir_urls=True):
                 d[key] = describe.describe(it[k])
         if combos.get(iid):
             d["combos"] = combos[iid][:30]
-        if info.get("d"):
-            d["desc"] = info["d"]
-        # Text for "search descriptions": the in-game description, else the plain-English effects.
-        words = info.get("d") or [x if isinstance(x, str) else x[0] if isinstance(x, list) else ""
-                                  for k in ("fx", "fxEquip") for x in d.get(k, [])]
-        if info.get("n") and info["n"] != (it.get("Name") or ""):
-            words = [info["n"]] + list(words)
+        # Text for "search descriptions": the plain-English effects translated from the item's scripts.
+        words = [w for k in ("fx", "fxEquip", "fxUnequip") for w in _fx_words(d.get(k, []))]
         flat = re.sub(r"⟦\w:[^|⟧]*\|([^⟧]*)⟧", r"\1", " ".join(words))
         flat = re.sub(r"\s+", " ", flat).strip().lower()
         if flat:

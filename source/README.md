@@ -41,8 +41,9 @@ missing pages and rewrites the Instances menu, so text written by hand on a page
 
 ## Item descriptions
 
-The in-game item descriptions (shown on item pages and used by "Also search descriptions") come from the game
-client's `itemInfo.lua`, saved as `data/item_text.json`. When the client's itemInfo changes, refresh it and rebuild:
+Item pages show the effects translated from each item's scripts (`tools/describe.py`), and "Also search
+descriptions" searches that same text. The client's `itemInfo.lua` is only used for the "Server" filter (jRO tags),
+saved as `data/item_text.json`. When the client's itemInfo changes, refresh it and rebuild:
 
 ```sh
 python3 tools/iteminfo.py /path/to/itemInfo.lua

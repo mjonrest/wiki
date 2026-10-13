@@ -539,9 +539,9 @@ def official_instances():
             str(r["level"]) if r["level"] else "—",
             "<br>".join(spots) or "—",
             official.duration(r["time_limit"]).strip(),
-            r["cooldown"] or "—",
+            official.entry_text(r, short=True),
         ])
-    return _table(["Instance", "Level", "Entrance", "Time limit", "Cooldown"], rows)
+    return _table(["Instance", "Level", "Entrance", "Time limit", "Entry"], rows)
 
 
 def _mob_cell(mid):
@@ -597,9 +597,12 @@ def instance_page(key, overview_only=False):
     for r in recs:
         label = f" ({official.title(r['name'])})" if len(recs) > 1 else ""
         bits = [f"Level **{r['level']}+**" if r["level"] else "Unlocked by its story quest",
-                f"time limit **{official.duration(r['time_limit']).strip()}**",
-                f"cooldown **{r['cooldown']}**" if r["cooldown"] else "no cooldown"]
+                f"time limit **{official.duration(r['time_limit']).strip()}**"]
         info.append(f"- **Requirements{label}:** " + ", ".join(bits))
+        entry = official.entry_text(r)
+        if entry:
+            note = f" {r['entry_note']}" if r["entry_note"] else ""
+            info.append(f"- **Entry{label}:** {entry}.{note}")
     spots = []
     for m, x, y, npc in main["entrances"][:2]:
         spots.append(f"{('**' + npc + '** at ') if npc else ''}`{m} {x}/{y}` (`/navi {m} {x}/{y}`)")
@@ -849,24 +852,31 @@ def cash_shop_price(aegis):
     return None
 
 
+def _fx_line(x):
+    """One plain-English effect as text; a condition lists its effects after a colon."""
+    if isinstance(x, str):
+        return x
+    if isinstance(x, list):
+        return f"{x[0]}: " + ", ".join(t for t in map(_fx_line, x[1]) if t)
+    return ""
+
+
 def _short_desc(iid, limit=3):
-    """First lines of the in-game description (data/item_text.json), up to the stats footer."""
-    import iteminfo
+    """First lines of the item's effects, translated from its scripts (tools/describe.py)."""
+    import describe
+    it = rodb_item(iid)
     lines = []
-    for line in (iteminfo.load().get(int(iid)) or {}).get("d", []):
-        if re.match(r"^(Type|Compound on|Weight|Requirement|Class|Location)\s*:", line):
-            break
-        lines.append(_md_text(line))
+    for k in ("Script", "EquipScript"):
+        for x in describe.describe(it[k]) if it.get(k) else []:
+            text = _fx_line(x)
+            text = re.sub(r"⟦\w:[^|⟧]*\|([^⟧]*)⟧", r"\1", text).strip()
+            if text:
+                lines.append(_md_text(text))
     more = " …" if len(lines) > limit else ""
     return "<br>".join(lines[:limit]) + more
 
 
 def _compound_on(iid):
-    import iteminfo
-    for line in (iteminfo.load().get(int(iid)) or {}).get("d", []):
-        m = re.match(r"^Compound on\s*:\s*(.+)$", line)
-        if m:
-            return _md_text(m.group(1))
     locs = [k for k, v in (rodb_item(iid).get("Locations") or {}).items() if v]
     return ", ".join(l.replace("_", " ") for l in locs)
 
