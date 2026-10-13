@@ -2,7 +2,8 @@
 
 **Location:** {{ npc_where("iRO Enchanter") }} · Quest Room
 
-Gives Follower equipment and OCP accessories **2 or 3 random options**, like the official Follower enchant.
+Gives Follower equipment, OCP accessories and OCP Type A equipment **2 or 3 random options**, like the official
+Follower and OCP enchant runes.
 
 | | |
 |---|---|
@@ -17,6 +18,8 @@ Three-option results are announced to the server.
 
 ## Possible options
 
+### Follower equipment and OCP accessories
+
 | Option 1 and 2 (always) | Option 3 ({{ scalar("npc/miracle/follower_enchant.txt", "ThirdChance") }}%) |
 |---|---|
 | STR / AGI / VIT / INT / DEX / LUK +5~15 | POW / SPL / STA / WIS / CON / CRT +1~6 |
@@ -25,16 +28,29 @@ Three-option results are announced to the server.
 | Critical damage +5~25% | After-cast delay -5~15% |
 | Long-range damage +5~25% | |
 
+### OCP Type A equipment
+
+These items roll the stronger iRO Random Option Type A instead.
+
+| Option 1 | Option 2 | Option 3 ({{ scalar("npc/miracle/follower_enchant.txt", "ThirdChance") }}%) |
+|---|---|---|
+| POW / SPL / STA / WIS / CON / CRT +2~12 | ATK / MATK +30~100 | POW / SPL / STA / WIS / CON / CRT +5~15 |
+| | ATK / MATK +15~30% | Max HP / Max SP +15~30% |
+| | Critical damage +15~30% | Variable cast time -10~15% |
+| | Long-range damage +15~30% | After-cast delay -10~15% |
+
 Each option in a column has the same chance, and the value is random within its range.
 
 ## Enchantable equipment
 
-{% set items = arrays("npc/miracle/follower_enchant.txt", "iRO Enchanter")["Items"] %}
-{{ items_table(items[:17], "Follower equipment") }}
+{% set cats = array_seq("npc/miracle/follower_enchant.txt", "iRO Enchanter", "Items") %}
+{{ items_table(cats[0], "Follower equipment") }}
 
 <details class="abstract shop" markdown="1">
-<summary>OCP accessories <span class="count">{{ items|length - 17 }} items</span></summary>
+<summary>OCP accessories <span class="count">{{ cats[1]|length }} items</span></summary>
 
-{{ items_table(items[17:], "Accessory") }}
+{{ items_table(cats[1], "Accessory") }}
 
 </details>
+
+{{ items_table(cats[2], "OCP Type A equipment") }}
