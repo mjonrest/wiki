@@ -23,7 +23,7 @@ The raid also ends after 1 hour or when everyone has left.
 
 - No {{ item_name(7621) }}, commands or cash shop
 - No teleport, warp, branches or Ice Wall; nothing is lost on death
-- Bosses have extra HP and damage and only take 1% of your damage
+- Bosses have extra HP and damage and take 50% less damage
 - [One character per computer](../guide/fair-play.md)
 
 ## Rounds and rewards

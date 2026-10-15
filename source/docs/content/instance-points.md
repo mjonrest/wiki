@@ -7,7 +7,7 @@ See [Instances](instances.md) for the basics.
 | | |
 |---|---|
 | **Daily cap** | 1,200 points per account, reset at 00:00 server time |
-| **Limit** | Each computer can claim each instance run once |
+| **Limit** | Each account and each computer can claim each instance once per day; logging in from another PC does not give a second claim |
 | **Bonus** | +50 points per claim while {{ item(30034) }} is active |
 | **Check** | `@instancepoints` shows how many points you earned today |
 

@@ -27,6 +27,7 @@ Use the [Coin Exchanger](../shops/coin-exchanger.md) to turn coins into points a
 | {{ item(30018) }} | 1 Instance Point | |
 | {{ item(30017) }} | 1 Event Point | |
 | {{ item(30007) }} | | [World Boss Merchant](../shops/world-boss-merchant.md) currency |
+| {{ item(30064) }} to {{ item(30067) }} | 50M to 1B Zeny | Carrying and trading Zeny, see [Bank Notes](../shops/coin-exchanger.md#bank-notes) |
 
 !!! info "Bound MVP Souls"
     Bound {{ item_name(30007) }} can be turned into normal, tradable ones 1:1 at the Coin Exchanger.

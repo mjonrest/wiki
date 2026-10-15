@@ -604,6 +604,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Commands
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -620,6 +638,47 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#statsview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        @statsview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#alootid2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        @alootid2
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -6753,6 +6812,36 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#statsview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        @statsview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#alootid2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        @alootid2
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -6800,7 +6889,11 @@
 </tr>
 <tr>
 <td><code>@statsview</code></td>
-<td>Lists every active bonus on your character (HP/SP %, ATK/MATK %, damage modifiers and more).</td>
+<td>Lists every bonus on your character from gear, cards, enchants, combos and buffs. See <a href="#statsview">below</a>.</td>
+</tr>
+<tr>
+<td><code>@alootid2</code></td>
+<td>Saves up to 10 named autoloot lists and loads one with a single command. See <a href="#alootid2">below</a>.</td>
 </tr>
 <tr>
 <td><code>@dummy</code></td>
@@ -6816,6 +6909,93 @@
 <p class="admonition-title">Commands are disabled in some places</p>
 <p>Hell Raid, the Mining Zone and the World Boss map block most commands and the cash shop.</p>
 </div>
+<h2 id="statsview">@statsview<a class="headerlink" href="#statsview" title="Permanent link">&para;</a></h2>
+<p><code>@statsview</code> shows the <strong>general</strong> and <strong>resist</strong> pages. Add a page name to see another one, or <code>all</code> for everything.
+You can use it once every 3 seconds.</p>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>What it lists</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@statsview general</code></td>
+<td>Stat, HP/SP, ATK/MATK and trait % bonuses</td>
+</tr>
+<tr>
+<td><code>@statsview offense</code></td>
+<td>Damage against race, element, size and class, ignore DEF/MDEF</td>
+</tr>
+<tr>
+<td><code>@statsview resist</code></td>
+<td>Damage reduction, element/race/size resist and status resists</td>
+</tr>
+<tr>
+<td><code>@statsview skill</code></td>
+<td>Cast time, delay, cooldown, per-skill damage and SP cost</td>
+</tr>
+<tr>
+<td><code>@statsview proc</code></td>
+<td>Autospells, autobonus, chances to cause statuses, HP/SP drain</td>
+</tr>
+<tr>
+<td><code>@statsview misc</code></td>
+<td>EXP and drop bonuses, extra drops, healing item bonuses and regen</td>
+</tr>
+<tr>
+<td><code>@statsview all</code></td>
+<td>Every page</td>
+</tr>
+</tbody>
+</table>
+<h2 id="alootid2">@alootid2<a class="headerlink" href="#alootid2" title="Permanent link">&para;</a></h2>
+<p><code>@alootid2</code> keeps <strong>saved autoloot groups</strong>: lists of up to 10 items you can switch between, instead of typing
+<code>@alootid</code> for each item again. You can have <strong>10 groups</strong> per character, numbered 1 to 10.</p>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@alootid2 list</code></td>
+<td>Shows your groups. <code>@alootid2 list &lt;#&gt;</code> shows the items in one group</td>
+</tr>
+<tr>
+<td><code>@alootid2 load &lt;#&gt;</code></td>
+<td>Clears your current autoloot list and autoloots the items in group <code>#</code></td>
+</tr>
+<tr>
+<td><code>@alootid2 save &lt;#&gt; &lt;item&gt; ...</code></td>
+<td>Saves your list of items into group <code>#</code>, replacing what it had</td>
+</tr>
+<tr>
+<td><code>@alootid2 add &lt;#&gt; &lt;item&gt; ...</code></td>
+<td>Adds items to group <code>#</code></td>
+</tr>
+<tr>
+<td><code>@alootid2 remove &lt;#&gt; &lt;item&gt; ...</code></td>
+<td>Removes items from group <code>#</code></td>
+</tr>
+<tr>
+<td><code>@alootid2 clear &lt;#&gt;</code></td>
+<td>Empties group <code>#</code></td>
+</tr>
+<tr>
+<td><code>@alootid2 set &lt;#&gt; name &lt;name&gt;</code></td>
+<td>Names the group (up to 24 characters, spaces allowed)</td>
+</tr>
+<tr>
+<td><code>@alootid2 set &lt;#&gt; autoload 1</code></td>
+<td>Loads this group by itself every time you log in (<code>0</code> turns it off). Only one group can do this</td>
+</tr>
+</tbody>
+</table>
+<p>Give items by their <strong>item ID</strong> (find them in the <a href="../../db/items/">item database</a>). Wait 2 seconds between <code>@alootid2</code> commands.</p>
 
 
 
