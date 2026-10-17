@@ -33,3 +33,11 @@ Opened from the Gold PC (hourly) button.
 {{ shop("Hourly", "Precious Etc") }}
 {{ shop("Hourly2", "Pet Coupon (A)") }}
 {{ shop("Hourly3", "Pet Coupon (B)") }}
+
+## Princess Mary (name color and auras)
+
+**Location:** {{ npc_where("Princess Mary") }}
+
+- **Color Nickname:** preview the 21 name colors, then pay 1 {{ item(30061) }} to keep the one you pick.
+- **Aura Changer:** an aura has three parts. Preview the styles for one part, then pay 1 matching ticket to keep it:
+  {{ item(30058) }} for part 1, {{ item(30059) }} for part 2, {{ item(30060) }} for part 3.

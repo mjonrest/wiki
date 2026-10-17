@@ -56,6 +56,9 @@ Leaving through the **exit portal** next to the Marquis gives **20 to 40 Instanc
 
 **Exchange:** spend {{ item(1000367) }} at the **Marquis of Remorse** at `/navi dali02 78/112`. He offers jewel, weapon and reform-material exchanges, plus the Thanatos helmet enchant.
 
+!!! info "More Mineas from the Tiara Follower Dress"
+    Wearing {{ item(450526) }} at **Grade A** gives a **30%** chance to get 1 {{ item(1000367) }} each time you kill one of these monsters in Niflheim Dungeon (`nif_dun01`, `nif_dun02`): {% for m in arrays("npc/miracle/tiara_mineas.txt", "TiaraMineas").Mobs %}{{ mob_name(m) }}{% if not loop.last %}, {% endif %}{% endfor %}.
+
 !!! tip "Instance Points"
     Instance Points can be earned once per device for each instance run, up to 1200 per account per day. A rented {{ item(30034) }} adds 50 points per claim. Use `@instancepoints` to see your total.
 
