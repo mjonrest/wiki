@@ -40,7 +40,8 @@ The Prontera Kafra ({{ npc_where("Kafra Employee") }}) also offers:
 ## 3. Heal and buff for free
 
 **Hera** ({{ npc_where("Hera") }}) heals you to full and gives Increase AGI and Blessing for 5 minutes.
-You can also just type a chat message containing **heal** near her.
+You can also just type a chat message containing **heal** near her, and she answers questions about the server:
+see [Hera](hera.md).
 [VIP](vip.md) players get a much bigger package: status cures, AP, food buffs, Assumptio, Impositio,
 Suffragium, Sacrament and your class Spirit, lasting 30 minutes.
 

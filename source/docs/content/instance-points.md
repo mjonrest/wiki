@@ -49,7 +49,7 @@ See [Instances](instances.md) for the basics.
 | [Villa of Deception](../official/instances/villa-of-deception.md) | 20–60 | Normal 20–40, Advanced 40–60 | Daily (shared by both modes) |
 | [Water Garden](../official/instances/water-garden.md) | 20–60 | Normal 20–40, Hard 40–60 | Daily |
 | [Farm Lost in Time](../official/instances/farm-lost-in-time.md) | 20–40 | When you leave through Silk | Daily |
-| [Geffen Night Arena](../official/instances/geffen-night-arena.md) | 20–40 | When you collect the reward | Daily |
+| [Geffen Night Arena](../official/instances/geffen-night-arena.md) | 20–40 | When you collect the reward, if you won at least one round | Daily |
 | [Hidden Flower Garden](../official/instances/hidden-flower-garden.md) | 20–40 | Story run | Story, once |
 | [Sanctuary Purification](../official/instances/sanctuary-purification.md) | 20–40 | Claimed from the Priest in Rachel when you turn in; turning in both Wolves quests together still pays once | Daily (shared with Wolves Gathering Place) |
 | [Thanatos Tower](../official/instances/thanatos-tower.md) | 20–40 | Only with *Reward Option 2* | Daily |

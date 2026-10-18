@@ -11,6 +11,7 @@ On top of the standard rAthena player commands, Miracle adds these:
 | `@donate` | Opens the donation shops (PoD Shop and Cash Shop). |
 | `@statsview` | Lists every bonus on your character from gear, cards, enchants, combos and buffs. See [below](#statsview). |
 | `@alootid2` | Saves up to 10 named autoloot lists and loads one with a single command. See [below](#alootid2). |
+| `@hera <question>` | Asks [Hera](hera.md) a question about Miracle from anywhere. She answers you privately. |
 | `@dummy` | Warps you to the Dummy Punching Bags in Prontera. |
 | `@pvpladder` | Opens the PvP/GvG ladder menu from anywhere. See [PvP & WoE](../content/pvp-woe.md). |
 

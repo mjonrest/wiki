@@ -4,6 +4,11 @@ The **Instant Warper** stands in every town (in Prontera at `/navi prontera 159/
 
 Maps from the newest content are tagged <span style="color:#00b000">**[New]**</span> in the menus.
 
+## Special Areas
+
+The **Special Areas** menu has the custom hubs. Its first entry, **Vending Zone (Morroc)**, takes you to
+`morocc 156/93`, where players open their shops (Prontera is a [no-vending zone](vending.md)).
+
 ## New: Episode 21 and Chapter 1
 
 These maps came with [Episode 21](../official/story/ep21.md) and [Chapter 1](../official/story/ch1.md).

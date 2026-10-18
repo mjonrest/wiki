@@ -68,6 +68,8 @@ server's own scripts.
 the Daily Quest Manager, the World Boss NPC, the Episode Skip NPC and the **Quest Area** NPC
 ({{ npc_where("Quest Area") }}) that warps you to the Quest Room.
 
+Prontera is a **no-vending zone**: open your shops in the [Vending Zone](guide/vending.md) in Morroc.
+
 **The Quest Room** (`moc_para01`) is where most custom NPCs live: the Quest Shop, the enchanters, the point
 merchants, the Card Trader, Hunting Missions and the gacha machines.
 
