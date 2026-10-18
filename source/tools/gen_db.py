@@ -20,6 +20,7 @@ import describe  # noqa: E402
 import albums  # noqa: E402
 import gen_sources  # noqa: E402
 import iteminfo  # noqa: E402
+import spawns as spawn_db  # noqa: E402
 from rodb import ROOT  # noqa: E402
 
 CHUNK = 1000  # detail files hold the ids id//CHUNK*CHUNK .. +CHUNK-1
@@ -126,21 +127,6 @@ def _mob_name(mob):
     return mob.get("JapaneseName") if not mob.get("Name") else mob["Name"]
 
 
-def _spawns():
-    """{mob id: [[map, count], ...]} from permanent spawns in every loaded script."""
-    import official
-    import main
-    files = official.official_scripts() + [f for f in main.enabled_scripts() if os.path.exists(os.path.join(ROOT, f))]
-    spawn = re.compile(r"^([\w@-]+),\d+,\d+(?:,\d+,\d+)?\t(?:boss_)?monster\t[^\t]+\t(\d+),(\d+)")
-    out = defaultdict(lambda: defaultdict(int))
-    for rel in dict.fromkeys(files):
-        for line in official._read(rel).splitlines():
-            m = spawn.match(line)
-            if m:
-                out[int(m.group(2))][m.group(1)] += int(m.group(3))
-    return {k: sorted(([m, n] for m, n in v.items()), key=lambda x: -x[1]) for k, v in out.items()}
-
-
 def _boxes(items, item_by_aegis):
     """({item id: [[box id, chance %|null], ...]}, {box id: [[item id, chance|null, amount], ...]})."""
     groups = ydb.table("db/item_group_db.yml", "Group")
@@ -174,7 +160,7 @@ def build(out, dir_urls=True):
     items, mobs, skills = ydb.items(), ydb.mobs(), ydb.skills()
     by_aegis = {it.get("AegisName"): iid for iid, it in items.items() if it.get("AegisName")}
     skill_by_name = {s.get("Name"): sid for sid, s in skills.items()}
-    spawns = _spawns()
+    spawns, summoned = spawn_db.permanent(), spawn_db.summoned()
 
     # Monsters, and the drop side of items.
     dropped_by = defaultdict(list)
@@ -196,7 +182,7 @@ def build(out, dir_urls=True):
         mob_index.append([mid, name, mob.get("Level", 1), mob.get("Hp", 1), mob.get("Race", "Formless"),
                           f"{mob.get('Element', 'Neutral')} {mob.get('ElementLevel', 1)}", mob.get("Size", "Small"),
                           bt, 1 if mid in spawns else 0, mob.get("BaseExp", 0), mob.get("JobExp", 0),
-                          " ".join(m for m, _ in spawns.get(mid, [])[:12])])
+                          " ".join(list(dict.fromkeys(s[0] for s in spawns.get(mid, [])))[:12])])
         mob_detail[mid // CHUNK][mid] = {
             "aegis": mob.get("AegisName"),
             "stats": {k: mob.get(k, 0) for k in ("Level", "Hp", "Sp", "BaseExp", "JobExp", "MvpExp", "Attack",
@@ -209,6 +195,7 @@ def build(out, dir_urls=True):
             "modes": _flags(mob.get("Modes")),
             "drops": drops,
             "spawns": spawns.get(mid, []),
+            "summoned": summoned.get(mid, []),
         }
 
     # Items.

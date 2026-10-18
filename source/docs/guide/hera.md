@@ -6,24 +6,21 @@ Hera heals and buffs you for free, and she can answer your questions about Mirac
 
 ## Healing
 
-Click Hera, or say a chat message with **heal** in it near her (for example `Hera, heal me`). She heals you to full
+Click Hera, or say a chat message with **heal** in it next to her (for example `Hera, heal me`). Healing only
+works next to her in Prontera. She heals you to full
 and gives Increase AGI and Blessing for 5 minutes. [VIP](vip.md) players get the bigger 30-minute package: status
 cures, AP, food buffs, Assumptio, Impositio, Suffragium, Sacrament and your class Spirit.
 See [New Players](new-players.md#3-heal-and-buff-for-free) for the details.
 
 ## Ask Hera a question
 
-There are two ways to ask:
+Stand near Hera in Prontera and say `Hera, <question>` in normal chat. There is no command to ask her from
+somewhere else.
 
-| How | Where | Who hears the answer |
-|---|---|---|
-| Say `Hera, <question>` in normal chat | Standing near her | You choose **Only me** or **Tell everyone** |
-| Type `@hera <question>` | Anywhere on the server | Only you (private message) |
+Examples: `Hera, when is hell raid?` · `Hera, where do I get MVP Souls?` · `Hera, is eddga alive?`
 
-Examples: `Hera, when is hell raid?` · `@hera where do I get MVP Souls?` · `@hera is eddga alive?`
-
-- If you pick **Tell everyone**, Hera says her answer out loud to everyone around her. Only her answer is
-  said in public, never your question.
+- She asks whether to answer **Only me** (private messages) or **Tell everyone** (she says it out loud to everyone
+  around her). Only her answer is said in public, never your question.
 - A typical answer takes a few seconds. If she needs longer, she says so; ask her anything again later and
   she gives you that answer first.
 - One question at a time, **20 seconds** between questions and **30 questions a day** per account

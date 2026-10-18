@@ -548,10 +548,29 @@
       if (d.drops.length) h += "<h3>Drops</h3>" + table(["Item", "Chance", ""], d.drops.map(function (x) {
         return [itemLink(x[0], items), pct(x[1]), (x[2] === "mvp" ? '<span class="db-chip db-mvp">MVP reward</span> ' : x[2] === "bonus" ? '<span class="db-chip">Kill bonus</span> ' : "") + (x[3] ? "<small>can't be stolen</small>" : "")];
       }));
-      h += "<h3>Where to find</h3>" + (d.spawns.length ? table(["Map", "Amount"], d.spawns.map(function (sp) { return ["<code>" + esc(sp[0]) + "</code>", sp[1]]; }))
-        : "<p>No permanent spawn. It appears in instances, events or by summon.</p>");
+      var summ = d.summoned || [];
+      h += "<h3>Where to find</h3>" + (d.spawns.length ? table(["Map", "Amount", "Respawn"], d.spawns.map(function (sp) { return ["<code>" + esc(sp[0]) + "</code>", sp[1], respawn(sp[2], sp[3])]; }))
+        : "<p>No permanent spawn" + (summ.length ? "." : ". The wiki found no instance, event or summon that makes it appear either, so it may not be used on Miracle.") + "</p>");
+      if (summ.length) {
+        var places = summ.filter(function (x) { return x[0] !== "@item"; }), by = summ.filter(function (x) { return x[0] === "@item"; });
+        if (places.length) h += "<h4>Also appears in</h4><ul>" + places.map(function (x) {
+          return "<li>" + (x[1] ? '<a href="' + guideUrl(x[1]) + '">' + esc(x[0]) + "</a>" : "Summoned by a script on <code>" + esc(x[0]) + "</code>") + "</li>";
+        }).join("") + "</ul>";
+        if (by.length) h += "<h4>Summoned with</h4><ul>" + by.map(function (x) { return "<li>" + itemLink(x[1], items) + "</li>"; }).join("") + "</ul>";
+      }
       root.innerHTML = h;
     });
+  }
+
+  // Respawn time of a spawn line: delay1 plus a random 0 to delay2 (ms).
+  function respawn(d1, d2) {
+    d1 = d1 || 0; d2 = d2 || 0;
+    if (d1 < 60000 && d2 < 60000) return "Instant";
+    function t(ms) {
+      var m = Math.round(ms / 60000), h = Math.floor(m / 60); m %= 60;
+      return [h ? h + " h" : "", m ? m + " min" : ""].filter(Boolean).join(" ") || "0 min";
+    }
+    return d2 ? t(d1) + " ~ " + t(d1 + d2) : t(d1);
   }
 
   function perLevel(v, unit) {
