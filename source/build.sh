@@ -3,6 +3,9 @@
 # Usage: MIRACLE_SERVER=/path/to/Miracle-MMO ./build.sh   (defaults to ../../Miracle-MMO)
 set -e
 cd "$(dirname "$0")"
+# Fixed hash seed so sets come out in the same order on every build; otherwise lists like an NPC's rewards
+# shuffle between builds and every rebuild changes files that did not really change.
+export PYTHONHASHSEED=0
 out=$(mktemp -d)
 mkdocs build --strict --site-dir "$out"
 cd ..
