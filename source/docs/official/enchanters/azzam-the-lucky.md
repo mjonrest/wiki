@@ -196,6 +196,9 @@ All seven Star enchants (Mettle, Master Archer, Sharp, Spell, Speed, Vital, Spir
 
 Choose the Star Cluster you want. It always succeeds. Slot 2 must be empty.
 
+{{ item(1001599) }} comes from the [Constellation Tower](../instances/constellation-tower.md#rewards) clear reward:
+every player gets as many as Meteorite Fragments.
+
 | Enchant | Cost |
 |---|---|
 | {{ item(313024) }} | 15 {{ item(1000442) }}, 10 {{ item(1000444) }}, 15 {{ item(1000447) }}, 20 {{ item(1001599) }}, 5,000,000z |
