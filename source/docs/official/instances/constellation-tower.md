@@ -139,6 +139,7 @@ The party leader talks to Betelgeuse to start. The fight has three phases, and B
 | {{ item(1000372) }} | 10 + 0.6 × T |
 | {{ item(1000373) }} | 5 + T ÷ 4 |
 | {{ item(1000397) }} | T ÷ 100 (max 10) |
+| {{ item(1001599) }} | Same as {{ item(1000373) }}, bonuses included |
 
 On top of that:
 
@@ -152,7 +153,8 @@ On top of that:
 | 1000% | — | +60 dust, +30 fragments, +2 souls |
 
 For example, a full 600% run on floor 50 gives 390 dust, 165 fragments and 8 souls each. A full 1000% run on floor
-75 gives 830 dust, 365 fragments and 17 souls each.
+75 gives 830 dust, 365 fragments and 17 souls each. You also get as many {{ item(1001599) }} as Meteorite Fragments (165 or 365
+in these examples, and always at least 5). They are the Slot 2 material at [Azzam the Lucky](../enchanters/azzam-the-lucky.md#slot-2-star-clusters-selectable).
 
 **Treasure boxes.** Boxes appear in the arena when Betelgeuse dies. Opening a box drops its items on the ground.
 
