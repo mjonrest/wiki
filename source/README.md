@@ -42,12 +42,10 @@ When the rebuild changes the database it starts **Sync images** for new pictures
 Both repositories need the secret `WIKI_SYNC_TOKEN` (Settings > Secrets and variables > Actions): a fine-grained
 GitHub token with access to `mjonrest/Miracle-MMO` and `mjonrest/wiki`, permission **Contents: Read and write**.
 
-On the web server, pull the wiki on a timer so new builds go live without anyone logging in, for example with
-cron (`crontab -e`):
-
-```
-*/5 * * * * cd /path/to/wiki && git pull -q --ff-only
-```
+The **Deploy to web host** workflow (`.github/workflows/deploy.yml`) then uploads the built site over FTP, sending
+only the files that changed. It needs three secrets with the same login WinSCP uses: `FTP_SERVER`, `FTP_USERNAME`
+and `FTP_PASSWORD`. The folder defaults to `domains/miracle-mmo.com/public_html/wiki/`; set the repository variable
+`FTP_DIR` to change it, and `FTP_PROTOCOL` to `ftps` if the host needs it.
 
 To build by hand instead:
 
