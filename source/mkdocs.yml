@@ -80,6 +80,8 @@ nav:
       - Currencies & Points: guide/currencies.md
       - Commands: guide/commands.md
       - Warper: guide/warper.md
+      - Hera (Healer & Helper): guide/hera.md
+      - Vending Zone: guide/vending.md
       - VIP: guide/vip.md
       - Anti-bot & Fair Play: guide/fair-play.md
   - Shops:
@@ -104,6 +106,7 @@ nav:
   - Special:
       - Tomb of the Fallen: special/tomb-of-the-fallen.md
       - Abyssal Bloody Branch: special/abyssal-bloody-branch.md
+      - MVP Spawns & Respawn Times: special/mvp-spawns.md
       - Illusion & Summoned Bosses: special/boss-spawns.md
       - jRO Cards from Card Albums: special/jro-card-album.md
   - Content:

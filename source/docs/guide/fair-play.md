@@ -12,11 +12,17 @@ Miracle runs **Gepard Shield** anti-cheat. Gepard identifies each computer, and 
 
 ## One character per computer
 
-These maps allow only one character per computer. A second one is warped back to Prontera:
+These places allow only one character per computer. A second one is refused at the NPC or warped back to Prontera:
 
 - The [World Boss](../content/world-boss.md) map
 - [Hell Raid](../content/hell-raid.md) (`ordeal_3-1`) and the Battle Rumble arena
 - PvP rooms and the `guild_vs` arenas
+- [Endless Tower](../official/instances/endless-tower.md)
+
+A character sitting in an autotrade shop does not count. The World Boss and Hell Raid also pay only **one reward
+per computer**, even if more than one of your characters is on the map.
+
+If you see *"Your client has no device ID"*, restart the game client and try again.
 
 ## Captcha (macro checker)
 

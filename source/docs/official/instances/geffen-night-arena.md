@@ -15,9 +15,12 @@ Geffen Night Arena is a **solo** boss-rush tournament. You face up to 10 rounds 
 | Cooldown | Once per day. Entering starts the cooldown, which resets at 04:00 server time. |
 | Time limit | The instance closes 60 minutes after it is created. |
 
-1. Talk to the Greedy Looking Man in Geffen and agree to join the tournament. This creates the arena.
-2. Talk to him again and choose **Yes** to be sent to the arena entrance in the Dimensional Gap (`dali02`).
-3. Step into the **Portal** to enter.
+1. Talk to the Greedy Looking Man in Geffen and agree to join the tournament. This creates the arena and sends you
+   straight to the arena entrance in the Dimensional Gap (`dali02`).
+2. Step into the **Portal** to enter.
+
+The arena closes if nobody enters it within **5 minutes**. If that happens, talk to the Greedy Looking Man again to
+open a new one. Your party cannot hold another memorial dungeon at the same time.
 
 ### How the tournament works
 
@@ -49,7 +52,7 @@ The reward depends on the last round you **cleared**:
 | 9 | 56 | 4 | 2 |
 | 10 (champion) | 89 | 5 | 3 |
 
-You also get **20 to 40 Instance Points** when you collect the reward.
+You also get **20 to 40 Instance Points** when you collect the reward, if you won at least one round.
 
 Spend the coins and certificates at the **Reward Geffen Night Arena** vending machine at `/navi dali02 85/70`. It has a default, special and card shop, plus an enchant option.
 

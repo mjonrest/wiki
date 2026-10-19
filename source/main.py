@@ -920,11 +920,32 @@ def bonus_roll_table(*boxes):
     return "\n".join(out)
 
 
+def mvp_spawns(fixed=True):
+    """MVPs with a permanent spawn (map, amount, respawn time), or with fixed=False the MVPs that only come from
+    instances, events or summon items."""
+    import spawns
+    import ydb
+    perm, summ = spawns.permanent(), spawns.summoned()
+    mvps = sorted((m for m, v in ydb.mobs().items() if (v.get("Modes") or {}).get("Mvp") or v.get("MvpExp")),
+                  key=lambda m: (mob_name(m).lower(), m))
+    rows = []
+    for m in mvps:
+        if fixed:
+            for mp, n, d1, d2 in perm.get(m, []):
+                rows.append([mob(m), f"`{mp}`", n, spawns.respawn_text(d1, d2)])
+        elif m not in perm and summ.get(m):
+            places = [f"[{_md_text(a)}]({_root()}{b})" if b else f"`{a}`" for a, b in summ[m] if a != "@item"]
+            items = [item_name(b) for a, b in summ[m] if a == "@item"]
+            rows.append([mob(m), ", ".join(places) or "—", ", ".join(items) or "—"])
+    head = ["MVP", "Map", "Amount", "Respawn"] if fixed else ["MVP", "Appears in", "Summon item"]
+    return _table(head, rows)
+
+
 def define_env(env):
     global ENV
     ENV = env
     for fn in (item, shops_in, items_table, items_list, shop, barter, quest_shop, quest_shop_tabs, slot_enchanter,
                item_enchant, array_seq, event_schedule, costume_drops, npc_directory, npc_where, arrays, scalar,
                fmt, item_name, mob_name, official_instances, official_instance_count,
-               official_npcs, instance_page, mob, endless_tower, cash_shop_price, bonus_roll_table, bonus_roll_boxes):
+               official_npcs, instance_page, mob, endless_tower, cash_shop_price, bonus_roll_table, bonus_roll_boxes, mvp_spawns):
         env.macro(fn)

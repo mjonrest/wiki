@@ -13,7 +13,7 @@ Talk to the Hell Raid Guardian to enter. You cannot join once the raid has start
 
 1. **70 monsters** spawn around the arena.
 2. When all are dead, a **round boss** appears 10 seconds later.
-3. Killing the boss mails every player on the map the round reward.
+3. Killing the boss mails every player on the map the round reward (one reward per computer).
 4. Talk to the **Hell Raid Guide** within 5 minutes and donate **10 Event Points** together
    (each account can donate once per round) to start the next round. If nobody does, the raid ends.
 
