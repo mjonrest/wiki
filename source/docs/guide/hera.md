@@ -2,7 +2,8 @@
 
 **Location:** {{ npc_where("Hera") }} · she walks around the Prontera fountain
 
-Hera heals and buffs you for free, and she can answer your questions about Miracle.
+Hera heals and buffs you for free, and she can answer your questions about Miracle, in game and on
+[Discord](#ask-hera-on-discord).
 
 ## Healing
 
@@ -42,6 +43,20 @@ She can also tell you a rough picture of what is going on right now:
 | Your own progress | Your instance cooldowns, instance points, daily quests, hunting mission, event / cash / PvP points, mining EXP and VIP time |
 
 Ask "What's happening now?" for a short summary. Your own progress can lag a few minutes behind the game.
+
+## Ask Hera on Discord
+
+Hera also answers in the Miracle Discord. Mention her or start your message with her name:
+
+`@Hera when is hell raid?` · `Hera, where do I get MVP Souls?`
+
+- She replies to your message. Answers are short and can only link to this wiki.
+- **20 seconds** between questions and **20 questions a day** per Discord user. If you ask again too soon she
+  puts an hourglass reaction on your message instead of answering. There is also a daily limit for all of Discord
+  together; once it is used up, ask her in game or read the wiki.
+- She knows the same wiki and live server info as in game, but **not your own progress**: Discord isn't linked to
+  your game account, so ask about your cooldowns, points or dailies next to her in Prontera.
+- She can't heal, buff or do anything else in game from Discord. She doesn't answer DMs.
 
 ### What she won't do
 

@@ -598,6 +598,7 @@
         ["Needs weapon", s.Weapon ? chips(s.Weapon) : ""], ["Needs state", s.State ? esc(nice(s.State)) : ""],
         ["Items used", s.ItemCost ? s.ItemCost.map(function (c) { return c[1] + " × " + itemLink(c[0], items) + (c[2] ? " <small>(Lv " + c[2] + ")</small>" : ""); }).join("<br>") : ""],
       ]);
+      if (s.note) h += '<div class="admonition note"><p class="admonition-title">Miracle change</p><p>' + esc(s.note) + "</p></div>";
       if (s.jobs.length) h += "<h3>Learned by</h3><p>" + s.jobs.map(jobLink).join(", ") + "</p>";
       root.innerHTML = h;
     });

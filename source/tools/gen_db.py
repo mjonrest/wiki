@@ -23,6 +23,12 @@ import iteminfo  # noqa: E402
 import spawns as spawn_db  # noqa: E402
 from rodb import ROOT  # noqa: E402
 
+# Skills that work differently on Miracle than the skill_db says (changes made in the server's C++ code).
+# Also listed on docs/guide/skill-changes.md, so keep both in step.
+SKILL_NOTES = {
+    "BO_MAYHEMIC_THORNS": "Hits 4 times while Research Report is active, and 3 times without it.",
+}
+
 CHUNK = 1000  # detail files hold the ids id//CHUNK*CHUNK .. +CHUNK-1
 
 
@@ -340,6 +346,8 @@ def build(out, dir_urls=True):
             row["Weapon"] = _flags(req.get("Weapon"))
         if req.get("State"):
             row["State"] = req["State"]
+        if SKILL_NOTES.get(s.get("Name")):
+            row["note"] = SKILL_NOTES[s.get("Name")]
         skill_out.append(row)
 
     stats = defaultdict(dict)
