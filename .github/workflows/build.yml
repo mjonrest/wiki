@@ -45,9 +45,11 @@ jobs:
       - name: Skip the hourly run when the game has not changed
         id: check
         env:
-          TOKEN: ${{ secrets.WIKI_SYNC_TOKEN }}
+          GH_TOKEN: ${{ secrets.WIKI_SYNC_TOKEN }}
         run: |
-          game=$(git ls-remote "https://x-access-token:$TOKEN@github.com/mjonrest/Miracle-MMO.git" refs/heads/main | cut -f1)
+          # Asked through the API: git ls-remote would send the wiki's own checkout token, which can't see the game repo.
+          game=$(gh api repos/mjonrest/Miracle-MMO/commits/main --jq .sha)
+          if [ -z "$game" ]; then echo "::error::Could not read Miracle-MMO main with WIKI_SYNC_TOKEN"; exit 1; fi
           echo "game=$game" >> "$GITHUB_OUTPUT"
           if [ "${{ github.event_name }}" = schedule ] && [ "$game" = "$(cat .game-commit 2>/dev/null)" ]; then
             echo "Already built from $game"
