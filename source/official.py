@@ -422,8 +422,10 @@ class _Resolver:
 
 
 @functools.lru_cache(None)
-def script_details(rel):
-    """Monsters spawned, items given and shops of one official script file."""
+def script_details(rel, maps=None):
+    """Monsters spawned, items given and shops of one official script file.
+
+    With `maps`, items given only count from NPCs placed on those maps."""
     text = "\n".join(b for _, b in blocks(rel))
     arrays = _setarrays(text)
     mobs = []
@@ -457,7 +459,9 @@ def script_details(rel):
                 add_mob(v)
 
     rewards = OrderedDict()
-    for _, body in blocks(rel):
+    for hdr, body in blocks(rel):
+        if maps is not None and hdr.group("map") not in maps:
+            continue
         for call in re.findall(r"\b(?:getitem2|getitembound2|getitembound|getitem|rentitem2|rentitem|makeitem2|makeitem)\b\s*\(?\s*([^;]+);", body):
             args = _split_args(call)
             if len(args) < 2:
@@ -467,7 +471,7 @@ def script_details(rel):
                 iid = _item_ref(v)
                 if iid and iid not in rewards:
                     rewards[iid] = amt
-    for var, vals in arrays.items():
+    for var, vals in arrays.items() if maps is None else ():
         if re.search(r"reward|prize|box|item", var, re.I) and not re.search(r"amount|count|cost|req", var, re.I):
             for v in vals:
                 iid = _item_ref(v)
@@ -529,7 +533,10 @@ def instance_details(rec):
         d = script_details(rel)
         mobs += [m for m in d["mobs"] if m not in mobs]
         if rel == rec["file"] and "instances" not in rel:
-            continue  # a quest script: its rewards and shops belong to the quests
+            # A quest script: its rewards and shops belong to the quests, except what NPCs inside the instance give.
+            for k, v in script_details(rel, tuple(instance_maps(rec["name"]))).get("rewards", {}).items():
+                rewards.setdefault(k, v)
+            continue
         for k, v in d["rewards"].items():
             rewards.setdefault(k, v)
         shops += [s for s in d["shops"] if s not in shops]
