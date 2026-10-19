@@ -1,6 +1,6 @@
 # Uploads the built wiki to the web host over FTP, so the live site at miracle-mmo.com/wiki follows main
 # without anyone copying files by hand. Only files that changed since the last upload are sent
-# (the action keeps a .ftp-deploy-sync-state.json file in the wiki folder on the host to know what is there).
+# (source/tools/deploy_ftp.sh keeps the uploaded commit in .deployed-commit in the wiki folder on the host).
 # Runs after "Rebuild wiki" and "Sync images" (their commits don't start workflows on their own), on any other
 # push to main, and by hand from the Actions tab.
 # Needs the secrets FTP_SERVER, FTP_USERNAME and FTP_PASSWORD: the same details WinSCP uses to log in.
@@ -42,17 +42,14 @@ jobs:
         if: steps.check.outputs.skip != 'true'
         with:
           ref: main
-      - uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - if: steps.check.outputs.skip != 'true'
+        run: sudo apt-get update -q && sudo apt-get install -y -q lftp
+      - name: Upload
         if: steps.check.outputs.skip != 'true'
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ${{ vars.FTP_PROTOCOL || 'ftp' }}
-          server-dir: ${{ vars.FTP_DIR || 'domains/miracle-mmo.com/public_html/wiki/' }}
-          exclude: |
-            **/.git*
-            **/.git*/**
-            .github/**
-            source/**
-            .game-commit
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_DIR: ${{ vars.FTP_DIR || 'domains/miracle-mmo.com/public_html/wiki' }}
+          FTP_PROTOCOL: ${{ vars.FTP_PROTOCOL || 'ftp' }}
+        run: source/tools/deploy_ftp.sh
