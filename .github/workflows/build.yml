@@ -1,0 +1,95 @@
+# Rebuilds the wiki from the game repository (mjonrest/Miracle-MMO) and commits the result to main, so the wiki
+# follows the game files without anyone running build.sh by hand.
+# Runs when:
+#   - the game repository pushes to main (its "Update wiki" workflow sends a "game-updated" event here),
+#   - a wiki page or tool in source/ changes on main,
+#   - every hour, as a safety net (skipped when the game has not changed since the last build),
+#   - by hand from the Actions tab ("Run workflow").
+# Needs the secret WIKI_SYNC_TOKEN: a token that can read mjonrest/Miracle-MMO (it is private).
+name: Rebuild wiki
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [game-updated]
+  schedule:
+    - cron: "17 * * * *"
+  push:
+    branches: [main]
+    paths: [source/**]
+
+permissions:
+  contents: write
+  actions: write   # to start "Sync images", which commits pushed with this workflow's token don't start
+
+concurrency:
+  group: rebuild-wiki
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Check the token is set
+        env:
+          TOKEN: ${{ secrets.WIKI_SYNC_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::error::Add the WIKI_SYNC_TOKEN secret (Settings > Secrets and variables > Actions). See source/README.md."
+            exit 1
+          fi
+      - name: Skip the hourly run when the game has not changed
+        id: check
+        env:
+          TOKEN: ${{ secrets.WIKI_SYNC_TOKEN }}
+        run: |
+          game=$(git ls-remote "https://x-access-token:$TOKEN@github.com/mjonrest/Miracle-MMO.git" refs/heads/main | cut -f1)
+          echo "game=$game" >> "$GITHUB_OUTPUT"
+          if [ "${{ github.event_name }}" = schedule ] && [ "$game" = "$(cat .game-commit 2>/dev/null)" ]; then
+            echo "Already built from $game"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.check.outputs.skip != 'true'
+        with:
+          repository: mjonrest/Miracle-MMO
+          ref: ${{ steps.check.outputs.game }}
+          token: ${{ secrets.WIKI_SYNC_TOKEN }}
+          path: game
+      - uses: actions/setup-python@v5
+        if: steps.check.outputs.skip != 'true'
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: source/requirements.txt
+      - if: steps.check.outputs.skip != 'true'
+        run: python -m pip install --quiet -r source/requirements.txt
+      - name: Build
+        if: steps.check.outputs.skip != 'true'
+        env:
+          MIRACLE_SERVER: ${{ github.workspace }}/game
+        run: |
+          (cd source && python tools/gen_instance_pages.py)
+          rm -rf game/.git
+          mv game "$RUNNER_TEMP/game"
+          MIRACLE_SERVER="$RUNNER_TEMP/game" source/build.sh
+          echo "${{ steps.check.outputs.game }}" > .game-commit
+      - name: Commit the rebuilt site
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          git add -A
+          if git diff --cached --quiet; then echo "Nothing changed"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Rebuild wiki from Miracle-MMO ${{ steps.check.outputs.game }}"
+          git pull --rebase origin main
+          git push origin HEAD:main
+          if git diff --name-only HEAD~1 HEAD | grep -q '^db/data/'; then
+            gh workflow run images.yml --ref main
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
