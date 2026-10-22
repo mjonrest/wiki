@@ -21,6 +21,7 @@ import albums  # noqa: E402
 import gen_sources  # noqa: E402
 import iteminfo  # noqa: E402
 import spawns as spawn_db  # noqa: E402
+import rodb  # noqa: E402
 from rodb import ROOT  # noqa: E402
 
 # Skills that work differently on Miracle than the skill_db says (changes made in the server's C++ code).
@@ -164,7 +165,7 @@ def _boxes(items, item_by_aegis):
 def build(out, dir_urls=True):
     conf = battle_conf()
     items, mobs, skills = ydb.items(), ydb.mobs(), ydb.skills()
-    by_aegis = {it.get("AegisName"): iid for iid, it in items.items() if it.get("AegisName")}
+    by_aegis = rodb.AegisMap((it.get("AegisName"), iid) for iid, it in items.items() if it.get("AegisName"))
     skill_by_name = {s.get("Name"): sid for sid, s in skills.items()}
     spawns, summoned = spawn_db.permanent(), spawn_db.summoned()
 
@@ -297,6 +298,8 @@ def build(out, dir_urls=True):
                                 "Range", "Slots", "Gender", "WeaponLevel", "ArmorLevel", "EquipLevelMin",
                                 "EquipLevelMax", "Refineable", "Gradable", "View", "Script", "EquipScript",
                                 "UnEquipScript") if it.get(k) not in (None, "", 0, False)}
+        if isinstance(it.get("Delay"), dict) and it["Delay"].get("Duration"):
+            d["Delay"] = it["Delay"]["Duration"]
         for k in ("Jobs", "Classes", "Locations", "Trade", "Flags"):
             if _flags(it.get(k)):
                 d[k] = _flags(it.get(k))

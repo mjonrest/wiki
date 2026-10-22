@@ -56,6 +56,18 @@ def official_scripts():
     return [f for f in files if os.path.exists(os.path.join(ROOT, f))]
 
 
+@functools.lru_cache(None)
+def loaded_scripts():
+    """Every script file the server loads: the official ones plus all of npc/scripts_custom.conf (npc/miracle too),
+    so exchange NPCs placed in custom scripts are found."""
+    extra = []
+    for line in _read("npc/scripts_custom.conf").splitlines():
+        m = re.match(r"^npc:\s*(\S.*?)\s*$", line)
+        if m and os.path.exists(os.path.join(ROOT, m.group(1))):
+            extra.append(m.group(1))
+    return list(dict.fromkeys(official_scripts() + extra))
+
+
 def instance_scripts():
     """Official scripts plus the official-style ones the server loads from scripts_custom.conf (npc/ep17,
     npc/custom); Miracle's own npc/miracle scripts are covered by the Content pages."""
@@ -422,6 +434,17 @@ class _Resolver:
 
 
 @functools.lru_cache(None)
+def _amounts(old, amt):
+    """Merge one more given amount into an 'a' or 'lo–hi' range ('' when unknown)."""
+    if old is None:
+        return amt
+    nums = [int(n) for n in re.findall(r"\d+", old or "")] + ([int(amt)] if amt else [])
+    if not nums:
+        return ""
+    lo, hi = min(nums), max(nums)
+    return str(lo) if lo == hi else f"{lo}–{hi}"
+
+
 def script_details(rel, maps=None):
     """Monsters spawned, items given and shops of one official script file.
 
@@ -469,8 +492,8 @@ def script_details(rel, maps=None):
             amt = args[1] if args[1].isdigit() else ""
             for v in res.values(args[0], body):
                 iid = _item_ref(v)
-                if iid and iid not in rewards:
-                    rewards[iid] = amt
+                if iid:
+                    rewards[iid] = _amounts(rewards.get(iid), amt)
     for var, vals in arrays.items() if maps is None else ():
         if re.search(r"reward|prize|box|item", var, re.I) and not re.search(r"amount|count|cost|req", var, re.I):
             for v in vals:
@@ -625,7 +648,7 @@ def barter_db():
 def callshop_spots():
     """[(shop name or prefix, npc name, map, x, y)] for NPCs that open a barter/market shop."""
     out = []
-    for rel in official_scripts():
+    for rel in loaded_scripts():
         for hdr, body in blocks(rel):
             if not hdr.group("map") or "@" in hdr.group("map"):
                 continue
@@ -655,7 +678,7 @@ def _block_items(body, cmd_regex, arrays):
 def item_users():
     """{item id: [trade dicts]} for every visible official NPC that takes the item."""
     out = {}
-    for rel in official_scripts():
+    for rel in loaded_scripts():
         for hdr, body in blocks(rel):
             if not hdr.group("map") or "@" in hdr.group("map"):
                 continue

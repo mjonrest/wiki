@@ -65,3 +65,9 @@ for you with a skip ticket. The freebies include the tickets for 16, 17 and 18.
 
 The **Dummy Punching Bags** in south-east Prontera (around 220, 70) let you test your damage.
 Type `@dummy` to warp straight to them.
+
+## 7. Pick up your loot fast
+
+Items dropped on the ground **disappear after {{ floor_item_seconds() }} seconds**, and that includes items a player
+drops. Turn on `@autoloot`, or set up item lists with [`@alootid2`](commands.md#alootid2), so drops go straight into
+your inventory.

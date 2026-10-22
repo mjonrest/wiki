@@ -54,7 +54,21 @@ The reward depends on the last round you **cleared**:
 
 You also get **20 to 40 Instance Points** when you collect the reward, if you won at least one round.
 
-Spend the coins and certificates at the **Reward Geffen Night Arena** vending machine at `/navi dali02 85/70`. It has a default, special and card shop, plus an enchant option.
+### Reward exchange
+
+Spend what you win at the {{ npc("Reward Geffen Night Arena", "dali02") }} vending machine, right next to the arena portal at
+`/navi dali02 85/70`. It has four menus:
+
+- **Default Product List**: Geffen magic gear and Geffen Magic order forms for {{ item(1000316) }}.
+- **Special Product List**: upgrade that gear to its Geffen Night Arena version (bring the base item plus coins).
+- **Card Product List**: trade 7 copies of a normal card plus 10 {{ item(1000366) }} for the opponent's Midnight card.
+- **Enchantment**: upgrade items for the Geffen Night Arena armor, hoods, rings and shields. Each costs one
+  {{ item(1000317) }}, coins and Zeny. Use it from your inventory to open the upgrade window for that gear.
+
+{{ barter("GeffenNightArena_SHOP_01", "Default Product List", collapsed=True) }}
+{{ barter("GeffenNightArena_SHOP_02", "Special Product List", collapsed=True) }}
+{{ barter("GeffenNightArena_SHOP_03", "Card Product List", collapsed=True) }}
+{{ barter("GeffenNightArena_SHOP_04", "Enchantment", collapsed=True) }}
 
 !!! tip "Instance Points"
     Instance Points can be earned once per device for each instance run, up to 1200 per account per day. A rented {{ item(30034) }} adds 50 points per claim. Use `@instancepoints` to see your total.

@@ -184,6 +184,16 @@ def guide_pages(docs_dir):
             names = [n.strip() for n in group.split(";") if n.strip()]
             for name in names:
                 official_npcs.setdefault(name, (rel, names))
+    # Instance pages: their entrance NPCs and the exchange NPCs next to the entrance, unless a guide above claims them.
+    import main
+    for path in sorted(paths):
+        rel = os.path.relpath(path, docs_dir).replace(os.sep, "/")
+        if not rel.startswith("official/instances/"):
+            continue
+        for key in re.findall(r'instance_page\(\s*"([^"]+)"', open(path, encoding="utf-8").read()):
+            names = main.instance_page_npcs(key)
+            for name in names:
+                official_npcs.setdefault(name, (rel, names))
     return custom, official_npcs
 
 
