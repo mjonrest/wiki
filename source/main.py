@@ -220,6 +220,13 @@ def mob(mid, size="sm"):
     return f'{img}[{_md_text(mob_name(mid))}]({_root()}db/monsters.md#{mid}) <small class="iid">#{mid}</small>'
 
 
+def npc(name, map_=""):
+    """NPC name linked to its Database entry (looked up by name and map, since NPC ids change between builds)."""
+    from urllib.parse import quote
+    key = quote(name + (f"@{map_}" if map_ else ""), safe="")
+    return f"[**{_md_text(name)}**]({_root()}db/npcs.md#{key})"
+
+
 def currency_label(currency):
     kind, value = currency
     if kind == "zeny":
@@ -616,17 +623,8 @@ def instance_page(key, overview_only=False):
     if overview_only:
         return "\n".join(out)
 
-    d = {"mobs": [], "rewards": OrderedDict(), "shops": []}
-    for r in recs:
-        dd = official.instance_details(r)
-        d["mobs"] += [m for m in dd["mobs"] if m not in d["mobs"]]
-        for k, v in dd["rewards"].items():
-            d["rewards"].setdefault(k, v)
-        d["shops"] += [x for x in dd["shops"] if x not in d["shops"]]
+    d = _group_details(key)
     db = official.mob_db()
-    # Script helpers (event dummies, invisible counters) are not monsters players fight.
-    d["mobs"] = [m for m in d["mobs"] if not re.match(r"^(Monster \d+|[A-Z0-9_]+|--.*--)$", str(db[m]["name"]))
-                 and db[m]["cls"] != "Battlefield" and int(db[m]["hp"] or 0) > 10]
     bosses = [m for m in d["mobs"] if db[m]["mvp"] or db[m]["cls"] == "Boss"]
     normal = [m for m in d["mobs"] if m not in bosses]
     if bosses:
@@ -655,6 +653,10 @@ def instance_page(key, overview_only=False):
     if trades:
         out += ["## Exchange and crafting", "",
                 "NPCs outside the instance that take what you bring back from it.", "", trades, ""]
+    enchants = _instance_enchants(key, d)
+    if enchants:
+        out += ["## Enchanting", "",
+                "NPCs that enchant the gear this instance and its exchange NPCs give.", "", enchants, ""]
     if d["shops"]:
         out += ["## Shops", "", "\n".join(f"- {s}" for s in d["shops"]), ""]
     return "\n".join(out)
@@ -666,8 +668,42 @@ def _names(ids, limit=8):
     return ", ".join(names) + more
 
 
-def _instance_trades(d):
-    """Table of NPCs that take this instance's materials (etc drops and rewards)."""
+@functools.lru_cache(None)
+def _group_details(key):
+    """Monsters, rewards and shops of one instance page (all its modes)."""
+    ttl, recs = official.group(key)
+    d = {"mobs": [], "rewards": OrderedDict(), "shops": []}
+    for r in recs:
+        dd = official.instance_details(r)
+        d["mobs"] += [m for m in dd["mobs"] if m not in d["mobs"]]
+        for k, v in dd["rewards"].items():
+            d["rewards"].setdefault(k, v)
+        d["shops"] += [x for x in dd["shops"] if x not in d["shops"]]
+    db = official.mob_db()
+    # Script helpers (event dummies, invisible counters) are not monsters players fight.
+    d["mobs"] = [m for m in d["mobs"] if not re.match(r"^(Monster \d+|[A-Z0-9_]+|--.*--)$", str(db[m]["name"]))
+                 and db[m]["cls"] != "Battlefield" and int(db[m]["hp"] or 0) > 10]
+    return d
+
+
+def instance_page_npcs(key):
+    """Names of the NPCs an instance page is the guide for: its entrance NPCs, and the exchange NPCs that stand on
+    an entrance map (Reward Geffen Night Arena, Hugin's Butler). Used to link their Database entries to the page."""
+    ttl, recs = official.group(key)
+    names, maps = [], set()
+    for r in recs:
+        for m, x, y, who in r["entrances"]:
+            maps.add(m)
+            if who and who not in names:
+                names.append(who)
+    for t, _ in _trade_users(_group_details(key)):
+        if t["npc"] and t["spot"][0] in maps and t["npc"] not in names:
+            names.append(t["npc"])
+    return names
+
+
+def _trade_users(d):
+    """[(trade dict, materials of this instance it takes)] for NPCs that take this instance's materials."""
     db, items_by_id = official.mob_db(), rodb.items()[0]
     mats = []
     for mid in d["mobs"]:
@@ -678,28 +714,113 @@ def _instance_trades(d):
     mats += [i for i in d["rewards"] if i not in mats]
     users, droppers = official.item_users(), official.item_droppers()
     here = set(d["mobs"])
-    # Keep the instance's own materials: etc items that few monsters outside it drop.
-    mats = [i for i in mats if items_by_id.get(i, {}).get("type") == "Etc" and 0 < len(users.get(i, [])) <= 6
-            and ((i in d["rewards"] and len(droppers.get(i, set()) - here) <= 6) or (droppers.get(i) and not droppers[i] - here
-                                       and any(db[m]["mvp"] or db[m]["cls"] == "Boss" for m in droppers[i])))]
-    seen, rows = set(), []
+    # Keep the instance's own materials: etc items that few NPCs take and few monsters outside it drop.
+    takers = {i: len({(t["npc"], t["spot"]) for t in users.get(i, [])}) for i in mats}
+    mats = [i for i in mats if items_by_id.get(i, {}).get("type") == "Etc" and 0 < takers[i] <= 8
+            and ((i in d["rewards"] and len(droppers.get(i, set()) - here) <= 6)
+                 # A newer (non-classic) boss drop here that a few monsters elsewhere drop too (Temporal Crystal, Cor Core).
+                 or (droppers.get(i) and (not droppers[i] - here or (i >= 6000 and len(droppers[i] - here) <= 12))
+                     and any(db[m]["mvp"] or db[m]["cls"] == "Boss" for m in droppers[i] & here)))]
+    seen, out = set(), []
     for mat in mats:
         for t in users[mat]:
             key = (t["npc"], t["spot"])
             if key in seen:
                 continue
             seen.add(key)
-            mine = [i for i in t["takes"] if i in mats]
-            if t["kind"] == "barter":
-                gives = [g for g, req in t["recipes"] if any(i in mats for i, _ in req)]
-            else:
-                gives = t["gives"]
-            what = _names(gives) if gives else ""
-            if t["enchants"]:
-                what += ("<br>" if what else "") + "Enchants: " + _names(t["enchants"], 6)
-            m, x, y = t["spot"]
-            rows.append([f"**{t['npc'] or 'NPC'}**<br>`{m} {x}/{y}`", _names(mine, 4), what or "Upgrades or quest use"])
+            out.append((t, [i for i in t["takes"] if i in mats]))
+    return out
+
+
+@functools.lru_cache(None)
+def _enchant_systems():
+    """{enchant id: (target item ids, material item ids)} from the item_enchant database the server loads."""
+    out = {}
+    for rel in ydb.files("db/item_enchant.yml")[1:]:
+        for eid, e in _enchant_db(rel).items():
+            targets = [item_id(a) for a in (e.get("TargetItems") or {})]
+            mats = [item_id(m["Material"]) for slot in (e.get("Slots") or []) for m in slot.get("Materials") or []]
+            mats += [item_id(m["Material"]) for m in ((e.get("Reset") or {}).get("Materials") or [])]
+            out[eid] = ([i for i in targets if i], [i for i in dict.fromkeys(mats) if i])
+    return out
+
+
+@functools.lru_cache(None)
+def _enchant_spots():
+    """[(npc, map, x, y, script, [enchant ids])] for every visible NPC that opens the enchant window."""
+    out = []
+    for rel in official.loaded_scripts():
+        for hdr, body in official.blocks(rel):
+            if not hdr.group("map") or "@" in hdr.group("map"):
+                continue
+            eids = [int(e) for e in dict.fromkeys(re.findall(r"\bitem_enchant\s*\(?\s*(\d+)", body))]
+            if eids:
+                name = hdr.group("name").split("#")[0].split("::")[0].strip()
+                out.append((name, hdr.group("map"), int(hdr.group("x")), int(hdr.group("y")), rel, eids))
+    return out
+
+
+def _instance_enchants(key, d):
+    """Table of enchant NPCs for this instance: placed by its scripts, or working on gear the instance gives."""
+    ttl, recs = official.group(key)
+    files = {f for r in recs for f in official.instance_files(r)}
+    # Gear the instance hands out or its exchange NPCs trade for (monster drops of common gear would add noise).
+    got = set(d["rewards"])
+    for t, _ in _trade_users(d):
+        got |= set(t["gives"])
+    systems, found = _enchant_systems(), OrderedDict()
+    for name, m, x, y, rel, eids in _enchant_spots():
+        mine = [e for e in eids if e in systems and (rel in files or got & set(systems[e][0]))]
+        if mine:
+            spot = found.setdefault((name, m), [x, y, []])
+            spot[2] += [e for e in mine if e not in spot[2]]
+    rows = []
+    for (name, m), (x, y, mine) in found.items():
+        targets = list(dict.fromkeys(i for e in mine for i in systems[e][0]))
+        links = ", ".join(f"[list {e}]({_root()}db/enchants.md#E{e})" for e in mine[:6])
+        rows.append([f"{npc(name, m)}<br>`/navi {m} {x}/{y}`", _names(targets, 6), links])
+    return _table(["NPC", "Enchants", "Enchant lists"], rows) if rows else ""
+
+
+def _instance_trades(d):
+    """Table of NPCs that take this instance's materials (etc drops and rewards)."""
+    rows = []
+    for t, mine in _trade_users(d):
+        if t["kind"] == "barter":
+            gives = [g for g, req in t["recipes"] if any(i in mine for i, _ in req)]
+        else:
+            gives = t["gives"]
+        what = _names(gives) if gives else ""
+        if t["enchants"]:
+            what += ("<br>" if what else "") + "Enchants: " + _names(t["enchants"], 6)
+        m, x, y = t["spot"]
+        who = npc(t["npc"], m) if t["npc"] else "**NPC**"
+        rows.append([f"{who}<br>`{m} {x}/{y}` (`/navi {m} {x}/{y}`)", _names(mine, 4), what or "Upgrades or quest use"])
     return _table(["NPC", "Takes", "Gives"], rows) if rows else ""
+
+
+def map_trades(*maps, title="Every NPC here that trades, crafts or enchants"):
+    """Collapsible table of every NPC on these maps that takes items: barters, crafters, enchanters, quest turn-ins."""
+    seen = OrderedDict()
+    for recs in official.item_users().values():
+        for t in recs:
+            m = t["spot"][0]
+            if m not in maps or not t["npc"]:
+                continue
+            row = seen.setdefault((t["npc"], m), {"spot": t["spot"], "takes": [], "gives": [], "enchants": []})
+            for k in ("takes", "gives", "enchants"):
+                row[k] += [i for i in t[k] if i not in row[k]]
+    rows = []
+    for (name, m), t in sorted(seen.items(), key=lambda kv: (maps.index(kv[0][1]), kv[0][0].lower())):
+        _, x, y = t["spot"]
+        gives = [i for i in t["gives"] if i not in t["takes"]]
+        what = _names(gives) if gives else ""
+        if t["enchants"]:
+            what += ("<br>" if what else "") + "Enchants: " + _names(t["enchants"], 6)
+        rows.append([f"{npc(name, m)}<br>`/navi {m} {x}/{y}`", _names(t["takes"], 4), what or "Upgrades or quest use"])
+    if not rows:
+        return "_No trading NPCs found on these maps._"
+    return _details(f'{title} <span class="count">{len(rows)} NPCs</span>', _table(["NPC", "Takes", "Gives"], rows))
 
 
 def official_npcs(*rels, only=None, limit=3):
@@ -843,6 +964,22 @@ def endless_tower():
     return "\n".join(out)
 
 
+def battle_setting(key, default=""):
+    """A conf/battle/*.conf value (the live server's conf/import can override it)."""
+    for name in sorted(os.listdir(os.path.join(ROOT, "conf", "battle"))):
+        for line in _read(f"conf/battle/{name}").splitlines():
+            m = re.match(r"^\s*(\w+)\s*:\s*(\S+)", line)
+            if m and m.group(1) == key:
+                return m.group(2)
+    return default
+
+
+def floor_item_seconds():
+    """How long a dropped item stays on the floor, in seconds."""
+    ms = int(battle_setting("flooritem_lifetime", "60000"))
+    return f"{ms / 1000:g}"
+
+
 def cash_shop_price(aegis):
     """(tab, price) of an item in the cash shop (db/import/item_cash.yml), or None."""
     for tab in (yaml.safe_load(_read("db/import/item_cash.yml")) or {}).get("Body") or []:
@@ -947,5 +1084,5 @@ def define_env(env):
     for fn in (item, shops_in, items_table, items_list, shop, barter, quest_shop, quest_shop_tabs, slot_enchanter,
                item_enchant, array_seq, event_schedule, costume_drops, npc_directory, npc_where, arrays, scalar,
                fmt, item_name, mob_name, official_instances, official_instance_count,
-               official_npcs, instance_page, mob, endless_tower, cash_shop_price, bonus_roll_table, bonus_roll_boxes, mvp_spawns):
+               official_npcs, instance_page, mob, npc, map_trades, endless_tower, cash_shop_price, floor_item_seconds, bonus_roll_table, bonus_roll_boxes, mvp_spawns):
         env.macro(fn)

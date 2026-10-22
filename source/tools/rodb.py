@@ -33,7 +33,7 @@ def _value(v):
 @functools.lru_cache(None)
 def items():
     """Returns ({id: {name, aegis, type, slots}}, {aegis: id})."""
-    by_id, by_aegis = {}, {}
+    by_id, by_aegis = {}, AegisMap()
     for rel in _chain("db/item_db.yml", ITEM_DBS):
         path = os.path.join(ROOT, rel)
         if not os.path.exists(path):
@@ -59,6 +59,29 @@ def item_name(iid):
     if slots and slots != "0" and info.get("type") in ("Weapon", "Armor", "Shadowgear"):
         name += f" [{slots}]"
     return name
+
+
+class AegisMap(dict):
+    """{AegisName: id} that also matches another letter case, as the server does (scripts write EP21_Wigner_Ticket
+    for Ep21_Wigner_Ticket)."""
+
+    def _lower(self):
+        if getattr(self, "_low", None) is None or len(self._low) != len(self):
+            self._low = {str(k).lower(): v for k, v in self.items()}
+        return self._low
+
+    def get(self, key, default=None):
+        if dict.__contains__(self, key):
+            return dict.__getitem__(self, key)
+        return self._lower().get(str(key).lower(), default) if isinstance(key, str) else default
+
+    def __contains__(self, key):
+        return dict.__contains__(self, key) or (isinstance(key, str) and key.lower() in self._lower())
+
+    def __getitem__(self, key):
+        if dict.__contains__(self, key):
+            return dict.__getitem__(self, key)
+        return self._lower()[str(key).lower()]
 
 
 def item_id(aegis):

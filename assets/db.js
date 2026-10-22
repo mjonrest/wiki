@@ -422,6 +422,7 @@
         ["Equips on", d.Locations ? chips(d.Locations) : ""],
         ["Refinable", d.Refineable ? "Yes" : r[2] === "Weapon" || r[2] === "Armor" ? "No" : ""],
         ["Gender", d.Gender && d.Gender !== "Both" ? esc(d.Gender) : ""],
+        ["Use delay", d.Delay ? +(d.Delay / 1000).toFixed(1) + " s between uses" : ""],
         ["Buy / sell", d.Buy || d.Sell ? num(d.Buy || (d.Sell || 0) * 2) + " / " + num(d.Sell || Math.floor((d.Buy || 0) / 2)) + " z" : ""],
         ["Trade limits", d.Trade ? chips(d.Trade) : ""],
       ]);
@@ -726,12 +727,26 @@
     });
   }
 
+  function npcByName(root, key) {
+    var at = key.lastIndexOf("@"), name = at > 0 ? key.slice(0, at) : key, map = at > 0 ? key.slice(at + 1) : "";
+    return get("npcs.json").then(function (rows) {
+      var hit = rows.filter(function (r) { return r[1] === name && (!map || r[2] === map); })[0]
+        || rows.filter(function (r) { return r[1] === name; })[0];
+      if (!hit) { root.innerHTML = back("npcs") + "<p>No NPC named " + esc(name) + ".</p>"; return; }
+      history.replaceState(null, "", location.pathname + "#" + hit[0]);
+      return npcView(root, hit[0]);
+    });
+  }
+
   var DETAIL = { items: itemView, monsters: mobView, skills: skillView, npcs: npcView, enchants: enchantView, jobs: jobView };
 
   function route(root, kind) {
     var key = decodeURIComponent(location.hash.slice(1));
     var view = root.querySelector(".db-view") || root;
-    var go = key ? DETAIL[kind](view, kind === "items" || kind === "monsters" || kind === "npcs" ? +key : key) : listView(view, kind);
+    var num = kind === "items" || kind === "monsters" || kind === "npcs";
+    // Pages link NPCs by name ("#Name@map"), since NPC ids change between builds.
+    var go = key && kind === "npcs" && isNaN(+key) ? npcByName(view, key)
+      : key ? DETAIL[kind](view, num ? +key : key) : listView(view, kind);
     go.catch(function (e) { view.innerHTML = '<p class="db-loading">Could not load the database (' + esc(e.message) + ").</p>"; });
     if (key) window.scrollTo(0, root.getBoundingClientRect().top + window.scrollY - 80);
   }

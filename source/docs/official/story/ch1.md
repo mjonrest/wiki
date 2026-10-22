@@ -296,3 +296,9 @@ The exit of every sector leads back to `ch1fild1 104/26`.
 | 1 | 100,000,000 Zeny, 85 {{ item(1002015) }}, 100 {{ item(1002013) }} | Your choice of Acute, Mettle, Tenacity, Master Archer, Magic Essence, Spell, Adamantine, Affection, Fierce Attack or Great Craftsman Jewel Lv 1 |
 
 Slot 1 has no random roll: you pick the jewel. A reset always succeeds and costs 1,000,000 Zeny, 5 {{ item(25731) }}, 5 {{ item(25729) }} and 15 {{ item(1001996) }}.
+
+## Shops, exchange and enchant NPCs
+
+The NPCs in this episode's areas (`ch1_gef_in`, `ch1_geffen`, `ch1_que01`, `ygg_roots`, `ygg_edge`, `ygg_fruit`) that take items: barter shops, crafters, enchanters and quests that use the episode's materials. Click a name for its Database entry, with the full trade list.
+
+{{ map_trades("ch1_gef_in", "ch1_geffen", "ch1_que01", "ygg_roots", "ygg_edge", "ygg_fruit") }}

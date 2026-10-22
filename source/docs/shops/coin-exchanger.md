@@ -36,3 +36,9 @@ Bank Notes weigh 1 and can be traded, so they are an easy way to carry or trade 
 !!! warning "Zeny limit"
     A character can hold at most **2,147,483,647 Zeny**. Cashing a note is refused if it would take you over that,
     so spend or store some Zeny first. Bank Notes cannot be sold to NPC shops.
+
+## Etel Box
+
+The **Etel Dust -> Etel Box** option packs every 1,000 {{ item(1000322) }} into one {{ item(30051) }}, so you can
+store or trade large amounts of dust. Use the box from your inventory to get the 1,000 dust back. If the dust would
+not fit (weight, or the 30,000 stack limit), you keep the box and get a message instead.
