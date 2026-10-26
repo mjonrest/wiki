@@ -62,7 +62,7 @@ See [Instances](instances.md) for the basics.
 
 | Instance | Points | Difficulty notes | Cooldown |
 |---|---|---|---|
-| [Endless Tower](../official/instances/endless-tower.md) | 50–500 | Fixed by mode: Easy 50, Veteran 100, Nightmare 150, Hell 200, Torment 500. From the Lost Soul at the top | 24 hours |
+| [Endless Tower](../official/instances/endless-tower.md) | 50–500 | Fixed by mode: Easy 50, Veteran 100, Nightmare 150, Hell 200, Torment 500. From the Lost Soul at the top | Daily |
 | [Glastheim Challenge Mode](../official/instances/glastheim-challenge-mode.md) | 20–200 | 20 × the stage you fought (stage 1: 20, stage 10: 200) | Daily |
 | [Infinite Space](../official/instances/infinite-space.md) | 50–120 | Normal 50–100, Hard 70–120 | 3 hours |
 | [Old Glast Heim](../official/instances/old-glast-heim.md) | 20–60 | Normal 20–40, Hard 40–60 | Daily (each mode separately) |
@@ -93,7 +93,7 @@ See [Instances](instances.md) for the basics.
 | [Temple of the Demon God](../official/instances/temple-of-the-demon-god.md) | 20–40 | From Nidhogg in the final room | Daily |
 | [Werner Laboratory Central Room](../official/instances/werner-laboratory-central-room.md) | 20–40 | Story run only, party leader. The repeatable daily run gives none | Story, once |
 | [Wolfchev's Laboratory](../official/instances/wolfchev-s-laboratory.md) | 20–40 | From Wolfchev; not on the run where you turn in all 13 *[Rest]* quests | Daily |
-| [Geffen Magic Tournament](../official/instances/geffen-magic-tournament.md) | 10 | From the exit portal | 23 hours |
+| [Geffen Magic Tournament](../official/instances/geffen-magic-tournament.md) | 10 | From the exit portal | Daily |
 | [Nidhoggur's Nest](../official/instances/nidhoggur-s-nest.md) | 10 | From World Tree Yggdrasil, *Please let me out.* | Every 3 days (04:00) |
 | [Sealed Catacomb](../official/instances/sealed-catacomb.md) | 10 | From the Ancient Hero's Soul | 12 hours |
 

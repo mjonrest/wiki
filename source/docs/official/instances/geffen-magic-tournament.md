@@ -15,7 +15,7 @@ Operator.
 | **Portal** | Dimensional Device next to him: `/navi dali 100/147` |
 | **Level** | 90+ |
 | **Party** | **Solo**: you must be the leader of a party with no other members |
-| **Cooldown** | 23 hours per character, counted from when you enter |
+| **Cooldown** | Once per day per character: entering starts a cooldown that ends at the next **04:00** server time |
 | **Time limit** | 2 hours |
 
 Talk to Emmitt White to create the instance, then use the Dimensional Device to enter.
