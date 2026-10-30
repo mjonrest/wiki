@@ -11,6 +11,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "too
 def on_post_build(config, **kwargs):
     import gen_db
     gen_db.build(os.path.join(config["site_dir"], "db", "data"), config["use_directory_urls"])
+    import gen_cp
+    gen_cp.build(os.path.join(config["site_dir"], "cp"), config["use_directory_urls"])
 
 
 def on_page_markdown(markdown, page, **kwargs):
@@ -26,8 +28,9 @@ def on_page_markdown(markdown, page, **kwargs):
 
 
 def on_post_page(output, page, config, **kwargs):
-    """Adds the script's checksum to its URL, so browsers load the new db.js after an update."""
-    path = os.path.join(config["docs_dir"], "assets", "db.js")
-    with open(path, "rb") as f:
-        version = hashlib.sha1(f.read()).hexdigest()[:10]
-    return output.replace('assets/db.js"', f'assets/db.js?v={version}"')
+    """Adds each script's checksum to its URL, so browsers load the new db.js and cp-sim.js after an update."""
+    for name in ("db.js", "cp-sim.js"):
+        with open(os.path.join(config["docs_dir"], "assets", name), "rb") as f:
+            version = hashlib.sha1(f.read()).hexdigest()[:10]
+        output = output.replace(f'assets/{name}"', f'assets/{name}?v={version}"')
+    return output
