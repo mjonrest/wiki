@@ -70,6 +70,14 @@ saved as `data/item_text.json`. When the client's itemInfo changes, refresh it a
 python3 tools/iteminfo.py /path/to/itemInfo.lua
 ```
 
+## Combat Power simulator
+
+`special/cp-simulator.md` (script `docs/assets/cp-sim.js`) scores gear with the same rules as the in-game `@cp`.
+`tools/gen_cp.py` writes its data to `cp/data.json` on every build by running the game repository's own scoring
+tools (`tools/combat-power` in Miracle-MMO: weights, enchant lists, script reader). That takes about 4 minutes, so
+the file is reused when no database file or scoring tool changed. Change the weights in the game repository,
+not here.
+
 ## Writing pages
 
 Useful macros (see `main.py` for all of them):

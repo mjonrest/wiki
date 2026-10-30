@@ -39,6 +39,7 @@ extra_css:
 
 extra_javascript:
   - assets/db.js
+  - assets/cp-sim.js
 
 hooks:
   - hooks.py
@@ -110,6 +111,7 @@ nav:
       - MVP Spawns & Respawn Times: special/mvp-spawns.md
       - Illusion & Summoned Bosses: special/boss-spawns.md
       - jRO Cards from Card Albums: special/jro-card-album.md
+      - Combat Power Simulator: special/cp-simulator.md
   - Content:
       - Hunting Missions: content/hunting-missions.md
       - Daily Quests: content/daily-quests.md
