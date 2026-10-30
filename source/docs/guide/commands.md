@@ -10,12 +10,30 @@ On top of the standard rAthena player commands, Miracle adds these:
 | `@HourlyBan` | Opts this character out of Activity Points until you relog. |
 | `@donate` | Opens the donation shops (PoD Shop and Cash Shop). |
 | `@statsview` | Lists every bonus on your character from gear, cards, enchants, combos and buffs. See [below](#statsview). |
+| `@cp` | Shows your gear's Combat Power (CP), one number for how strong your equipment is. See [below](#cp). |
 | `@alootid2` | Saves up to 10 named autoloot lists and loads one with a single command. See [below](#alootid2). |
 | `@dummy` | Warps you to the Dummy Punching Bags in Prontera. |
 | `@pvpladder` | Opens the PvP/GvG ladder menu from anywhere. See [PvP & WoE](../content/pvp-woe.md). |
 
 !!! note "Commands are disabled in some places"
     Hell Raid, the Mining Zone and the World Boss map block most commands and the cash shop.
+
+## @cp
+
+`@cp` (or `@combatpower`) shows your **Combat Power**: one number that adds up everything your equipment, cards,
+enchants, random options and set bonuses give, weighed by how much each stat helps your job. Use it to compare
+gear: swap an item, type `@cp` again, and see whether the number went up.
+
+| Command | What it does |
+|---|---|
+| `@cp` | Your CP, split into Physical, Magic, Both, Defense and Utility, plus the stats that give the most |
+| `@cp auto` | Shows your new CP and the change every time you change equipment (`@cp auto` again turns it off) |
+
+- CP depends on your job: skill damage bonuses only count for skills you have, and a caster's MATK doesn't help
+  a knight. The same item can be worth a lot on one job and little on another.
+- Chance-based bonuses (autobonus) count only while they are active.
+- Want to try gear you don't have yet? Use the [Combat Power Simulator](../special/cp-simulator.md), which
+  counts the same way.
 
 ## @statsview
 
