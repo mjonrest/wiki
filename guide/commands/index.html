@@ -661,6 +661,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#cp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        @cp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#statsview" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6999,6 +7010,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#cp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        @cp
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#statsview" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7072,6 +7094,10 @@
 <td>Lists every bonus on your character from gear, cards, enchants, combos and buffs. See <a href="#statsview">below</a>.</td>
 </tr>
 <tr>
+<td><code>@cp</code></td>
+<td>Shows your gear's Combat Power (CP), one number for how strong your equipment is. See <a href="#cp">below</a>.</td>
+</tr>
+<tr>
 <td><code>@alootid2</code></td>
 <td>Saves up to 10 named autoloot lists and loads one with a single command. See <a href="#alootid2">below</a>.</td>
 </tr>
@@ -7089,6 +7115,35 @@
 <p class="admonition-title">Commands are disabled in some places</p>
 <p>Hell Raid, the Mining Zone and the World Boss map block most commands and the cash shop.</p>
 </div>
+<h2 id="cp">@cp<a class="headerlink" href="#cp" title="Permanent link">&para;</a></h2>
+<p><code>@cp</code> (or <code>@combatpower</code>) shows your <strong>Combat Power</strong>: one number that adds up everything your equipment, cards,
+enchants, random options and set bonuses give, weighed by how much each stat helps your job. Use it to compare
+gear: swap an item, type <code>@cp</code> again, and see whether the number went up.</p>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>@cp</code></td>
+<td>Your CP, split into Physical, Magic, Both, Defense and Utility, plus the stats that give the most</td>
+</tr>
+<tr>
+<td><code>@cp auto</code></td>
+<td>Shows your new CP and the change every time you change equipment (<code>@cp auto</code> again turns it off)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>CP depends on your job: skill damage bonuses only count for skills you have, and a caster's MATK doesn't help
+  a knight. The same item can be worth a lot on one job and little on another.</li>
+<li>Chance-based bonuses (autobonus) count only while they are active.</li>
+<li>Want to try gear you don't have yet? Use the <a href="../../special/cp-simulator/">Combat Power Simulator</a>, which
+  counts the same way.</li>
+</ul>
 <h2 id="statsview">@statsview<a class="headerlink" href="#statsview" title="Permanent link">&para;</a></h2>
 <p><code>@statsview</code> shows the <strong>general</strong> and <strong>resist</strong> pages. Add a page name to see another one, or <code>all</code> for everything.
 You can use it once every 3 seconds.</p>
