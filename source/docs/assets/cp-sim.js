@@ -325,7 +325,7 @@
       (filt ? '<label class="cp-sort"><input type="checkbox" class="cp-have"' + (onlyHave ? " checked" : "") + "> Only items players can get</label>" : "") + '</div><div class="cp-pop-list" role="listbox"></div>';
     document.body.appendChild(pop);
     var r = anchor.getBoundingClientRect();
-    var w = Math.min(Math.max(r.width, 340), window.innerWidth - 32);
+    var w = Math.min(Math.max(r.width, 440), window.innerWidth - 32);
     pop.style.width = w + "px";
     pop.style.left = Math.max(16, Math.min(r.left, window.innerWidth - w - 16)) + window.scrollX + "px";
     pop.style.top = r.bottom + window.scrollY + 4 + "px";
@@ -403,11 +403,14 @@
   function slotHtml(key) {
     var b = B(), s = b.slots[key], lab = SLOT[key][1], by = coveredBy(b, key);
     var marg = s && s.id != null ? cpOf(b) - score(stats(b, key), b.job).total : 0;
-    var h = '<div class="cp-slot" data-slot="' + key + '"><div class="cp-slot-head"><span class="cp-slot-name">' + esc(lab) + "</span>" +
-      (s && s.id != null ? '<span class="cp-slot-cp" title="CP this slot adds to the build">' + fmt1(marg) + " CP</span>" : "") + "</div>";
+    var filled = s && s.id != null;
+    var h = '<div class="cp-slot ' + (by ? "cp-is-covered" : filled ? "cp-is-filled" : "cp-is-empty") + '" data-slot="' + key + '">' +
+      '<div class="cp-slot-head"><span class="cp-slot-name">' + esc(lab) + "</span>" +
+      (filled ? '<span class="cp-slot-cp ' + (marg >= 0 ? "up" : "down") + '" title="CP this slot adds to the build">' + fmt1(marg) + " CP</span>" +
+        '<button type="button" class="cp-x" data-pick="remove" title="Take it off" aria-label="Take off ' + esc(lab) + '">×</button>' : "") + "</div>";
     if (by) return h + '<p class="cp-covered">Used by the ' + esc(SLOT[by][1].toLowerCase()) + ".</p></div>";
     var it = s && I(s.id);
-    h += pickBtn("cp-item", it && it[0], it, it ? label(it) : "Choose " + lab.toLowerCase() + "…", ' data-pick="item"');
+    h += pickBtn("cp-item", it && it[0], it, it ? label(it) : "+ Choose " + lab.toLowerCase(), ' data-pick="item"');
     if (!it) return h + "</div>";
     if (it[0] > 0) h += '<a class="cp-link" href="' + itemPage(it[0]) + '" target="_blank" rel="noopener" title="Open in the Database">ⓘ</a>';
     var row = "";
@@ -471,7 +474,7 @@
     h += '<div class="cp-groups">';
     ["P", "M", "S", "D", "U"].forEach(function (k) {
       var counted = (k === "P" && g.P < g.M) || (k === "M" && g.M <= g.P && g.P > 0) ? " cp-off" : "";
-      h += '<div class="cp-group' + counted + '"><span>' + GROUPS[k] + '</span><span class="cp-bar"><i style="width:' +
+      h += '<div class="cp-group cp-g-' + k + counted + '"><span>' + GROUPS[k] + '</span><span class="cp-bar"><i style="width:' +
         Math.max(0, g[k] / max * 100) + '%"></i></span><b>' + fmt(g[k]) + "</b></div>";
     });
     h += '</div><p class="cp-note">Only the bigger of Physical and Magic counts.</p>';
@@ -512,21 +515,27 @@
   function draw() {
     var b = B();
     var jobs = D.jobs.map(function (j, i) { return [i, j.n]; });
-    var h = '<div class="cp-bar-top"><label>Job ' + selectHtml("cp-job", jobs, b.job) + "</label>" +
+    var res = score(stats(b), b.job), other = builds.B ? cpOf(builds[cur === "A" ? "B" : "A"]) : null;
+    var h = '<div class="cp-toolbar"><div class="cp-bar-top"><label class="cp-joblab">Job ' + selectHtml("cp-job", jobs, b.job) + "</label>" +
       '<div class="cp-tabs"><button type="button" class="cp-tab' + (cur === "A" ? " on" : "") + '" data-b="A">Build A</button>' +
       (builds.B ? '<button type="button" class="cp-tab' + (cur === "B" ? " on" : "") + '" data-b="B">Build B</button>'
-        : '<button type="button" class="cp-tab cp-addb" title="Copy this build to compare a change">+ Compare</button>') + "</div>" +
-      '<button type="button" class="md-button cp-share">Copy share link</button>' +
-      '<button type="button" class="md-button cp-saveb">Save</button>' +
-      selectHtml("cp-load", [["", "Saved builds…"]].concat(Object.keys(saved()).sort().map(function (n) { return [n, n]; })), "") +
-      '<button type="button" class="md-button cp-clear">Clear</button></div>';
+        : '<button type="button" class="cp-tab cp-addb" title="Copy this build to compare a change">+ Compare</button>') + "</div></div>" +
+      '<div class="cp-bar-top cp-actions"><button type="button" class="cp-btn cp-share">Copy share link</button>' +
+      '<button type="button" class="cp-btn cp-saveb">Save build</button>' +
+      selectHtml("cp-load", [["", "Load a saved build…"]].concat(Object.keys(saved()).sort().map(function (n) { return [n, n]; })), "") +
+      '<button type="button" class="cp-btn cp-clear">Clear all</button></div></div>';
+    // small total that stays on screen on phones, where the full summary sits below the gear
+    h += '<div class="cp-mini"><span>Combat Power</span><b>' + fmt(res.total) + "</b>" +
+      (other != null ? '<small class="' + (res.total >= other ? "up" : "down") + '">' + fmt1(res.total - other) + " vs " + (cur === "A" ? "B" : "A") + "</small>" : "") + "</div>";
     h += '<div class="cp-main"><div class="cp-gear">';
     var group = "";
     SLOTS.forEach(function (s) {
       if (s[3] !== group) {
         if (group) h += "</div>";
         group = s[3];
-        h += '<h3 class="cp-h">' + group + '</h3><div class="cp-grid">';
+        var inGroup = SLOTS.filter(function (x) { return x[3] === group; });
+        var used = inGroup.filter(function (x) { return b.slots[x[0]] && b.slots[x[0]].id != null; }).length;
+        h += '<h3 class="cp-h">' + group + ' <small>' + used + " / " + inGroup.length + '</small></h3><div class="cp-grid">';
       }
       h += slotHtml(s[0]);
     });
@@ -586,6 +595,7 @@
       var el = t.closest(".cp-slot"), key = el && el.getAttribute("data-slot"), kind = t.getAttribute("data-pick");
       if (!key || !kind) return;
       var s = b.slots[key], i = +t.getAttribute("data-i"), base = cpOf(b);
+      if (kind === "remove") { delete b.slots[key]; return redraw(); }
       if (kind === "item") {
         var rows = [];
         if (SLOT[key][2] & COSTUME) rows.push([ANY_COSTUME, "Any costume (no bonus, holds a stone)", ""]);
