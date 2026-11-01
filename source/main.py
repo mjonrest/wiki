@@ -334,11 +334,11 @@ def npc_block(rel, npc):
 
 
 def arrays(rel, npc=None):
-    """All `setarray .Var[...], a, b, c;` in a script (or one NPC of it) -> {Var: [values]}."""
+    """All `setarray .Var[...], a, b, c;` (or `$Var`) in a script (or one NPC of it) -> {Var: [values]}."""
     text = npc_block(rel, npc) if npc else script_text(rel)
     out = OrderedDict()
-    for m in re.finditer(r"setarray\s+(\.@?[\w$]+)(?:\[[^\]]*\])?\s*,(.*?);", text, re.S):
-        name = m.group(1).lstrip(".@")
+    for m in re.finditer(r"setarray\s+((?:\.@?|\$@?)[\w$]+)(?:\[[^\]]*\])?\s*,(.*?);", text, re.S):
+        name = m.group(1).lstrip(".@$")
         vals = [v.strip().strip('"') for v in m.group(2).split(",") if v.strip()]
         vals = [int(v) if re.fullmatch(r"-?\d+", v) else v for v in vals]
         out.setdefault(name, [])
