@@ -19,7 +19,7 @@ Winners earn **Event Points**, spent at the [Event Shop](../shops/event-shop.md)
 | **Poring Catcher** | Dozens of Porings with fake names spawn. Kill the one named exactly **Poring**. Kill a wrong one and you are out. | 20 Event Points |
 | **Poring Hunter** | Score the most points before time runs out: Poring +1, Drops +5, Poporing -10. | 20 Event Points |
 | **Disguise** | The **Disguise Event** NPC in the Quest Room ({{ npc_where("Disguise Event") }}) turns into a monster. Be the first to type its name in chat. | 4 Event Points per round |
-| **Monster Battle** | Two monsters fight in `poring_w02`. Bet 20 Event Points on one at the **MVP Bet Girl**. | 100 Event Points if your monster wins |
+| **Monster Battle** | Two monsters fight in `poring_w02`. Bet 20 Event Points on one at the **MVP Bet Girl**. You get **one bet per round** for each computer and account, so you can't bet on both monsters. | 100 Event Points if your monster wins |
 
 ## Weekend double rates
 

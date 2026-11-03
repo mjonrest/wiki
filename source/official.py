@@ -653,7 +653,11 @@ def callshop_spots():
             if not hdr.group("map") or "@" in hdr.group("map"):
                 continue
             npc = hdr.group("name").split("#")[0].split("::")[0].strip()
-            for name in re.findall(r'callshop\s*\(?\s*"([^"]+)"', body):
+            names = re.findall(r'callshop\s*\(?\s*"([^"]+)"', body)
+            # callshop .@shop$: every string the script assigns to that variable (menu-picked shops)
+            for var in re.findall(r"callshop\s*\(?\s*([.'$@]*\w+\$)", body):
+                names += re.findall(re.escape(var) + r'\s*=\s*"([^"]+)"', body)
+            for name in dict.fromkeys(names):
                 out.append((name, npc, hdr.group("map"), int(hdr.group("x")), int(hdr.group("y"))))
     return out
 

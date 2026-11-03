@@ -9,6 +9,7 @@ Miracle runs **Gepard Shield** anti-cheat. Gepard identifies each computer, and 
 - [Daily Quest](../content/daily-quests.md) registration (one per computer and IP per day)
 - [Instance Points](../content/instances.md) (one claim per computer per instance run)
 - [Activity Points](../content/gacha.md) (one character per computer)
+- [Monster Battle](../content/events.md#the-events) bets (one bet per computer and account each round)
 
 ## One character per computer
 
