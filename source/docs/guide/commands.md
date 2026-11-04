@@ -10,6 +10,7 @@ On top of the standard rAthena player commands, Miracle adds these:
 | `@HourlyBan` | Opts this character out of Activity Points until you relog. |
 | `@donate` | Opens the donation shops (PoD Shop and Cash Shop). |
 | `@statsview` | Lists every bonus on your character from gear, cards, enchants, combos and buffs. See [below](#statsview). |
+| `@mystats` | Opens the Player Statistics window with tabs for your stats, Combat Power and every bonus. See [below](#mystats). |
 | `@cp` | Shows your gear's Combat Power (CP), one number for how strong your equipment is. See [below](#cp). |
 | `@alootid2` | Saves up to 10 named autoloot lists and loads one with a single command. See [below](#alootid2). |
 | `@dummy` | Warps you to the Dummy Punching Bags in Prontera. |
@@ -17,6 +18,23 @@ On top of the standard rAthena player commands, Miracle adds these:
 
 !!! note "Commands are disabled in some places"
     Hell Raid, the Mining Zone and the World Boss map block most commands and the cash shop.
+
+## @mystats
+
+`@mystats` (or `@playerstats`) opens **Player Statistics**: one window with a tab for everything about your
+character. Pick a tab from the menu; it always shows your live values, and it changes nothing.
+
+| Tab | What it shows |
+|---|---|
+| Overview | Stats, ATK/MATK, DEF/MDEF, HIT, FLEE, CRIT, ASPD, 4th job traits and your Combat Power total |
+| Combat Power | The same breakdown as [@cp](#cp) |
+| Bonuses, Offense, Resist, Skills, Procs, EXP & Drops | The [@statsview](#statsview) pages |
+
+Add a tab name to open it straight away: `@mystats cp`, `@mystats offense`, `@mystats misc` and so on (the same
+names as `@statsview`, plus `overview` and `cp`).
+
+The Miracle client also has this as a real window: click the **Stats** button under Graymap or press
+**Ctrl+Shift+S**. See [Voice Chat, Graymap & Stats](voice-chat.md#player-statistics-ctrlshifts).
 
 ## @cp
 

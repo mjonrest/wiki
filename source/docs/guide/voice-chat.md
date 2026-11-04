@@ -1,6 +1,7 @@
-# Voice Chat & Graymap
+# Voice Chat, Graymap & Stats
 
-The Miracle client has built-in **voice chat** and a **Graymap** view. Both come with the normal client patch.
+The Miracle client has built-in **voice chat**, a **Graymap** view and a **Player Statistics** window. All three
+come with the normal client patch.
 
 ## Signing in to voice chat
 
@@ -51,3 +52,42 @@ A **Graymap** button sits under the Cash Shop button at the top right of the scr
 | Water | Walkable water |
 | Shootable wall | Cells you can't walk on but can shoot over |
 | Grid lines | The outline of every cell |
+
+## Player Statistics (Ctrl+Shift+S)
+
+A **Stats** button sits under the Graymap button. **Click** it, or press **Ctrl+Shift+S**, to open the Player
+Statistics window. **Drag** the button to move it. The window works whether voice chat is on or off.
+
+The tabs on the left show everything about your character. The numbers are live: they update every few seconds
+while the window is open, so you can swap gear and watch them change.
+
+| Tab | What it shows |
+|---|---|
+| **Overview** | Your stats, ATK/MATK, DEF/MDEF, HIT, FLEE, CRIT, ASPD, traits for 4th jobs, and your Combat Power total |
+| **Combat Power** | The full [@cp](commands.md#cp) breakdown |
+| **Bonuses** | Stat, HP/SP, ATK/MATK and trait % bonuses |
+| **Offense** | Damage against race, element, size and class, ignore DEF/MDEF |
+| **Resist** | Damage reduction, element/race/size resist and status resists |
+| **Skills** | Cast time, delay, cooldown, per-skill damage and SP cost |
+| **Procs** | Autospells, autobonus, chances to cause statuses, HP/SP drain |
+| **EXP & Drops** | EXP and drop bonuses, extra drops, healing item bonuses and regen |
+
+Scroll with the mouse wheel, the arrow keys or Page Up/Down. **Esc** closes the window.
+
+### If it says "Not signed in"
+
+The window signs in the same way voice chat does. If it shows `Not signed in: type @voice CODE in game chat, or
+relog`, either type that `@voice` line in chat or log out and back in. This happens when two game clients play on
+the same internet connection.
+
+### Background pictures
+
+You can put your own picture behind the window. Copy any `.png`, `.jpg` or `.bmp` into the
+`plugins\stats_backgrounds` folder in your game folder. Any size works; it is scaled to fill the window and cropped
+around the middle, so a picture of about 520x440 or bigger with the subject in the centre looks best.
+
+- The **Background** button picks a picture, sets how see-through the text panels are, and opens the folder.
+- The **<** and **>** buttons step through your pictures.
+
+!!! tip "No client window?"
+    Type `@mystats` (or `@playerstats`) to see the same tabs in an NPC dialog. See [Commands](commands.md#mystats).
