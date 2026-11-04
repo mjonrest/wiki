@@ -6,6 +6,13 @@ These monsters have a **0.5%** chance to drop the costume next to them. Every dr
 
 {{ costume_drops() }}
 
+## Costume headgear slots
+
+Costume hats that used to cover the upper, middle and lower slots together now take only the **upper** slot,
+so you can wear a middle and lower costume with them. A few costumes that give **stats** (for example
+{{ item(19502) }}) still take more than one slot, so their bonus can't stack with stat middle or lower costumes.
+The Database shows each costume's slots under **Equips on**.
+
 ## Instance headgear drops
 
 Monsters in the **Old Glast Heim** style instances (monster IDs 3214-3246) have a **0.1%** chance to drop one of:

@@ -21,6 +21,28 @@ ENCHANT_UI = re.compile(r"\bitem_enchant\s*\(?\s*(\d+)")
 CALLSHOP = re.compile(r"\bcallshop\s*\(?\s*\"([^\"]+)\"")
 SELECT = re.compile(r"\b(?:select|prompt)\s*\(([^;]*)\)")
 MENU = re.compile(r"\bmenu\s+(\"[^;]*);")
+CALLSHOP_ANY = re.compile(r"\bcallshop\s*\(?\s*([^;,)]+)")
+
+
+def callshop_names(body, known):
+    """Shop names a script opens. Besides callshop "NAME", follows callshop .@shop$ (every string literal the
+    script assigns to that variable) and callshop "PREFIX" + .@n (every known shop whose name starts with PREFIX),
+    so NPCs that pick the shop from a menu (Rune Crown Manager, Bitoli) are found too."""
+    out = []
+    for arg in CALLSHOP_ANY.findall(body):
+        arg = arg.strip()
+        m = re.fullmatch(r'"([^"]+)"', arg)
+        if m:
+            out.append(m.group(1))
+            continue
+        m = re.match(r'"([^"]{4,})"\s*\+', arg)
+        if m:
+            out += sorted(n for n in known if n.startswith(m.group(1)))
+            continue
+        m = re.fullmatch(r"([.'$@]*\w+\$)", arg)
+        if m:
+            out += [v for v in re.findall(re.escape(m.group(1)) + r'\s*=\s*"([^"]+)"', body) if v in known]
+    return list(dict.fromkeys(out))
 
 
 def sprite_ids():
@@ -232,6 +254,7 @@ def build(items, by_aegis, docs_dir=None):
     for ex, d in defs.items():
         if d["type"] in SHOP_TYPES:
             floating_sells[ex] = _shop_sells(d["type"], d["rest"], items, main.CURRENCIES)
+    known_shops = set(floating_sells) | set(barters)
 
     def barter_rows(shop):
         rows = []
@@ -283,7 +306,7 @@ def build(items, by_aegis, docs_dir=None):
                 if v:
                     n[k] = v
             sells, trades = [], []
-            for shop in dict.fromkeys(CALLSHOP.findall(body)):
+            for shop in callshop_names(body, known_shops):
                 if shop in floating_sells:
                     sells += floating_sells[shop]
                 elif shop in barters:
@@ -318,7 +341,7 @@ def build(items, by_aegis, docs_dir=None):
             row = [name, kind, os.path.basename(d["file"]), d["map"] or "", d["x"], d["y"]]
             if row not in events[iid]:
                 events[iid].append(row)
-        for shop in dict.fromkeys(CALLSHOP.findall(d["body"])):
+        for shop in callshop_names(d["body"], known_shops):
             for iid, price, cur in floating_sells.get(shop, []):
                 hidden_sells[iid].append([name, "", 0, 0, price, cur, None, kind])
             for iid, cost in barter_rows(barters[shop]) if shop in barters else []:
