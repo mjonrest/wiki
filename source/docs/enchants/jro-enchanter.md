@@ -19,6 +19,19 @@ shoes and accessories. It replaces the old Aulion and Desmond enchanters.
   so an item can have JRO enchants and iRO Enchanter options at the same time.
 - Rental items, bound items, signed or forged items and equipped items can't be enchanted. Take the item off first.
 
+## Pity: Guaranteed Pick
+
+Not every enchant in a list is useful, so bad luck is softened:
+
+- Every paid enchant adds **1** to your pity counter. The NPC shows it as **Pity: N/100**.
+- At **100** the counter goes back to 0 and you get **1 Guaranteed Pick**.
+- With a Guaranteed Pick you **choose** which enchant goes into the next slot, from that slot's list. Using a pick
+  costs no ticket and no Zeny. It still follows the usual rules (slot order 4, 3, 2 and the refine needed).
+- The counter and picks belong to your **account**, so tries on all your characters add up, and a pick can be used
+  by any of them. You can save picks; they never expire.
+- Resets and enchants made with a pick don't count toward the next pick.
+- Slots with only one possible enchant don't offer a pick, since there is nothing to choose.
+
 ## Equipment and enchant lists
 
 Click an item to see what each slot can roll.
