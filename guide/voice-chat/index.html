@@ -889,10 +889,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#if-it-says-not-signed-in" class="md-nav__link">
+  <a href="#if-the-window-shows-no-numbers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        If it says "Not signed in"
+        If the window shows no numbers
       
     </span>
   </a>
@@ -1412,6 +1412,8 @@
       
         
       
+        
+      
     
     
     
@@ -1565,6 +1567,34 @@
     
   
     Special & Memory Enchanters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../enchants/dim-glacier-ring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dim Glacier Ring Enchant
   
 
     
@@ -7176,10 +7206,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#if-it-says-not-signed-in" class="md-nav__link">
+  <a href="#if-the-window-shows-no-numbers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        If it says "Not signed in"
+        If the window shows no numbers
       
     </span>
   </a>
@@ -7304,9 +7334,13 @@ use headphones on open mic. Settings are saved in <code>miracle_voice.ini</code>
 </table>
 <h2 id="player-statistics-ctrlshifts">Player Statistics (Ctrl+Shift+S)<a class="headerlink" href="#player-statistics-ctrlshifts" title="Permanent link">&para;</a></h2>
 <p>A <strong>Stats</strong> button sits under the Graymap button. <strong>Click</strong> it, or press <strong>Ctrl+Shift+S</strong>, to open the Player
-Statistics window. <strong>Drag</strong> the button to move it. The window works whether voice chat is on or off.</p>
-<p>The tabs on the left show everything about your character. The numbers are live: they update every few seconds
-while the window is open, so you can swap gear and watch them change.</p>
+Statistics window. <strong>Drag</strong> the button to move it. The window works whether voice chat is on or off, and you
+don't have to be signed in to voice chat.</p>
+<p>The tabs on the left show everything about your character. The window takes a <strong>snapshot</strong> when it opens: the
+numbers stay the same while it is open. After you change gear or buffs, press <strong>Recalculate</strong> (or close and open
+the window again) to see the new numbers.</p>
+<p>The <strong>minimize</strong> button next to the close button folds the window down to its title bar. Click it again, or click
+the Stats button, to open it back up (the Stats button also takes a new snapshot).</p>
 <table>
 <thead>
 <tr>
@@ -7350,10 +7384,36 @@ while the window is open, so you can swap gear and watch them change.</p>
 </tbody>
 </table>
 <p>Scroll with the mouse wheel, the arrow keys or Page Up/Down. <strong>Esc</strong> closes the window.</p>
-<h3 id="if-it-says-not-signed-in">If it says "Not signed in"<a class="headerlink" href="#if-it-says-not-signed-in" title="Permanent link">&para;</a></h3>
-<p>The window signs in the same way voice chat does. If it shows <code>Not signed in: type @voice CODE in game chat, or
-relog</code>, either type that <code>@voice</code> line in chat or log out and back in. This happens when two game clients play on
-the same internet connection.</p>
+<h3 id="if-the-window-shows-no-numbers">If the window shows no numbers<a class="headerlink" href="#if-the-window-shows-no-numbers" title="Permanent link">&para;</a></h3>
+<p>The window reads your stats with your game login, so there is nothing to sign in to. The line at the bottom says
+what went wrong:</p>
+<table>
+<thead>
+<tr>
+<th>Message</th>
+<th>What to do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Enter a map first, then press Recalculate.</code></td>
+<td>Wait until you are on a map, then press <strong>Recalculate</strong>.</td>
+</tr>
+<tr>
+<td><code>The server didn't find your character. Relog, then press Recalculate.</code></td>
+<td>Log out and back in, then press <strong>Recalculate</strong>.</td>
+</tr>
+<tr>
+<td><code>No answer from the server. Press Recalculate to try again.</code></td>
+<td>Press <strong>Recalculate</strong> again.</td>
+</tr>
+<tr>
+<td><code>The server can't send statistics right now. Try again later.</code></td>
+<td>Use <code>@mystats</code> (below) for now.</td>
+</tr>
+</tbody>
+</table>
+<p>The bottom line also shows how old the snapshot is, for example <code>Snapshot 40 s ago</code>.</p>
 <h3 id="background-pictures">Background pictures<a class="headerlink" href="#background-pictures" title="Permanent link">&para;</a></h3>
 <p>You can put your own picture behind the window. Copy any <code>.png</code>, <code>.jpg</code> or <code>.bmp</code> into the
 <code>plugins\stats_backgrounds</code> folder in your game folder. Any size works; it is scaled to fill the window and cropped

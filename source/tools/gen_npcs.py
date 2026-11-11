@@ -22,6 +22,17 @@ CALLSHOP = re.compile(r"\bcallshop\s*\(?\s*\"([^\"]+)\"")
 SELECT = re.compile(r"\b(?:select|prompt)\s*\(([^;]*)\)")
 MENU = re.compile(r"\bmenu\s+(\"[^;]*);")
 CALLSHOP_ANY = re.compile(r"\bcallshop\s*\(?\s*([^;,)]+)")
+ENCHANT_VAR = re.compile(r"\bitem_enchant\s*\(?\s*([.'$@]*\w+)\s*[\[)]")
+
+
+def enchant_ids(body):
+    """Enchant system ids a script opens: item_enchant(201), and item_enchant(.table[.@i]) or item_enchant(.@id)
+    (every number the script assigns to that variable), so NPCs that pick the table per item (Gacha Enchanter)
+    are found too."""
+    out = [int(e) for e in ENCHANT_UI.findall(body)]
+    for var in ENCHANT_VAR.findall(body):
+        out += [int(v) for v in re.findall(re.escape(var) + r"(?:\[[^\]]*\])?\s*=\s*(\d+)\s*;", body)]
+    return list(dict.fromkeys(out))
 
 
 def callshop_names(body, known):
@@ -301,7 +312,7 @@ def build(items, by_aegis, docs_dir=None):
                          ("gives", script_gives(body, by_aegis, items, funcs)), ("takes", _items(TAKE, body, by_aegis, items)),
                          ("warps", list(dict.fromkeys(w for w in WARP.findall(body) if w not in ("SavePoint", "Random")))[:20]),
                          ("instances", list(dict.fromkeys(INSTANCE.findall(body)))),
-                         ("enchants", [int(e) for e in dict.fromkeys(ENCHANT_UI.findall(body))]),
+                         ("enchants", enchant_ids(body)),
                          ("quests", [[int(q), quests.get(int(q), {}).get("Title", "")] for q in dict.fromkeys(QUEST.findall(body))][:30])):
                 if v:
                     n[k] = v

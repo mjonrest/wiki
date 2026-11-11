@@ -346,6 +346,13 @@ def arrays(rel, npc=None):
     return out
 
 
+def indexed(rel, var, npc=None):
+    """Values of `.Var[0] = a; .Var[1] = b;` (one assignment per index) in a script or one NPC, in order."""
+    text = npc_block(rel, npc) if npc else script_text(rel)
+    vals = re.findall(r"\.@?" + re.escape(var) + r"\[\s*\d+\s*\]\s*=\s*(-?\d+)\s*;", text)
+    return [int(v) for v in vals]
+
+
 def array_seq(rel, npc, var):
     """Each separate `setarray <var>` in one NPC/function, in order (for tiered pools)."""
     text = npc_block(rel, npc)
@@ -434,6 +441,22 @@ def _slot_category(iid):
     return "Other"
 
 
+def enchant_db(eid):
+    """One entry of the item_enchant database (the last loaded file that has it), or {}."""
+    for rel in reversed(ydb.files("db/item_enchant.yml")[1:]):
+        data = _enchant_db(rel)
+        if eid in data:
+            return data[eid]
+    return {}
+
+
+def enchant_cost(c):
+    """'2,000,000 Zeny, 20× Item, ...' for an item_enchant slot, perfect enchant, upgrade or reset."""
+    c = c or {}
+    out = [f"{fmt(c['Price'])} Zeny"] if c.get("Price") else []
+    return ", ".join(out + [f"{m.get('Amount', 1)}× {_aegis_item(m['Material'])}" for m in c.get("Materials") or []]) or "free"
+
+
 def item_enchant(eid):
     """Render one entry of the item_enchant database (official-style enchant UI)."""
     for rel in reversed(ydb.files("db/item_enchant.yml")[1:]):
@@ -461,9 +484,22 @@ def item_enchant(eid):
         total = sum(p.get("Chance", 0) for p in pool) or 1
         rows = [(_aegis_item(p["Item"]), f"{p.get('Chance', 0) / total * 100:.1f}%") for p in pool]
         md.append(f"#### Slot {slot['Slot']}\n")
-        md.append(f"Cost per try: {', '.join(cost) or 'free'}\n")
-        md.append(_table(["Enchant", "Chance"], rows))
-        md.append("")
+        if rows:
+            md.append(f"Cost per try: {', '.join(cost) or 'free'}\n")
+            md.append(_table(["Enchant", "Chance"], rows))
+            md.append("")
+
+        perfect = slot.get("PerfectEnchants") or []
+        if perfect:
+            md.append("You **choose** the enchant for this slot:\n")
+            md.append(_table(["Enchant", "Cost"], [(_aegis_item(p["Item"]), enchant_cost(p)) for p in perfect]))
+            md.append("")
+        ups = slot.get("Upgrades") or []
+        if ups:
+            md.append("The enchant in this slot can be **upgraded** (an upgrade always succeeds):\n")
+            md.append(_table(["From", "To", "Cost"],
+                             [(_aegis_item(u["Enchant"]), _aegis_item(u["Upgrade"]), enchant_cost(u)) for u in ups]))
+            md.append("")
     return "\n".join(md) + "\n"
 
 
@@ -1082,7 +1118,7 @@ def define_env(env):
     global ENV
     ENV = env
     for fn in (item, shops_in, items_table, items_list, shop, barter, quest_shop, quest_shop_tabs, slot_enchanter,
-               item_enchant, array_seq, event_schedule, costume_drops, npc_directory, npc_where, arrays, scalar,
+               item_enchant, enchant_db, enchant_cost, array_seq, event_schedule, costume_drops, npc_directory, npc_where, arrays, indexed, scalar,
                fmt, item_name, mob_name, official_instances, official_instance_count,
                official_npcs, instance_page, mob, npc, map_trades, endless_tower, cash_shop_price, floor_item_seconds, bonus_roll_table, bonus_roll_boxes, mvp_spawns):
         env.macro(fn)
