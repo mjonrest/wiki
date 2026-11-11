@@ -56,10 +56,15 @@ A **Graymap** button sits under the Cash Shop button at the top right of the scr
 ## Player Statistics (Ctrl+Shift+S)
 
 A **Stats** button sits under the Graymap button. **Click** it, or press **Ctrl+Shift+S**, to open the Player
-Statistics window. **Drag** the button to move it. The window works whether voice chat is on or off.
+Statistics window. **Drag** the button to move it. The window works whether voice chat is on or off, and you
+don't have to be signed in to voice chat.
 
-The tabs on the left show everything about your character. The numbers are live: they update every few seconds
-while the window is open, so you can swap gear and watch them change.
+The tabs on the left show everything about your character. The window takes a **snapshot** when it opens: the
+numbers stay the same while it is open. After you change gear or buffs, press **Recalculate** (or close and open
+the window again) to see the new numbers.
+
+The **minimize** button next to the close button folds the window down to its title bar. Click it again, or click
+the Stats button, to open it back up (the Stats button also takes a new snapshot).
 
 | Tab | What it shows |
 |---|---|
@@ -74,11 +79,19 @@ while the window is open, so you can swap gear and watch them change.
 
 Scroll with the mouse wheel, the arrow keys or Page Up/Down. **Esc** closes the window.
 
-### If it says "Not signed in"
+### If the window shows no numbers
 
-The window signs in the same way voice chat does. If it shows `Not signed in: type @voice CODE in game chat, or
-relog`, either type that `@voice` line in chat or log out and back in. This happens when two game clients play on
-the same internet connection.
+The window reads your stats with your game login, so there is nothing to sign in to. The line at the bottom says
+what went wrong:
+
+| Message | What to do |
+|---|---|
+| `Enter a map first, then press Recalculate.` | Wait until you are on a map, then press **Recalculate**. |
+| `The server didn't find your character. Relog, then press Recalculate.` | Log out and back in, then press **Recalculate**. |
+| `No answer from the server. Press Recalculate to try again.` | Press **Recalculate** again. |
+| `The server can't send statistics right now. Try again later.` | Use `@mystats` (below) for now. |
+
+The bottom line also shows how old the snapshot is, for example `Snapshot 40 s ago`.
 
 ### Background pictures
 

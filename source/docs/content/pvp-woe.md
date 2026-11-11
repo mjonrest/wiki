@@ -15,6 +15,11 @@
 - {{ item(1599) }} and {{ item(2199) }} must be stored before entering.
 - [One character per computer](../guide/fair-play.md) in PvP rooms.
 
+## Golden Thief Bug Card
+
+{{ item(4128) }} blocks **all** magic damage on normal maps, but only **50%** of magic damage on PvP and WoE maps.
+A message at the bottom of the chat tells you when the PvP / WoE version is active.
+
 ## PvP stats
 
 The **PvP-StatsViewer** ({{ npc_where("PvP-StatsViewer") }}) shows your kill streaks and multi-kills, with
