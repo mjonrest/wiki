@@ -42,8 +42,37 @@ jobs:
         if: steps.check.outputs.skip != 'true'
         with:
           ref: main
-      - if: steps.check.outputs.skip != 'true'
-        run: sudo apt-get update -q && sudo apt-get install -y -q lftp
+      # lftp comes from Ubuntu's package servers, which GitHub's runners sometimes can't reach (DNS failures on
+      # 2026-11-11 failed two deploys). Keep the downloaded package in the Actions cache and install from it, and
+      # retry the download a few times when it isn't cached yet.
+      - name: Restore the cached lftp package
+        if: steps.check.outputs.skip != 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/lftp-deb
+          key: lftp-deb-${{ runner.os }}-${{ runner.arch }}-v1
+      - name: Install lftp
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          mkdir -p ~/lftp-deb
+          if command -v lftp >/dev/null; then exit 0; fi
+          if ls ~/lftp-deb/*.deb >/dev/null 2>&1 && sudo dpkg -i ~/lftp-deb/*.deb; then
+            echo "Installed lftp from the cache"; exit 0
+          fi
+          rm -f ~/lftp-deb/*.deb
+          apt_opts="-q -o Acquire::Retries=3 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20"
+          for try in 1 2 3 4; do
+            if sudo apt-get install -y $apt_opts --download-only lftp \
+               || { sudo apt-get update $apt_opts && sudo apt-get install -y $apt_opts --download-only lftp; }; then
+              cp /var/cache/apt/archives/lftp_*.deb ~/lftp-deb/
+              sudo apt-get install -y $apt_opts lftp
+              exit 0
+            fi
+            echo "::warning::Could not download lftp (try $try of 4); waiting before the next try"
+            sleep $((try * 30))
+          done
+          echo "::error::Ubuntu's package servers could not be reached, so lftp could not be installed. Re-run this workflow later."
+          exit 1
       - name: Upload
         if: steps.check.outputs.skip != 'true'
         env:
