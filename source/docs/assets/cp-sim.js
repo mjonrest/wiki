@@ -127,7 +127,7 @@
     if (src && src.pools) {
       (s.opts || []).forEach(function (o, k) {
         if (!o) return;
-        var pool = src.pools[k < src.n[0] ? 0 : 1], op = pool && pool[o[0]];
+        var pool = src.pools[k], op = pool && pool[o[0]];
         if (op) table(acc, op[3][Math.min(o[1], op[3].length - 1)], j, r, g);
       });
     }
@@ -447,10 +447,10 @@
     var osrc = s.opt != null ? D.sources[s.opt] : null;
     if (osrc && osrc.pools) {
       h += '<div class="cp-sub">Random options (' + esc(osrc.w || osrc.s) + ")</div>";
-      var total = osrc.n[0] + osrc.n[1];
+      var total = osrc.pools.length;
       for (var o = 0; o < total; o++) {
-        var pool = osrc.pools[o < osrc.n[0] ? 0 : 1], sel = s.opts[o], op = sel && pool[sel[0]];
-        h += '<div class="cp-row">' + selectHtml("cp-opt-sel", [["", o < osrc.n[0] ? "Option " + (o + 1) : "Option 3 (rare)"]].concat(pool.map(function (p, i) {
+        var pool = osrc.pools[o], sel = s.opts[o], op = sel && pool[sel[0]];
+        h += '<div class="cp-row">' + selectHtml("cp-opt-sel", [["", o < total - 1 ? "Option " + (o + 1) : "Option " + (o + 1) + " (rare)"]].concat(pool.map(function (p, i) {
           return [i, optName(p)];
         })), sel ? sel[0] : "", ' data-i="' + o + '"');
         if (op && op[2] > op[1]) {
@@ -564,7 +564,7 @@
       else if (t.classList.contains("cp-grade")) s.g = +t.value;
       else if (t.classList.contains("cp-src")) { s.src = t.value === "" ? null : +t.value; s.ench = []; }
       else if (t.classList.contains("cp-opt-sel")) {
-        var oi = +t.getAttribute("data-i"), os = D.sources[s.opt], pl = os.pools[oi < os.n[0] ? 0 : 1];
+        var oi = +t.getAttribute("data-i"), os = D.sources[s.opt], pl = os.pools[oi];
         s.opts[oi] = t.value === "" ? null : [+t.value, pl[+t.value][3].length - 1];
       }
       else if (t.classList.contains("cp-opt-val")) { var o = s.opts[+t.getAttribute("data-i")]; if (o) o[1] = +t.value; }

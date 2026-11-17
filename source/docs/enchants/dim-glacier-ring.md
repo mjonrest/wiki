@@ -3,10 +3,11 @@
 **NPC:** {{ npc("Gacha Enchanter", "moc_para01") }} · **Location:** {{ npc_where("Gacha Enchanter") }}
 
 The Gacha Enchanter enchants the **Dim Glacier Ring of Resonance**, one ring for each 4th job, in the official
-enchant window. Talk to the NPC, pick your ring, and the enchant window opens.
+enchant window. Talk to the NPC, choose **Dim Glacier Ring of Resonance**, pick your ring, and the enchant window
+opens. The same NPC also does the [Abyss Lake / Violent Dragon Armor-LT enchant](lt-armor.md).
 
 {% set f = "npc/miracle/dim_ring_enchant.txt" %}
-{% set rings = indexed(f, "ring", "Gacha Enchanter") %}
+{% set rings = indexed(f, "item", "Gacha Enchanter")[:scalar(f, "lt_start", "Gacha Enchanter")] %}
 {% set e = enchant_db(indexed(f, "table", "Gacha Enchanter")[0]) %}
 {% set s3 = e.Slots | selectattr("Slot", "equalto", 3) | first %}
 {% set s2 = e.Slots | selectattr("Slot", "equalto", 2) | first %}
