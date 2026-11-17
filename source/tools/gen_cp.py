@@ -285,7 +285,7 @@ def generate():
                 d = {"s": s["src"], "w": ", ".join(s.get("where") or []), "m": s.get("minref", 0), "slots": slots}
             else:
                 pools = []
-                for pool in (s["pool1"], s["pool2"]):
+                for pool in (s["pools"] if "pools" in s else [s["pool1"], s["pool1"], s["pool2"]]):
                     p = []
                     for name, lo, hi, script in pool:
                         lo, hi = lo or 0, hi or 0
@@ -293,7 +293,7 @@ def generate():
                         p.append([name, lo, hi, [b.table(script.replace("getrandomoptinfo(ROA_VALUE)", str(v)))
                                                 for v in vals]])
                     pools.append(p)
-                d = {"s": "iRO", "w": ", ".join(s.get("where") or []), "pools": pools, "n": [2, 1]}
+                d = {"s": "iRO", "w": ", ".join(s.get("where") or []), "pools": pools}
             key = json.dumps(d, sort_keys=True)
             if key not in src_id:
                 src_id[key] = len(sources)

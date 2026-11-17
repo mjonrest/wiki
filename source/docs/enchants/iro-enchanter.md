@@ -2,8 +2,8 @@
 
 **Location:** {{ npc_where("iRO Enchanter") }} · Quest Room
 
-Gives Follower equipment, OCP accessories and OCP Type A equipment **2 or 3 random options**, like the official
-Follower and OCP enchant runes.
+Gives Follower equipment, OCP accessories, OCP Type A equipment and Kafra Point equipment **2 or 3 random options**,
+like the official Follower and OCP enchant runes and the iRO Kafra Point Enchant Stone.
 
 | | |
 |---|---|
@@ -39,7 +39,20 @@ These items roll the stronger iRO Random Option Type A instead.
 | | Critical damage +15~30% | Variable cast time -10~15% |
 | | Long-range damage +15~30% | After-cast delay -10~15% |
 
-Each option in a column has the same chance, and the value is random within its range.
+### Kafra Point equipment
+
+These items roll the iRO **Kafra Point Enchant Stone** options.
+
+| Option 1 | Option 2 | Option 3 ({{ scalar("npc/miracle/follower_enchant.txt", "ThirdChance") }}%) |
+|---|---|---|
+| POW / SPL / STA / WIS / CON / CRT +2~12 | Max HP / Max SP +10~25% | EXP +5~20% when killing monsters |
+| | *Rare:* ATK / MATK +5~20% | |
+| | *Rare:* Critical damage +5~20% | |
+| | *Rare:* Long-range damage +5~20% | |
+
+In option 2, Max HP and Max SP are each 10 times more likely than one rare option.
+
+Each option in a column has the same chance unless noted, and the value is random within its range.
 
 ## Enchantable equipment
 
@@ -54,3 +67,5 @@ Each option in a column has the same chance, and the value is random within its 
 </details>
 
 {{ items_table(cats[2], "OCP Type A equipment") }}
+
+{{ items_table(cats[3], "Kafra Point equipment") }}
