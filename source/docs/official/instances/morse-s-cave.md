@@ -22,6 +22,9 @@ The leader talks to the Senior Tracker and answers **Yes** to open the Red Flowe
 
 ### Walkthrough
 
+!!! info "Faster waves on Miracle"
+    Monsters in Morse's Cave spawn **twice as fast** as on official servers. Every wave timer is halved, while the number of monsters per wave and the fail rule stay the same.
+
 **1. The entrance**
 
 Walking in wakes Morocc up and 9 {{ mob(3001) }} spawn along the corridor. Kill them all. Grim Reaper Ankou then appears, and after his speech three portals open that lead to Morocc's chamber.
@@ -35,21 +38,21 @@ Step into the chamber to trigger a cutscene, after which {{ mob(2998) }} spawns.
 
 **3. The split rooms (left and right)**
 
-The party is split between two rooms. In each room Morocc freezes you for a few seconds, then waves keep spawning for **3 minutes**:
+The party is split between two rooms. In each room Morocc freezes you for a few seconds, then waves keep spawning for **90 seconds**:
 
-- 4 {{ mob(3001) }} at the start and then about every 20 seconds
-- one {{ mob(3003) }} each at around 2:40 and 2:50
+- 4 {{ mob(3001) }} at the start and then about every 10 seconds
+- one {{ mob(3003) }} each at around 1:20 and 1:25
 
-At the 3-minute mark the script counts the monsters still alive in each room. **If 20 or more are left in a room, the run fails:** Ankou appears and the portals send everyone to Prontera. Otherwise the remaining monsters vanish and new portals open. The leader steps in and the party regroups in the next room.
+At the 90-second mark the script counts the monsters still alive in each room. **If 20 or more are left in a room, the run fails:** Ankou appears and the portals send everyone to Prontera. Otherwise the remaining monsters vanish and new portals open. The leader steps in and the party regroups in the next room.
 
 **4. The lower-left room**
 
-This works the same way, also for **3 minutes**, but each wave adds more {{ mob(3003) }} and {{ mob(3005) }} to the 4 Ghouls. The same rule applies: **20 or more monsters alive at the end means failure.** If you survive, the leader takes the portal to the final room.
+This works the same way, also for **90 seconds** (a wave about every 12 seconds), but each wave adds more {{ mob(3003) }} and {{ mob(3005) }} to the 4 Ghouls. The same rule applies: **20 or more monsters alive at the end means failure.** If you survive, the leader takes the portal to the final room.
 
 **5. Morocc Necromancer**
 
 1. Morocc hands the fight over to his Necromancer. The first form, {{ mob(2999) }}, spawns. Kill it.
-2. The second form, {{ mob(3000) }}, appears in the same spot and keeps summoning adds about every 7 seconds. The fewer adds are alive, the bigger the wave. It stops summoning while 40 or more are alive. Waves mix {{ mob(3001) }}, {{ mob(3003) }}, {{ mob(3004) }}, {{ mob(3005) }} and {{ mob(3006) }}.
+2. The second form, {{ mob(3000) }}, appears in the same spot and keeps summoning adds about every 12 seconds. The fewer adds are alive, the bigger the wave. It stops summoning while 40 or more are alive. Waves mix {{ mob(3001) }}, {{ mob(3003) }}, {{ mob(3004) }}, {{ mob(3005) }} and {{ mob(3006) }}.
 3. Many waves also bring a {{ mob(3002) }} that drops poison clouds where it stands every few seconds. Kill Osiris quickly or move away from it.
 4. When the Necromancer dies, all remaining adds vanish, Ankou has a last word and an exit portal opens in the middle of the room.
 

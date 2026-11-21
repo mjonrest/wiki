@@ -23,19 +23,32 @@ Every monster killed on the server adds **1 soul** to a shared counter. When it 
 
 ## Rewards
 
-Rewards are sent **by mail** to **everyone who hit the boss** and is still on the boss map when it dies.
-Only **one reward per computer**: if several of your characters hit the boss, only the one with the most damage
-is rewarded.
+{% set wb = "npc/miracle/wb_new(non-regen).txt" %}
+{% set per = scalar(wb, "soul_per_dmg", "World Boss") %}
+{% set w = arrays(wb, "World Boss") %}
+Rewards are sent **by mail** when the boss dies, and they depend on **how much damage you dealt yourself**:
 
-{% set w = arrays("npc/miracle/wb_new(non-regen).txt", "World Boss") %}
+- You get **{{ scalar(wb, "soul_amount", "World Boss") }} {{ item(scalar(wb, "soul_item", "World Boss")) }}** for every
+  **{{ "{:,}".format(per) }} damage**, up to **{{ "{:,}".format(scalar(wb, "soul_cap", "World Boss")) }} souls**.
+  Less than {{ "{:,}".format(per) }} damage gives no reward.
+- **Party bonus:** +{{ scalar(wb, "party_bonus_per", "World Boss") }}% of your own souls for every other party member who
+  also earned a reward (up to +{{ scalar(wb, "party_bonus_max", "World Boss") }}%, a full party). The bonus is based on
+  your own damage only, so party members who did not fight add nothing.
+- Only damage counts: healing or buffing other players does not earn souls, and there is no extra prize for the top
+  damage dealer.
+- You must still be **on the boss map** when it dies, and not idle for more than
+  **{{ scalar(wb, "idle_limit", "World Boss") }} seconds** (time spent waiting before the gate opens does not count).
+- Only **one reward per computer**: if several of your characters hit the boss, only the one with the most damage
+  is rewarded.
+
+Every rewarded player also has a chance at these extra items:
+
 | Reward | Amount | Chance |
 |---|---|---|
-{% for i in w.default_item %}| {{ item(i) }} | {{ w.default_min[loop.index0] }} ~ {{ w.default_max[loop.index0] }} | Always |
-{% endfor %}{% for i in w.reward_item %}| {{ item(i) }} | {{ w.reward_min[loop.index0] }} ~ {{ w.reward_max[loop.index0] }} | {{ w.reward_rate[loop.index0] }}% |
+{% for i in w.reward_item %}| {{ item(i) }} | {{ w.reward_min[loop.index0] }} ~ {{ w.reward_max[loop.index0] }} | {{ w.reward_rate[loop.index0] }}% |
 {% endfor %}
 
-The **top damage dealer** also gets {% for i in w.killer_item %}{{ w.killer_min[loop.index0] }}~{{ w.killer_max[loop.index0] }} {{ item(i) }}{% endfor %}.
-Having {{ item(30034) }} active adds **50** extra {{ item_name(30007) }} to your reward.
+Having {{ item(30034) }} active adds **{{ scalar(wb, "rental_bonus_extra", "World Boss") }}** extra {{ item_name(30007) }} to your reward.
 
 Spend MVP Souls at the [World Boss Merchant](../shops/world-boss-merchant.md).
 

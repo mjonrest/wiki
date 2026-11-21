@@ -16,9 +16,10 @@ Each reward can be claimed **once per account and once per computer**.
 
 === "Equipment Freebies"
 
-    Pick one job (Knight, Crusader, Hunter, Wizard, Sage, Blacksmith, Alchemist, Rogue or Monk) and receive a full
-    starter set, all account bound: a +12 enchanted weapon, +11 enchanted armor, garment and shoes, and two
-    enchanted accessories. You can only claim one job's set.
+    Pick one job (Knight, Crusader, Hunter, Wizard, Sage, Blacksmith, Alchemist, Rogue or Monk (Sura)) and receive a
+    full starter set, all account bound: a +12 enchanted weapon, +11 enchanted armor, garment and shoes, and two
+    enchanted accessories. You can only claim one job's set. The Monk (Sura) set comes with {{ item(29605) }} in the
+    weapon and two {{ item(310156) }} on the armor.
 
 === "Limit Break Shadows"
 
