@@ -2,8 +2,8 @@
 
 **Location:** {{ npc_where("iRO Enchanter") }} · Quest Room
 
-Gives Follower equipment, OCP accessories, OCP Type A equipment and Kafra Point equipment **2 or 3 random options**,
-like the official Follower and OCP enchant runes and the iRO Kafra Point Enchant Stone.
+Gives Follower equipment, OCP accessories, OCP Type A equipment, Kafra Point equipment and Royal Garments **2 or 3
+random options**, like the official Follower, OCP and Royal Medal enchant runes and the iRO Kafra Point Enchant Stone.
 
 | | |
 |---|---|
@@ -28,9 +28,10 @@ Three-option results are announced to the server.
 | Critical damage +5~25% | After-cast delay -5~15% |
 | Long-range damage +5~25% | |
 
-### OCP Type A equipment
+### OCP Type A equipment and Royal Garments
 
-These items roll the stronger iRO Random Option Type A instead.
+These items roll the stronger iRO Random Option Type A instead. The iRO **Royal Medal Enchant Rune** for Royal
+Garments uses the same list.
 
 | Option 1 | Option 2 | Option 3 ({{ scalar("npc/miracle/follower_enchant.txt", "ThirdChance") }}%) |
 |---|---|---|
@@ -69,3 +70,5 @@ Each option in a column has the same chance unless noted, and the value is rando
 {{ items_table(cats[2], "OCP Type A equipment") }}
 
 {{ items_table(cats[3], "Kafra Point equipment") }}
+
+{% if cats|length > 4 %}{{ items_table(cats[4], "Royal Garment") }}{% endif %}
