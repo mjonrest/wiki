@@ -249,6 +249,7 @@ All dailies in this chapter reset at 4:00.
 - ***Hazy Gate*** from **Rubiel** (`/navi ygg_edge 175/186`): click the **Recon Point** at `/navi hem_fild 180/263` and talk to **Rubiel** inside (`ch1_sf03 122/255`). This opens two hunting areas off Hem Field:
     - At Base Level 230, **Minuel** (`/navi hem_fild 329/191`) gives a one-hour dimensional magic resistance buff for 20 {{ item(1001996) }}. With it, the **Dimensional Boundary** at `hem_fild 334/188` takes you to the northern or southern area of `hem_dun02`.
     - At Base Level 260, **Rubiel** (`ch1_sf03 122/255`) gives a one-hour buff for 45 {{ item(1001996) }}. With it, the **Dimensional Boundaries** at `hem_fild 133/337` and `hem_fild 231/299` lead to the Corrupted Geffenia (`ch1_gfn03` and `ch1_gfn01`).
+    - Monsters in these areas drop Illusion Stones (4.18% each per kill): {{ item(1002003) }} and {{ item(1002004) }} in `hem_dun02`, {{ item(1002005) }} and {{ item(1002006) }} in `ch1_gfn01` and `ch1_gfn03`.
 - **Zero Cell**, below.
 
 ## Zero Cell extension
