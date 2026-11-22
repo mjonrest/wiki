@@ -27,6 +27,14 @@ $1"
 # Files that belong to the site: everything tracked except the sources, workflows and git files.
 site() { grep -vE '^(source/|\.github/|\.git|\.game-commit$|\.deployed-commit$)' || true; }
 
+# Log in once first, so a host that is down, blocks the runner or rejects the login fails in about a minute with
+# lftp's own error message, instead of being read as "no upload commit" and retried for another 15 minutes.
+if ! ftp "set net:max-retries 2; cls -1 >/dev/null" 2>"$tmp/login.err"; then
+  echo "::error::Could not connect or log in to the FTP host: $(tr '\n' ' ' < "$tmp/login.err")"
+  echo "Check that the host is up, that FTP_SERVER, FTP_USERNAME and FTP_PASSWORD still match WinSCP, and that the host's firewall does not block GitHub."
+  exit 1
+fi
+
 old=$(ftp "cat \"$dir/.deployed-commit\"" 2>/dev/null | tr -d '[:space:]' || true)
 if [ -n "$old" ] && git cat-file -e "$old^{commit}" 2>/dev/null || { [ -n "$old" ] && git fetch -q --depth=1 origin "$old" 2>/dev/null; }; then
   echo "Host has $old; uploading changes up to $head"
