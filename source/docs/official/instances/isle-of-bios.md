@@ -17,7 +17,7 @@ Isle of Bios is a short three-island memorial dungeon from the Morocc storyline.
 The leader talks to the Yellow Seed and picks **Create Memorial dungeon**, then everyone talks to it again and picks **Enter Isle of Bios**.
 
 !!! note "Re-entering"
-    For the first 5 minutes after your first entry you can still re-enter (for example after a disconnect). After those 5 minutes, or once you have claimed the reward, the Seed refuses entry until the daily reset. The NPC text says "23 hours", but the lockout actually ends at the next 04:00 reset.
+    For the first 5 minutes after your first entry you can still re-enter (for example after a disconnect). After those 5 minutes, or as soon as Grim Reaper Ankou dies (for everyone inside at that moment), the Seed refuses entry until the daily reset. The NPC text says "23 hours", but the lockout actually ends at the next 04:00 reset.
 
 ### Walkthrough
 
@@ -48,10 +48,11 @@ When Ankou is dead, **each party member** talks to **Vrid** to claim their rewar
 | Reward | Amount |
 |---|---|
 | {{ item(6684) }} | 1 |
+| {{ item(22537) }} | 5, only if you were inside when Ankou died |
 | Instance Points | 20 to 40 (random) |
 
-{{ mob(3029) }} also always drops a {{ item(22537) }} on the ground when it dies, so loot it before talking to Vrid.
-The box gives one random reward; open the item to see what's inside.
+Each character gets the Prize Of Hero once per run. Players who join after Ankou dies get none.
+Ankou no longer drops it on the ground. The box gives one random reward; open the item to see what's inside.
 
 !!! tip "Instance Points"
     Instance Points can be earned once per device for each instance run, up to 1200 per account per day. A rented {{ item(30034) }} adds 50 points per claim. Use `@instancepoints` to see your total.

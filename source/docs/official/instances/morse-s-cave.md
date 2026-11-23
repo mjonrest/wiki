@@ -63,9 +63,11 @@ This works the same way, also for **90 seconds** (a wave about every 12 seconds)
 
 | When | Reward | Who |
 |---|---|---|
+| Using the exit portal after the Necromancer dies | 5 {{ item(22537) }} | Each player who was inside when the Necromancer died, once per character |
 | Using the exit portal after the Necromancer dies | 20 to 40 Instance Points (random) | Each player who uses the portal |
 | Reporting back to the **Senior Tracker** | {{ item(6684) }} x1 (only if you were credited with the second-form Necromancer kill) | Each player |
-| When the second-form Necromancer ({{ mob(3000) }}) dies | 2 {{ item(22537) }} dropped on the ground | Whoever loots them |
+
+The Necromancer no longer drops Prize Of Hero on the ground, and players who join after it dies get none.
 
 Reporting to the Senior Tracker after a run is required either way. It closes your current quest and starts the daily cooldown.
 
