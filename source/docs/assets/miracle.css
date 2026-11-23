@@ -195,6 +195,7 @@
 .cp-sort { display: inline-flex; gap: .35em; align-items: center; margin: .45em 1em 0 0; font-size: .74rem; color: var(--cp-muted); cursor: pointer; }
 .cp-pop-list { overflow: auto; padding: .3em; }
 .cp-opt { display: flex; align-items: center; gap: .4em; width: 100%; padding: .4em .5em; text-align: left; background: none; border: 0; border-radius: .3rem; cursor: pointer; }
+.cp-pop .cp-other { display: flex; align-items: center; gap: .4em; margin: .2em 0; padding: 0 .5em; color: var(--cp-muted); font-size: .74rem; }
 .cp-opt:nth-child(even) { background: var(--cp-card); }
 .cp-opt:hover, .cp-opt:focus { background: var(--cp-hover); }
 .cp-opt-name { flex: 1; min-width: 0; }

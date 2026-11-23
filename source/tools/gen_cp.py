@@ -28,8 +28,9 @@ from collections import defaultdict
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from rodb import ROOT  # noqa: E402
+import equip_check  # noqa: E402
 
-VERSION = 1
+VERSION = 2  # 2: who can wear an item follows the map server (equip_check.py)
 TOOLS = os.path.join(ROOT, "tools", "combat-power")
 HERE = os.path.dirname(os.path.abspath(__file__))
 SITE_ROOT = os.path.dirname(os.path.dirname(HERE))  # the repository root holds the last published site
@@ -64,12 +65,13 @@ STONE = [(re.compile(r"\((?:Upper|Top)\)|Upper\b"), 1024), (re.compile(r"\((?:Mi
 def _inputs_checksum():
     """Checksum of every file the data is made from, so an unchanged game reuses the last result."""
     h = hashlib.sha1(str(VERSION).encode())
-    paths = [os.path.join(HERE, "gen_cp.py")]
+    paths = [os.path.join(HERE, "gen_cp.py"), os.path.join(HERE, "equip_check.py")]
     for folder in ("db", "tools/combat-power"):
         for base, dirs, files in os.walk(os.path.join(ROOT, folder)):
             dirs.sort()
             paths += [os.path.join(base, f) for f in sorted(files) if f.endswith((".yml", ".py"))]
-    paths += [os.path.join(ROOT, p) for p in ("src/map/map.hpp", "src/common/mmo.hpp", "npc/scripts_custom.conf",
+    paths += [os.path.join(ROOT, p) for p in ("src/map/map.hpp", "src/common/mmo.hpp", "src/map/script_constants.hpp",
+                                              "src/map/itemdb.hpp", "npc/scripts_custom.conf",
                                               "npc/miracle/jro_enchant.txt", "npc/miracle/follower_enchant.txt")]
     for p in paths:
         if os.path.exists(p):
@@ -233,8 +235,10 @@ def generate():
     b = Builder(cp)
     njobs = len(cp.JOBS)
 
-    def jobmask(it):
-        return sum(1 << i for i, j in enumerate(cp.JOBS) if cp.can_equip(it, j))
+    # The Combat Power tools' can_equip only reads the Jobs names; the server also looks at which job row a name
+    # is on and at Classes, so use its rules here (Star_Emperor boots for Sky Emperor, no Swordman-only gear for
+    # Dragon Knight, ...).
+    jobmask = equip_check.make(ROOT, cp.JOBS)
 
     # ---------------------------------------------------------------- equipment
     eq = []
