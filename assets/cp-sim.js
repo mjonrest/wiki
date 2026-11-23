@@ -218,6 +218,11 @@
   function cpOf(b) { return score(stats(b), b.job).total; }
 
   // ------------------------------------------------------------------ what fits where
+  function jobsOf(mask) {
+    var n = [];
+    D.jobs.forEach(function (j, i) { if (mask & (1 << i)) n.push(j.n); });
+    return n.length === D.jobs.length ? "all jobs" : n.length > 6 ? n.length + " jobs" : n.join(", ");
+  }
   function canDual(j) { return !!DUAL_JOBS[D.jobs[j].n]; }
   function fits(it, key, j) {
     var bit = SLOT[key][2];
@@ -315,7 +320,9 @@
   var pop = null, popClose = null;
   function closePop() { if (pop) { pop.remove(); pop = null; } if (popClose) { document.removeEventListener("mousedown", popClose); popClose = null; } }
   /* rows: [[id, label, extra], ...]; gainOf(id) -> CP change; onPick(id or null) */
-  function openPicker(anchor, title, rows, gainOf, onPick, allowNone, noFilter) {
+  /* others: rows that fit the slot but not the chosen job ([id, label, jobs text]); shown as a note when the
+     search finds them, so an item never just seems to be missing */
+  function openPicker(anchor, title, rows, gainOf, onPick, allowNone, noFilter, others) {
     var filt = HAVE && !noFilter;
     closePop();
     pop = document.createElement("div");
@@ -351,7 +358,18 @@
           '<span class="cp-gain ' + (gn > 0.5 ? "up" : gn < -0.5 ? "down" : "") + '">' + fmt1(gn) + "</span></button>";
       });
       if (hits.length > 80) html += '<p class="cp-more">' + (hits.length - 80) + " more: type to narrow down.</p>";
-      if (!hits.length) html += '<p class="cp-more">Nothing matches.</p>';
+      var elsewhere = q.length && others ? others.filter(function (x) {
+        var t = (x[1] + " " + x[0]).toLowerCase();
+        return q.every(function (w) { return t.indexOf(w) >= 0; });
+      }) : [];
+      if (!hits.length && !elsewhere.length) html += '<p class="cp-more">Nothing matches.</p>';
+      if (elsewhere.length) {
+        html += '<p class="cp-more">Other jobs only (change the job to use them):</p>';
+        elsewhere.slice(0, 8).forEach(function (x) {
+          html += '<p class="cp-more cp-other">' + pic(x[0]) + "<span>" + esc(x[1]) + ' <small class="iid">' + x[0] + "</small> (" + esc(x[2]) + ")</span></p>";
+        });
+        if (elsewhere.length > 8) html += '<p class="cp-more">' + (elsewhere.length - 8) + " more: type to narrow down.</p>";
+      }
       list.innerHTML = html;
     }
     input.addEventListener("input", draw);
@@ -599,9 +617,13 @@
       if (kind === "item") {
         var rows = [];
         if (SLOT[key][2] & COSTUME) rows.push([ANY_COSTUME, "Any costume (no bonus, holds a stone)", ""]);
-        D.items.forEach(function (it) { if (fits(it, key, b.job)) rows.push([it[0], label(it), it[12] === 1 ? it[9] : ""]); });
+        var others = [];
+        D.items.forEach(function (it) {
+          if (fits(it, key, b.job)) rows.push([it[0], label(it), it[12] === 1 ? it[9] : ""]);
+          else if (it[2] & SLOT[key][2]) others.push([it[0], label(it), jobsOf(it[10])]);
+        });
         openPicker(t, SLOT[key][1].toLowerCase(), rows, function (id) { return gainWith(function (c) { equip(c, key, id); }, base); },
-          function (id) { equip(b, key, id); redraw(); }, true);
+          function (id) { equip(b, key, id); redraw(); }, true, false, others);
       } else if (kind === "card") {
         var it = I(s.id), cr = [];
         D.cards.forEach(function (c) { if (cardFits(c, it, key)) cr.push([c[0], c[1], ""]); });
