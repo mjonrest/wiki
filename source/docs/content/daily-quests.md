@@ -18,8 +18,27 @@ Each quest is a random type and a random difficulty:
 - **Hunting** asks for one monster from the hunting list below.
 - **Collecting** asks for one item from the list for that difficulty. The items are taken when you submit.
   **Medium** asks for **two different Monster Souls** instead. Each soul drops (10%) only from its own monster,
-  and only on certain maps: open a soul below to see where it drops.
+  and only on certain maps: open a soul below to see where it drops, or type [`@souls`](../guide/commands.md#souls)
+  to see which of its monsters are alive and when the dead ones respawn.
 - **Instance** counts any instance you clear (party instances count for the whole party).
+
+## Soul guarantee
+
+{% set dn = "npc/miracle/daily_new.txt" %}
+While your current quest is a **Medium** soul quest, your **{{ scalar(dn, "SoulPityKills", "Daily Quest Manager") }}rd kill**
+of one of its soul monsters, on that soul's drop maps, always gives you the soul if you have none of it yet.
+On the kills before that, a message over your head shows how many kills are left.
+
+- It works **once per soul per quest**, so each Medium quest can guarantee both of its souls, even if you get the
+  same soul again in a later quest.
+- Guaranteed souls are **account bound**: they cannot be traded, vended or sold. Normal drops are not bound.
+- If you already carry that soul, no extra one is given.
+
+## Changing a quest
+
+You can **change your current quest {{ scalar(dn, "FreeRerolls", "Daily Quest Manager") }} times a day for free**
+(per account). Pick **Change Quest** at the Daily Quest Manager and you get a different random quest of a random type
+and difficulty. Progress on the old quest is lost. The option is gone once you have used your free changes for the day.
 
 ## Rewards
 

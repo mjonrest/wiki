@@ -36,6 +36,12 @@ Prizes are account bound and announced to the server.
 
 </details>
 
+## MVP Soul Costume Gacha
+
+The [World Boss Merchant](../shops/world-boss-merchant.md#mvp-soul-costume-gacha) has a costume gacha paid with
+{{ item_name(30007) }}: **{{ scalar("npc/miracle/gacha_mvpsoul.txt", "cost", "MvpSoulGacha") }} Souls per pull**, every
+pull wins a random Upper, Mid or Lower costume, and the prizes are not bound.
+
 ## Zeny Gacha Machine
 
 **Location:** {{ npc_where("Zeny Gacha Machine") }} · Quest Room
