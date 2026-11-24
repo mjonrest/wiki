@@ -13,7 +13,7 @@ On top of the standard rAthena player commands, Miracle adds these:
 | `@mystats` | Opens the Player Statistics window with tabs for your stats, Combat Power and every bonus. See [below](#mystats). |
 | `@cp` | Shows your gear's Combat Power (CP), one number for how strong your equipment is. See [below](#cp). |
 | `@alootid2` | Saves up to 10 named autoloot lists and loads one with a single command. See [below](#alootid2). |
-| `@souls` | Lists every Monster Soul with its monsters' maps, which ones are alive and the exact respawn time of the dead ones. See [below](#souls). |
+| `@souls` | Lists every Monster Soul with its monsters' maps, which ones are alive and the exact respawn time of the dead ones. Costs Event Points. See [below](#souls). |
 | `@dummy` | Warps you to the Dummy Punching Bags in Prontera. |
 | `@pvpladder` | Opens the PvP/GvG ladder menu from anywhere. See [PvP & WoE](../content/pvp-woe.md). |
 
@@ -26,6 +26,10 @@ On top of the standard rAthena player commands, Miracle adds these:
 It lists every soul with how many of its monsters are up right now, for example `[3/5 up]`. Pick a soul to see each
 map where it drops, whether each monster there is **Alive** or **Dead**, and the exact server time a dead one
 respawns. The tracker only shows information: it gives nothing and changes nothing.
+
+Each use costs **{{ scalar("npc/miracle/soul_tracker.txt", "soul_cost", "SoulTracker") }} [Event Points](../content/events.md)**.
+The tracker asks before it takes them, and you pay once per opening: you can then look through every soul and
+page as long as the window stays open. Type `@eventjoin` to see how many Event Points you have.
 
 ## @mystats
 
