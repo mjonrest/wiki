@@ -287,7 +287,7 @@ def build(out, dir_urls=True):
             ("B", in_box.get(iid)), ("L", laphine), ("Q", "quest" in kinds), ("I", "instance" in kinds),
             ("C", "cash" in kinds), ("M", "mapdrop" in kinds), ("U", "questdrop" in kinds),
             ("A", "achievement" in kinds), ("T", "attendance" in kinds), ("R", "craft" in kinds),
-            ("F", "reform" in kinds)) if has)
+            ("F", "reform" in kinds), ("G", "gacha" in kinds)) if has)
         jobs = _flags(it.get("Jobs"))
         jobs = "*" if "All" in jobs or (not jobs and t in ("Weapon", "Armor", "ShadowGear")) else ".".join(str(job_pos[j]) for j in jobs if j in job_pos)
         item_index.append([iid, it.get("Name") or it.get("AegisName"), t, it.get("SubType", ""), it.get("Slots", 0),

@@ -18,7 +18,7 @@ Each quest is a random type and a random difficulty:
 - **Hunting** asks for one monster from the hunting list below.
 - **Collecting** asks for one item from the list for that difficulty. The items are taken when you submit.
   **Medium** asks for **two different Monster Souls** instead. Each soul drops (10%) only from its own monster,
-  and only on certain maps: open a soul below to see where it drops, or type [`@souls`](../guide/commands.md#souls)
+  on the maps where that monster spawns: open a soul below to see where it drops, or type [`@souls`](../guide/commands.md#souls)
   to see which of its monsters are alive and when the dead ones respawn.
 - **Instance** counts any instance you clear (party instances count for the whole party).
 
