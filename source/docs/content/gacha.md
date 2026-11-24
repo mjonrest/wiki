@@ -36,6 +36,37 @@ Prizes are account bound and announced to the server.
 
 </details>
 
+## MVP Soul Costume Gacha
+
+The [World Boss Merchant](../shops/world-boss-merchant.md#mvp-soul-costume-gacha) has a costume gacha paid with
+{{ item_name(30007) }}: **{{ scalar("npc/miracle/gacha_mvpsoul.txt", "cost", "MvpSoulGacha") }} Souls per pull**, every
+pull wins a random Upper, Mid or Lower costume, and the prizes are not bound.
+
+## Which gacha gives which costume
+
+{% set gm = h.top + h.mid + h.low %}
+{% set gg = arrays("npc/miracle/gacha_costume.txt", "Garment_Gacha").garments %}
+{% set ms = arrays("npc/miracle/gacha_mvpsoul.txt", "MvpSoulGacha") %}
+{% set mv = ms.pool_raw_top + ms.pool_raw_mid + ms.pool_raw_low %}
+{% set both = gm | select("in", mv) | list %}
+{% set only_gm = gm | reject("in", mv) | list %}
+
+| | Gacha Machine | MVP Soul Costume Gacha |
+|---|---|---|
+| **Where** | {{ npc_where("Gacha Machine") }} (Quest Room) | [World Boss Merchant](../shops/world-boss-merchant.md#mvp-soul-costume-gacha) |
+| **Paid with** | Activity Points (10 per headgear play, 30 per garment play) | {{ scalar("npc/miracle/gacha_mvpsoul.txt", "cost", "MvpSoulGacha") }} {{ item_name(30007) }} per pull |
+| **Win chance** | 10% headgear, 5% garment | Every pull wins |
+| **Plays** | 10 a day per account | No limit |
+| **Prizes** | {{ gm|length }} headgear + {{ gg|length }} garments, **account bound** | {{ mv|length }} headgear (no garments), **not bound** |
+
+- **{{ both|length }} costumes** are in both machines.
+- **{{ only_gm|length }}** only in the Gacha Machine{% if only_gm %}: {{ items_list(only_gm) }}{% endif %}.
+- **{{ mv|length - both|length }}** only in the MVP Soul Costume Gacha.
+- Costume garments only come from the Gacha Machine.
+- To check one costume, open it in the [item database](../db/items.md): **How to get → Gacha machine** lists every
+  machine that can give it, which slot list it is in and the cost. You can also filter the item database by
+  **Gacha machine**.
+
 ## Zeny Gacha Machine
 
 **Location:** {{ npc_where("Zeny Gacha Machine") }} · Quest Room

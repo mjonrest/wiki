@@ -133,7 +133,7 @@
   // Ways to get an item, as letters in column 12 of items.json (tools/gen_db.py).
   var HOW = { D: "Monster drop", S: "NPC shop", X: "Barter / exchange", N: "NPC or quest reward", E: "Script event",
     B: "Box or album", L: "Laphine synthesis", Q: "Quest Shop", I: "Instance reward", C: "Cash Shop", M: "Map drop",
-    U: "Quest drop", A: "Achievement", T: "Attendance", R: "Crafting", F: "Reform" };
+    U: "Quest drop", A: "Achievement", T: "Attendance", R: "Crafting", F: "Reform", G: "Gacha machine" };
   function howList(code) {
     return code ? code.split("").map(function (c) { return HOW[c] || c; }) : ["No known source"];
   }
@@ -492,6 +492,11 @@
       if (pts) out.push(num(pts) + " " + esc(ptsName || "Cash Points"));
       return out.join("<br>") || "free";
     };
+    if (list("gacha").length) h += '<h3>Gacha machine</h3><p><small>A random prize from these machines. Every prize in a list has the same chance (see <a href="' +
+      guideUrl("content/gacha.md") + '">Gacha Machines</a>).</small></p>' + table(["Machine", "Slot", "Cost", "Prize"], list("gacha").map(function (r) {
+        var g = r[4].split("#");
+        return ['<a href="' + guideUrl(g[0]) + (g[1] ? "#" + g[1] : "") + '">' + esc(r[1]) + "</a>", esc(r[2]) + " <small>(1 of " + num(r[6]) + ")</small>", esc(r[3]), esc(r[5])];
+      }));
     if (list("quest").length) h += '<h3>Quest shops</h3><p><small>Trade in the materials at these NPCs (the main one is the <a href="' + guideUrl("shops/quest-shop.md") +
       '">Quest Shop</a>).</small></p>' + table(["NPC", "Tab", "You get", "Costs"], list("quest").map(function (r) { return [esc(r[6] || "Quest Shop"), esc(r[1]), r[2], costList(r[3], r[4], r[5], r[7])]; }));
     if (list("instance").length) h += "<h3>Instance reward</h3><p><small>Handed out by the NPCs of these instances (as a reward or a quest item).</small></p>" +

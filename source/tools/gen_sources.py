@@ -152,6 +152,35 @@ def reform(out, by_aegis):
 KILL_BONUS_NPCS = ("MobExtraDrops", "MobDropModifier")
 
 
+# Costume gacha machines: (script, NPC/function block, [(array name, slot label)], machine, price, guide page, note).
+# The prize lists are read straight from the scripts, so new costumes show up on their own.
+GACHAS = [
+    ("npc/miracle/gacha_costume.txt", "Claw_Machine_Gacha", [("top", "Upper"), ("mid", "Mid"), ("low", "Lower")],
+     "Gacha Machine: Costume Headgear", "10 Activity Points per play, 10% win", "content/gacha.md", "account bound"),
+    ("npc/miracle/gacha_costume.txt", "Garment_Gacha", [("garments", "Garment")],
+     "Gacha Machine: Costume Garment", "30 Activity Points per play, 5% win", "content/gacha.md", "account bound"),
+    ("npc/miracle/gacha_mvpsoul.txt", "MvpSoulGacha", [("pool_raw_top", "Upper"), ("pool_raw_mid", "Mid"), ("pool_raw_low", "Lower")],
+     "MVP Soul Costume Gacha (World Boss Merchant)", "{cost} MVP Soul per pull, every pull wins",
+     "shops/world-boss-merchant.md#mvp-soul-costume-gacha", "not bound"),
+]
+
+
+def gachas(out):
+    """["gacha", machine, slot, price, guide page, note, pool size] for every costume a loaded gacha machine can give."""
+    import main
+    loaded = set(main.enabled_scripts())
+    for rel, block, pools, name, price, guide, note in GACHAS:
+        if rel not in loaded:
+            continue
+        arr = main.arrays(rel, block)
+        cost = main.scalar(rel, "cost", block)
+        price_txt = price.format(cost=f"{cost:,}" if cost else "?")
+        for var, slot in pools:
+            ids = [i for i in arr.get(var, []) if isinstance(i, int)]
+            for iid in dict.fromkeys(ids):
+                out[iid].append(["gacha", name, slot, price_txt, guide, note, len(set(ids))])
+
+
 def kill_bonus(mobs):
     """Miracle's OnNPCKillEvent extra drops (npc/miracle/mob_drop.txt): [(mob id, item id, chance in 1/10000)]."""
     out = []
@@ -185,6 +214,6 @@ def build(items, by_aegis, mobs):
     for step in (lambda: quest_shop(out), lambda: instances(out), lambda: cash_shop(out, by_aegis),
                  lambda: map_drops(out, by_aegis), lambda: quest_drops(out, by_aegis, mob_by_aegis),
                  lambda: achievements(out, by_aegis), lambda: attendance(out, by_aegis), lambda: crafting(out, items),
-                 lambda: reform(out, by_aegis)):
+                 lambda: reform(out, by_aegis), lambda: gachas(out)):
         step()
     return {k: v for k, v in out.items() if k in items}
