@@ -398,9 +398,13 @@ def slot_enchanter(rel, npc, title_prefix="Group"):
     """Slot enchanters: GroupItemIDn + GroupSlot{4,3,2}_n pools (+ optional GroupRefinen: slot 4, 3, 2)."""
     arr = arrays(rel, npc)
     out = []
-    n = 1
-    while f"GroupItemID{n}" in arr:
+    # Every group number the script defines: a group can be commented out (e.g. JRO group 222),
+    # so walking 1, 2, 3... until the first missing number would drop all later groups.
+    groups = sorted(int(k[11:]) for k in arr if k.startswith("GroupItemID") and k[11:].isdigit())
+    for n in groups:
         ids = arr[f"GroupItemID{n}"]
+        if not ids:
+            continue
         refine = arr.get(f"GroupRefine{n}")
         rows = []
         for k, slot in enumerate((4, 3, 2) if refine else (2, 3, 4)):
@@ -415,8 +419,7 @@ def slot_enchanter(rel, npc, title_prefix="Group"):
         header = ["Slot"] + (["Refine"] if refine else []) + ["Possible enchants (equal chance)"]
         body = "**Equipment:** " + items_list(ids) + "\n\n" + _table(header, rows)
         out.append((_slot_category(ids[0]), _details(f"{names}", body)))
-        n += 1
-    if not any(arr.get(f"GroupRefine{i}") for i in range(1, n)):
+    if not any(arr.get(f"GroupRefine{i}") for i in groups):
         return "\n".join(b for _, b in out)
     md = []
     for cat in SLOT_CATEGORIES:
